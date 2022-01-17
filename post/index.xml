@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Projects on Mushfiqur Rahman</title>
+    <title>Projects on Md. Mushfiqur Rahman</title>
     <link>https://Mushfiqur-Rahman-Robin.github.io/post/</link>
-    <description>Recent content in Projects on Mushfiqur Rahman</description>
+    <description>Recent content in Projects on Md. Mushfiqur Rahman</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 02 Mar 2020 12:00:00 -0500</lastBuildDate><atom:link href="https://Mushfiqur-Rahman-Robin.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bangla Movie Recommendation System</title>
+      <link>https://Mushfiqur-Rahman-Robin.github.io/post/project-7/</link>
+      <pubDate>Sat, 25 Dec 2021 09:10:00 -0800</pubDate>
+      
+      <guid>https://Mushfiqur-Rahman-Robin.github.io/post/project-7/</guid>
+      <description>There has been a lot of recommendation system available for English movie recommendation. Although there are some streaming services like Hoichoi, Bioscope, etc. are available for Bangla contents, there is a scarcity of recommendation system for suggesting Bangla movies. This project was part of my Software Engineering course. I had very little amount of time to put in this work. As a result, this project still requires some work to be done.</description>
+    </item>
+    
     <item>
       <title>Natural Language Processing</title>
       <link>https://Mushfiqur-Rahman-Robin.github.io/post/project-6/</link>
