@@ -44,6 +44,7 @@ jobs:
         run: |
           uv venv
           uv sync
+          uv sync --extra dev
 
       - name: Run linter (Ruff)
         working-directory: ./backend
@@ -86,7 +87,7 @@ jobs:
           DEBUG: "False"
         run: |
           source .venv/bin/activate
-          pytest api/tests.py
+          pytest --ds=core.settings api/tests.py
 
   frontend-checks:
     runs-on: ubuntu-latest
