@@ -16,9 +16,10 @@ jobs:
       postgres:
         image: postgres:15-alpine
         env:
-          POSTGRES_DB: test_db
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_password
+          # Use GitHub Secrets for sensitive values
+          POSTGRES_DB: ${{ secrets.DB_TEST_NAME }}
+          POSTGRES_USER: ${{ secrets.DB_TEST_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
@@ -33,7 +34,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Install uv
         run: pip install uv
@@ -53,8 +54,9 @@ jobs:
       - name: Run tests (Pytest)
         working-directory: ./backend
         env:
-          DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
-          SECRET_KEY: test-secret-key
+          # Construct DATABASE_URL using secrets
+          DATABASE_URL: postgres://${{ secrets.DB_TEST_USER }}:${{ secrets.DB_TEST_PASSWORD }}@localhost:5432/${{ secrets.DB_TEST_NAME }}
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY_TEST }} # Use GitHub Secret
           DEBUG: "False"
         run: pytest
 
