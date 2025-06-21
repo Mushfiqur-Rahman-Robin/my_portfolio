@@ -35,3 +35,10 @@ backend/.coverage
 # IDE
 .vscode/
 .idea/
+
+# others
+codetotext.py
+codebase_content.txt
+
+# ruff cache
+.ruff_cache/

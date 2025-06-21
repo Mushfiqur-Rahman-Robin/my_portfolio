@@ -1,25 +1,15 @@
-version: "3.8"
-
 services:
-  db:
-    image: postgres:15-alpine
-    container_name: portfolio_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=portfolio_user
-      - POSTGRES_PASSWORD=portfolio_password
-      - POSTGRES_DB=portfolio_db
-    ports:
-      - "5432:5432"
-
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: portfolio_backend
-    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn core.wsgi:application --config gunicorn.conf.py
     volumes:
-      - ./backend:/app
+      - static_volume:/app/staticfiles
       - media_volume:/app/media
+    expose:
+      - 8000
     ports:
       - "8000:8000"
     env_file:
@@ -28,19 +18,27 @@ services:
       - db
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.dev
+    build: ./frontend
     container_name: portfolio_frontend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     ports:
-      - "5173:5173"
+      - "5173:80"
+    volumes:
+      - static_volume:/usr/share/nginx/html/static
+      - media_volume:/usr/share/nginx/html/media
+    depends_on:
+      - backend  # Add dependency to ensure backend is up
+
+  db:
+    image: postgres:15-alpine
+    container_name: portfolio_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
     environment:
-      - VITE_API_BASE_URL=http://localhost:8000/api
-      - CHOKIDAR_USEPOLLING=true
+      - POSTGRES_USER=portfolio
+      - POSTGRES_PASSWORD=portfolio
+      - POSTGRES_DB=portfolio_db
 
 volumes:
   postgres_data:
+  static_volume:
   media_volume:

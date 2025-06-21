@@ -4,6 +4,10 @@ asgiref==3.8.1
     # via
     #   django
     #   django-cors-headers
+attrs==25.3.0
+    # via
+    #   jsonschema
+    #   referencing
 dj-database-url==3.0.0
     # via backend (pyproject.toml)
 django==5.2.3
@@ -12,19 +16,58 @@ django==5.2.3
     #   dj-database-url
     #   django-cors-headers
     #   djangorestframework
+    #   drf-spectacular
 django-cors-headers==4.7.0
     # via backend (pyproject.toml)
 djangorestframework==3.16.0
+    # via
+    #   backend (pyproject.toml)
+    #   drf-spectacular
+drf-spectacular==0.28.0
     # via backend (pyproject.toml)
 gunicorn==23.0.0
     # via backend (pyproject.toml)
+inflection==0.5.1
+    # via drf-spectacular
+iniconfig==2.1.0
+    # via pytest
+jsonschema==4.24.0
+    # via drf-spectacular
+jsonschema-specifications==2025.4.1
+    # via jsonschema
 packaging==25.0
-    # via gunicorn
+    # via
+    #   gunicorn
+    #   pytest
+pathspec==0.12.1
+    # via backend (pyproject.toml)
+pillow==11.2.1
+    # via backend (pyproject.toml)
+pluggy==1.6.0
+    # via pytest
 psycopg2-binary==2.9.10
+    # via backend (pyproject.toml)
+pygments==2.19.1
+    # via pytest
+pytest==8.4.1
     # via backend (pyproject.toml)
 python-decouple==3.8
     # via backend (pyproject.toml)
+pyyaml==6.0.2
+    # via drf-spectacular
+referencing==0.36.2
+    # via
+    #   jsonschema
+    #   jsonschema-specifications
+rpds-py==0.25.1
+    # via
+    #   jsonschema
+    #   referencing
 sqlparse==0.5.3
     # via django
 typing-extensions==4.14.0
-    # via dj-database-url
+    # via
+    #   dj-database-url
+    #   referencing
+uritemplate==4.2.0
+    # via drf-spectacular

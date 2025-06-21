@@ -10,8 +10,12 @@ dependencies = [
     "django>=5.2.3",
     "django-cors-headers>=4.7.0",
     "djangorestframework>=3.16.0",
+    "drf-spectacular>=0.28.0",
     "gunicorn>=23.0.0",
+    "pathspec>=0.12.1",
+    "pillow>=11.2.1",
     "psycopg2-binary>=2.9.10",
+    "pytest>=8.4.1",
     "python-decouple>=3.8",
 ]
 
@@ -24,8 +28,15 @@ dev = [
 ]
 
 [tool.ruff]
-line-length = 88
+line-length = 112
 select = ["E", "F", "W", "I"]
 
 [tool.ruff.format]
 quote-style = "double"
+
+[tool.black]
+line-length = 112
+
+[tool.isort]
+profile = "black"
+line_length = 112
