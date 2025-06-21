@@ -55,6 +55,11 @@ jobs:
         working-directory: ./backend
         run: ruff format --check .
 
+      - name: Install test dependencies
+        working-directory: ./backend
+        run: |
+          uv pip install pytest
+
       - name: Run tests (Pytest)
         working-directory: ./backend
         env:
@@ -62,7 +67,9 @@ jobs:
           DATABASE_URL: postgres://${{ secrets.DB_TEST_USER }}:${{ secrets.DB_TEST_PASSWORD }}@localhost:5432/${{ secrets.DB_TEST_NAME }}
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY_TEST }} # Use GitHub Secret
           DEBUG: "False"
-        run: pytest
+        run: |
+          source .venv/bin/activate
+          pytest
 
   frontend-checks:
     runs-on: ubuntu-latest
