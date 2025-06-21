@@ -42,3 +42,4 @@ codebase_content.txt
 
 # ruff cache
 .ruff_cache/
+.mypy_cache/
