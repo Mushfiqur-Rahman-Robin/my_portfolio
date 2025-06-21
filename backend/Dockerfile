@@ -1,55 +1,51 @@
-FROM python:3.12-slim
+# multi stage image build
 
-# Set environment variables to ensure Python outputs logs immediately
-ENV PYTHONFAULTHANDLER=1
-# Disable bytecode generation to save space
-ENV PYTHONDONTWRITEBYTECODE=1
-# Disable buffering of stdout and stderr to ensure logs are output immediately
-ENV PYTHONUNBUFFERED=1
-
-# Set the working directory to /app
+# ────────────────
+# Stage 1: builder
+# ────────────────
+FROM python:3.12-slim AS builder
 WORKDIR /app
 
-# Install runtime OS tools needed later (curl for HEALTHCHECK)
+# Tools needed at *build* time
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
+    curl postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
+
+COPY requirements.txt .
+RUN uv venv /opt/venv
+RUN uv pip install --python /opt/venv/bin/python --no-cache-dir -r requirements.txt
+
+COPY . .
+RUN /opt/venv/bin/python manage.py collectstatic --noinput
+RUN /opt/venv/bin/python -m compileall .
+
+# ────────────────
+# Stage 2: runtime
+# ────────────────
+FROM python:3.12-slim AS runtime
+WORKDIR /app
+
+# Runtime-only tools we still need
+RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Install uv
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH"
 
-# Add uv's installation directory to PATH
-ENV PATH="/root/.local/bin:$PATH"
+# Bring in the venv and code from the builder
+COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder /app /app
 
-# Copy requirements.txt to /app
-COPY requirements.txt .
-
-# Create virtual environment at /opt/venv (outside /app to avoid volume mount override)
-RUN uv venv /opt/venv
-
-# Install dependencies (ensure gunicorn is in requirements.txt!)
-RUN uv pip install --python /opt/venv/bin/python --no-cache-dir -r requirements.txt
-
-# Update PATH to include the virtual environment's bin directory
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Copy the application code to /app
-COPY . .
-
-# Collect all static files into STATIC_ROOT
-RUN python manage.py collectstatic --noinput
-
-# Create a gunicorn configuration file
-COPY gunicorn.conf.py .
-
-# Copy entrypoint script and make it executable
+# Entrypoint
 COPY entrypoint.sh .
 RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 8000
-
-# Use entrypoint.sh as the entrypoint, with CMD as the default argument
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "90"]
 
