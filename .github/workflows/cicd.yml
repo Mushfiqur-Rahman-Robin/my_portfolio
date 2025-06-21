@@ -66,6 +66,17 @@ jobs:
           source .venv/bin/activate
           python manage.py migrate
 
+      - name: Set up Django
+        working-directory: ./backend
+        env:
+          DJANGO_SETTINGS_MODULE: core.settings
+          DATABASE_URL: postgres://${{ secrets.DB_TEST_USER }}:${{ secrets.DB_TEST_PASSWORD }}@localhost:5432/${{ secrets.DB_TEST_NAME }}
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY_TEST }}
+          DEBUG: "False"
+        run: |
+          source .venv/bin/activate
+          python manage.py check
+
       - name: Run tests (Pytest)
         working-directory: ./backend
         env:
