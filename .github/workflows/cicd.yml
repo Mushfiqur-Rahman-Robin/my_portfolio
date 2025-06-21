@@ -47,7 +47,9 @@ jobs:
 
       - name: Run linter (Ruff)
         working-directory: ./backend
-        run: ruff check .
+        run: |
+          curl -LsSf https://astral.sh/ruff/install.sh | sh
+          ruff check .
 
       - name: Run formatter check (Ruff)
         working-directory: ./backend
