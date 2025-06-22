@@ -13,5 +13,5 @@ router.register(r"achievements", AchievementViewSet, basename="achievement")
 
 urlpatterns = [
     # Only include your API endpoints here
-    path("", include(router.urls)),
+    path("v1/", include(router.urls)),
 ]
