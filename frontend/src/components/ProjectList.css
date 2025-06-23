@@ -11,6 +11,40 @@
   color: var(--color-green-accent); /* Green accent for section title */
 }
 
+.tag-filter-section {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--color-white-text);
+}
+
+.tag-filter-section label {
+  font-size: 1.1rem;
+  margin-right: 0.5rem;
+}
+
+.tag-filter-section select {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-subtle);
+  background-color: var(--color-darker-gray-elements);
+  color: var(--color-white-text);
+  font-size: 1rem;
+  cursor: pointer;
+  -webkit-appearance: none; /* Remove default arrow on WebKit browsers */
+  -moz-appearance: none; /* Remove default arrow on Firefox */
+  appearance: none; /* Remove default arrow */
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2C188.4L154.5%2C55.9c-2.8-2.8-6.3-4.2-9.9-4.2c-3.6%2C0-7.1%2C1.4-9.9%2C4.2L5.4%2C188.4c-4.9%2C4.9-4.9%2C12.8%2C0%2C17.7c2.4%2C2.4%2C5.6%2C3.7%2C8.8%2C3.7c3.2%2C0%2C6.4-1.3%2C8.8-3.7l124.9-124.9l124.9%2C124.9c2.4%2C2.4%2C5.6%2C3.7%2C8.8%2C3.7c3.2%2C0%2C6.4-1.3%2C8.8-3.7C292.4%2C201.2%2C292.4%2C193.3%2C287%2C188.4z%22%2F%3E%3C%2Fsvg%3E'); /* Custom arrow */
+  background-repeat: no-repeat;
+  background-position: right 0.7em top 50%, 0 0;
+  background-size: 0.65em auto, 100%;
+}
+
+.tag-filter-section select:focus {
+  outline: 4px auto var(--color-green-accent);
+  border-color: var(--color-green-accent);
+}
+
+
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -81,11 +115,21 @@
 }
 
 .project-tags {
-  font-style: italic;
-  font-size: 0.9rem;
-  color: #888; /* Can keep a slightly different gray for tags */
+  display: flex; /* Display tags as flex items */
+  flex-wrap: wrap;
+  gap: 0.5rem; /* Space between tag badges */
   margin-top: 1rem;
 }
+
+.tag-badge {
+  background-color: #333; /* Dark background for tags */
+  color: var(--color-white-text);
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  font-size: 0.85rem;
+  border: 1px solid #555;
+}
+
 
 .error {
   color: #ff6b6b; /* Red for errors */

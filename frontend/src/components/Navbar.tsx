@@ -25,6 +25,11 @@ const Navbar: React.FC = () => {
             </Link>
           </li>
           <li className="nav-item">
+            <Link to="/resume" className="nav-links"> {/* New: Resume link */}
+              Resume
+            </Link>
+          </li>
+          <li className="nav-item">
             <Link to="/contact" className="nav-links">
               Contact Me
             </Link>

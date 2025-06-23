@@ -1,0 +1,54 @@
+/* frontend/src/pages/Resume.css */
+.resume-container {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.resume-container h1 {
+  font-size: 3rem;
+  color: var(--color-green-accent);
+  margin-bottom: 2rem;
+}
+
+.loading-message, .no-resume-found {
+  font-size: 1.2rem;
+  color: var(--color-light-gray-text);
+  margin-top: 2rem;
+}
+
+.resume-viewer {
+  background-color: var(--color-darker-gray-elements);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  overflow: hidden; /* Ensures iframe respects border-radius */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.resume-viewer iframe {
+  border: none;
+  width: 100%;
+  min-height: 700px; /* Base height, adjust as needed */
+  background-color: #fff; /* Ensure white background for PDF viewer */
+}
+
+.download-text {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  color: var(--color-light-gray-text);
+}
+
+.download-text a {
+  color: var(--color-green-accent);
+  font-weight: bold;
+}
+
+.error {
+  color: #ff6b6b;
+  margin-bottom: 1rem;
+}

@@ -7,8 +7,8 @@ import tseslint from 'typescript-eslint'
 export default tseslint.config(
   { ignores: ['dist'] },
   {
+    files: ['**/*.{ts,tsx}', '!vite.config.ts'],
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
@@ -32,4 +32,15 @@ export default tseslint.config(
       ],
     },
   },
-)
+  {
+    files: ['vite.config.ts'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.node,
+      parserOptions: {
+        project: './tsconfig.node.json',
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+);
