@@ -1,4 +1,5 @@
-import { useState } from 'react'; // Keep only specific hooks
+import { useState } from 'react';
+import axios from 'axios'; // Ensure axios is imported
 import './Contact.css';
 
 const Contact: React.FC = () => {
@@ -18,17 +19,17 @@ const Contact: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('Sending...');
+    setStatus('Sending message...');
     try {
-      // In a real application, you would send this to your backend
-      // For now, we'll simulate a successful submission.
-      console.log('Form Data Submitted:', formData);
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      // Real API call to your backend
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}messages/`, formData);
+      console.log('Message sent successfully:', response.data);
       setStatus('Message sent successfully!');
       setFormData({ name: '', email: '', message: '' }); // Clear form
-    } catch (error) {
+    } catch (err) {
+      console.error('Contact form submission error:', err);
+      // More detailed error handling could check err.response.data for specific backend errors
       setStatus('Failed to send message. Please try again later.');
-      console.error('Contact form submission error:', error);
     }
   };
 

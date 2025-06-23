@@ -1,0 +1,142 @@
+/* frontend/src/pages/ProjectDetail.css */
+.project-detail-container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: var(--color-darker-gray-elements);
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.project-detail-container .project-title {
+  font-size: 3rem;
+  color: var(--color-green-accent);
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 10px rgba(110, 230, 78, 0.5);
+}
+
+.project-main-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain; /* Adjust as needed: cover or contain */
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.project-description {
+  font-size: 1.1rem;
+  color: var(--color-light-gray-text);
+  line-height: 1.8;
+  margin-bottom: 2.5rem;
+  text-align: left;
+}
+
+.project-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Center meta items horizontally */
+  gap: 1rem 2rem; /* Row gap and column gap */
+  margin-bottom: 2.5rem;
+  padding: 1rem 0;
+  border-top: 1px dashed var(--color-border-subtle);
+  border-bottom: 1px dashed var(--color-border-subtle);
+}
+
+.project-meta strong {
+  color: var(--color-white-text);
+}
+
+.project-tags-detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Re-using existing tag-badge style from ProjectList.css / Home.css */
+.tag-badge {
+  background-color: var(--color-green-accent); /* Green background for tags */
+  color: var(--color-white-text); /* White text on tags */
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  font-size: 0.85rem;
+  border: 1px solid #55c43d; /* Slightly darker green border */
+}
+
+.project-created-at {
+  color: var(--color-light-gray-text);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.project-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.project-action-btn {
+  /* Re-using general btn styles from Home.css */
+  padding: 0.8rem 1.8rem;
+  font-size: 1.05rem;
+  text-decoration: none;
+}
+
+/* Example of overriding general button style for ProjectDetail's specific buttons if needed */
+.project-actions .btn.primary {
+  /* Specific primary button style */
+}
+.project-actions .btn.secondary {
+  /* Specific secondary button style */
+}
+
+.back-link {
+  margin-top: 2rem;
+}
+
+.back-link .btn {
+  background-color: transparent;
+  color: var(--color-green-accent);
+  border: 2px solid var(--color-green-accent);
+  padding: 0.7rem 1.5rem;
+}
+
+.back-link .btn:hover {
+  background-color: var(--color-green-accent);
+  color: var(--color-black-background);
+}
+
+.loading-message, .no-project-found {
+  font-size: 1.2rem;
+  color: var(--color-light-gray-text);
+  margin-top: 2rem;
+}
+.error {
+  color: #ff6b6b; /* Red for errors */
+}
+
+@media (max-width: 768px) {
+  .project-detail-container {
+    padding: 1rem;
+  }
+  .project-detail-container .project-title {
+    font-size: 2.2rem;
+  }
+  .project-meta {
+    flex-direction: column;
+    align-items: flex-start; /* Align left for readability on small screens */
+    padding: 1rem;
+  }
+  .project-actions {
+    flex-direction: column;
+  }
+  .project-action-btn {
+    width: 100%; /* Make buttons full width */
+  }
+}

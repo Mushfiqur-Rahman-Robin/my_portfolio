@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom'; // Import Link for navigating to detail page
 import './ProjectList.css';
 
 interface Project {
@@ -21,11 +22,10 @@ interface Tag {
 
 const ProjectList: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [allTags, setAllTags] = useState<Tag[]>([]); // To store all available tags
-  const [selectedTag, setSelectedTag] = useState<string>(''); // For filtering
+  const [allTags, setAllTags] = useState<Tag[]>([]);
+  const [selectedTag, setSelectedTag] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
-  // Effect to fetch all tags
   useEffect(() => {
     const fetchTags = async () => {
       try {
@@ -38,7 +38,6 @@ const ProjectList: React.FC = () => {
     fetchTags();
   }, []);
 
-  // Effect to fetch projects based on selectedTag
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -58,7 +57,7 @@ const ProjectList: React.FC = () => {
 
   return (
     <div className="project-list-container">
-      <h1>My Projects</h1>
+      <h1>All Projects</h1> {/* Changed title */}
 
       <div className="tag-filter-section">
         <label htmlFor="tag-select">Filter by Tag:</label>
@@ -82,7 +81,7 @@ const ProjectList: React.FC = () => {
           projects.map((project) => (
             <div key={project.id} className="project-card">
               <h2>{project.title}</h2>
-              <p>{project.description}</p>
+              <p>{project.description.substring(0, 150)}...</p> {/* Truncate for preview */}
               {project.image && (
                 <img src={project.image} alt={project.title} />
               )}
@@ -93,7 +92,7 @@ const ProjectList: React.FC = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    View Project
+                    View Live
                   </a>
                 )}
                 {project.repo_url && (
@@ -102,7 +101,7 @@ const ProjectList: React.FC = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    View Repository
+                    View Code
                   </a>
                 )}
               </div>
@@ -113,6 +112,9 @@ const ProjectList: React.FC = () => {
                   </span>
                 ))}
               </div>
+              <Link to={`/projects/${project.id}`} className="btn preview-btn"> {/* Link to detail page */}
+                Learn More
+              </Link>
             </div>
           ))
         ) : (

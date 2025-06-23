@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Resume.css';
 
 interface ResumeFile {
   id: string;
   title: string;
-  pdf_file: string; // URL to the PDF file
+  pdf_file: string; // Full URL to the PDF file
   uploaded_at: string;
 }
 
@@ -18,9 +18,11 @@ const Resume: React.FC = () => {
     const fetchResume = async () => {
       try {
         // Fetch the latest resume (assuming backend orders by uploaded_at desc)
+        // Adjust this if your backend uses a different way to get the "active" resume
         const response = await axios.get<ResumeFile[]>(`${import.meta.env.VITE_API_URL}resumes/`);
         if (response.data && response.data.length > 0) {
-          setResume(response.data[0]); // Get the latest one
+          // Assuming the latest resume is the first one if sorted by uploaded_at descending
+          setResume(response.data[0]);
         } else {
           setError("No resume found. Please upload one via Django admin.");
         }
@@ -48,7 +50,17 @@ const Resume: React.FC = () => {
       {error && <p className="error">{error}</p>}
       {resume ? (
         <div className="resume-viewer">
-          {/* Using iframe for PDF display - widely supported and simple */}
+          {/* Download button in the top right corner */}
+          <a
+            href={resume.pdf_file}
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+            className="download-pdf-button" // New class for styling
+          >
+            Download PDF
+          </a>
+          {/* Using iframe for PDF display */}
           <iframe
             src={resume.pdf_file}
             title={resume.title}
