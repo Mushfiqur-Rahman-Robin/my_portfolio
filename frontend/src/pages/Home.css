@@ -1,0 +1,121 @@
+/* frontend/src/pages/Home.css */
+.home-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.hero-section {
+  background-color: var(--color-darker-gray-elements); /* Darker gray for hero background */
+  padding: 4rem 2rem;
+  border-radius: 10px;
+  margin-bottom: 3rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+}
+
+.hero-section h1 {
+  font-size: 3.5rem;
+  color: var(--color-green-accent); /* Green accent for hero title */
+  margin-bottom: 1rem;
+}
+
+.hero-section p {
+  font-size: 1.3rem;
+  color: var(--color-light-gray-text); /* Light gray for hero text */
+  margin-bottom: 2rem;
+}
+
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.9rem 2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.btn.primary {
+  background-color: var(--color-green-accent); /* Green primary button */
+  color: var(--color-black-background); /* Black text */
+  border: 2px solid var(--color-green-accent);
+}
+
+.btn.primary:hover {
+  background-color: #55c43d; /* Slightly darker green on hover */
+  border-color: #55c43d;
+  transform: translateY(-2px);
+}
+
+.btn.secondary {
+  background-color: transparent;
+  color: var(--color-green-accent); /* Green outline, green text */
+  border: 2px solid var(--color-green-accent);
+}
+
+.btn.secondary:hover {
+  background-color: var(--color-green-accent); /* Green background on hover */
+  color: var(--color-black-background); /* Black text on hover */
+  transform: translateY(-2px);
+}
+
+.highlights-section {
+  margin-bottom: 3rem;
+}
+
+.highlights-section h2 {
+  font-size: 2.5rem;
+  color: var(--color-green-accent); /* Green accent for section title */
+  margin-bottom: 2.5rem;
+}
+
+.highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.highlight-card {
+  background-color: var(--color-darker-gray-elements); /* Darker gray for card background */
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4); /* Stronger shadow */
+  text-align: left;
+}
+
+.highlight-card h3 {
+  color: var(--color-white-text); /* White heading */
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.highlight-card p {
+  color: var(--color-light-gray-text); /* Light gray text */
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-section p {
+    font-size: 1rem;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .highlights-section h2 {
+    font-size: 2rem;
+  }
+}

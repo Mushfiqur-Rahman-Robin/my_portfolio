@@ -1,11 +1,22 @@
+/* frontend/src/index.css */
+
+/* Define CSS Variables for your color palette */
 :root {
+  /* Colors from your reference image */
+  --color-black-background: #0d0d0d; /* Slightly off-black for depth */
+  --color-green-accent: #6ee64e; /* The specific green from the image */
+  --color-white-text: #ffffff;
+  --color-light-gray-text: rgba(255, 255, 255, 0.87); /* Existing general text color */
+  --color-darker-gray-elements: #1a1a1a; /* For card backgrounds, inputs */
+  --color-border-subtle: #333; /* For subtle borders */
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: dark; /* Explicitly set dark mode */
+  color: var(--color-light-gray-text);
+  background-color: var(--color-black-background);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,28 +24,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* General Link Styling (updated to accent green) */
 a {
   font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  color: var(--color-green-accent); /* Use your new green */
+  text-decoration: none; /* No underline by default */
 }
 a:hover {
-  color: #535bf2;
+  color: var(--color-green-accent); /* Keep the same for hover or slightly lighter */
+  text-decoration: underline; /* Add underline on hover for clarity */
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
+/* General Button Styling (updated to match concept) */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -42,19 +43,35 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--color-green-accent); /* Green button background */
+  color: var(--color-black-background); /* Black text on green button */
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: background-color 0.25s, border-color 0.25s, color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  background-color: #55c43d; /* Slightly darker green on hover */
+  border-color: #55c43d;
+  color: var(--color-black-background);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 4px auto var(--color-green-accent); /* Green focus outline */
 }
 
-@media (prefers-color-scheme: light) {
+body {
+  margin: 0;
+  display: flex; /* Kept for flex layout from App.css */
+  place-items: center; /* Kept for initial centering from App.css, adjust if needed */
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-white-text); /* All headings white by default */
+}
+
+/* Remove light scheme override as you want a consistent dark theme */
+/* @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
     background-color: #ffffff;
@@ -65,4 +82,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */
