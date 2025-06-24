@@ -14,6 +14,13 @@ interface Experience {
   display_order: number;
 }
 
+interface PaginationInfo<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
 const ExperienceList: React.FC = () => {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -22,11 +29,29 @@ const ExperienceList: React.FC = () => {
   useEffect(() => {
     const fetchExperiences = async () => {
       try {
-        const response = await axios.get<Experience[]>(`${import.meta.env.VITE_API_URL}experiences/`);
-        setExperiences(response.data);
-      } catch (err) {
-        setError("Failed to fetch professional experiences.");
-        console.error("Experience fetch error:", err);
+        // Use PaginationInfo type now
+        const response = await axios.get<PaginationInfo<Experience>>(
+          `${import.meta.env.VITE_API_URL}experiences/`
+        );
+
+        // If results exist, load them.  Otherwise, clear the existing state.
+        if (response.data && response.data.results) {
+          setExperiences(response.data.results);
+          setError(null); // Clear any previous errors
+        } else {
+          setExperiences([]); // Clear existing if nothing
+          setError("No experiences found in the API response, or 'results' missing.");
+        }
+
+      } catch (err: any) {
+        // Enhanced error handling with AxiosError check
+        if (axios.isAxiosError(err)) {
+          setError(`Failed to fetch experiences. ${err.message}. Status: ${err.response?.status}`);
+          console.error("Experience fetch error (Axios):", err);
+        } else {
+          setError("Failed to fetch experiences. An unexpected error occurred.");
+          console.error("Experience fetch error (Generic):", err);
+        }
       } finally {
         setLoading(false);
       }

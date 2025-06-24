@@ -37,28 +37,33 @@
 }
 
 .skill-bar-container {
-  background-color: #333;
+  /* This container will now be responsible for the full bar background */
+  background-color: var(--color-white-text); /* White background for the empty part */
   border-radius: 10px;
   height: 20px;
   overflow: hidden;
   position: relative;
+  /* Add a subtle border to the container for definition */
+  border: 1px solid var(--color-border-subtle);
 }
 
 .skill-bar-fill {
   height: 100%;
+  /* Use a gradient from green to green for the filled part, so it looks solid green. */
+  /* The width will be controlled by inline style, showing this green portion. */
   background: linear-gradient(
     90deg,
     var(--color-green-accent) 0%,
     #55c43d 100%
   );
   border-radius: 10px;
-  width: 0;
-  animation: fill-bar 1.5s ease-out forwards;
+  /* Removed animation and initial width here */
+  transition: width 1.5s ease-out; /* Smooth transition for width change */
   position: relative;
   overflow: hidden;
 }
 
-/* Inner glow effect for electric bar */
+/* Inner glow effect for electric bar (kept as it looks good on green) */
 .skill-bar-fill::before {
   content: '';
   position: absolute;
@@ -84,30 +89,6 @@
     opacity: 0;
   }
 }
-
-
-@keyframes fill-bar {
-  from {
-    width: 0;
-  }
-  to {
-    width: var(--skill-level);
-  }
-}
-
-/* Removed skill-level-text style as the span is removed from HTML */
-/*
-.skill-level-text {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--color-black-background);
-  font-size: 0.85rem;
-  font-weight: bold;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-}
-*/
 
 @media (max-width: 768px) {
   .skills-grid {
