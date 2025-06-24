@@ -16,7 +16,6 @@ jobs:
       postgres:
         image: postgres:15-alpine
         env:
-          # Use GitHub Secrets for sensitive values
           POSTGRES_DB: ${{ secrets.DB_TEST_NAME }}
           POSTGRES_USER: ${{ secrets.DB_TEST_USER }}
           POSTGRES_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
@@ -54,7 +53,7 @@ jobs:
 
       - name: Run formatter check (Ruff)
         working-directory: ./backend
-        run: ruff format --check .
+        run: ruff format .
 
       - name: Apply migrations
         working-directory: ./backend

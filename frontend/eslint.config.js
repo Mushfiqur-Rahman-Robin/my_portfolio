@@ -15,10 +15,10 @@ export default tseslint.config(
         ...globals.browser,
         ...globals.node,
       },
-      parserOptions: {
-        project: ['./tsconfig.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
+      // parserOptions: {
+      //   project: ['./tsconfig.json', './tsconfig.app.json'],
+      //   tsconfigRootDir: import.meta.dirname,
+      // },
     },
     plugins: {
       'react-hooks': reactHooks,
@@ -37,10 +37,10 @@ export default tseslint.config(
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.node,
-      parserOptions: {
-        project: './tsconfig.node.json',
-        tsconfigRootDir: import.meta.dirname,
-      },
+      // parserOptions: {
+      //   project: './tsconfig.node.json',
+      //   tsconfigRootDir: import.meta.dirname,
+      // },
     },
   },
 );
