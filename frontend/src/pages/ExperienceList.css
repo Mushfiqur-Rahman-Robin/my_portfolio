@@ -75,6 +75,36 @@
   font-size: 1rem;
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+  gap: 1rem;
+}
+
+.pagination-btn {
+  background-color: var(--color-darker-gray-elements);
+  color: var(--color-white-text);
+  border: 1px solid var(--color-border-subtle);
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pagination-btn:hover:not(:disabled),
+.pagination-btn.active {
+  background-color: var(--color-green-accent);
+  color: var(--color-black-background);
+  border-color: var(--color-green-accent);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .error {
   color: #ff6b6b;
 }

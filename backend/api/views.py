@@ -37,6 +37,12 @@ class StandardResultsPagination(PageNumberPagination):
     max_page_size = 100
 
 
+class ExperienceResultsPagination(PageNumberPagination):
+    page_size = 2
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
@@ -104,7 +110,7 @@ class ResumeViewSet(viewsets.ModelViewSet):
 class ExperienceViewSet(viewsets.ModelViewSet):
     queryset = Experience.objects.all()
     serializer_class = ExperienceSerializer
-    pagination_class = StandardResultsPagination
+    pagination_class = ExperienceResultsPagination
     http_method_names = ["get", "post", "head", "options"]
 
 
