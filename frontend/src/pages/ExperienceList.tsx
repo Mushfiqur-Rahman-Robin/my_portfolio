@@ -40,11 +40,25 @@ const ExperienceList: React.FC = () => {
                 setExperiences(response.data.results);
                 setTotalPages(Math.ceil(response.data.count / 2));  // items per page from backend
                 setError(null);
-            } catch (err: any) {
-                setError(`Failed to fetch experiences: ${err.message}`);
-                console.error('Error fetching experiences:', err);
-                setExperiences([]);  // Ensure empty state on error
-                setTotalPages(1);
+            // } catch (err: any) {
+            //     setError(`Failed to fetch experiences: ${err.message}`);
+            //     console.error('Error fetching experiences:', err);
+            //     setExperiences([]);  // Ensure empty state on error
+            //     setTotalPages(1);
+              } catch (error: unknown) {
+              let errorMessage = "Failed to fetch experiences: An unexpected error occurred."; // Provide a default message
+              if (axios.isAxiosError(error)) { // Check if it's an Axios error
+                errorMessage = `Failed to fetch experiences: ${error.message}`;  // Now we are sure it has .message
+                console.error('Axios error fetching experiences:', error);
+              } else if (error instanceof Error) { // Standard JS error.
+                errorMessage = `Failed to fetch experiences: ${error.message}`;
+                console.error('Generic JS error fetching experiences:', error);
+              } else {
+                console.error("Unexpected error during experience fetch:", error); // Fallback if it's neither Axios nor standard error
+              }
+              setError(errorMessage);
+              setExperiences([]);  // Ensure empty state on error
+              setTotalPages(1);
             } finally {
                 setLoading(false);
             }
