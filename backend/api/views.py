@@ -46,12 +46,14 @@ class ExperienceResultsPagination(PageNumberPagination):
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    schema_tags = ["Portfolio Management - Tags"]
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     pagination_class = StandardResultsPagination
+    schema_tags = ["Portfolio Management - Projects"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -77,30 +79,35 @@ class PublicationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Publication.objects.all()
     serializer_class = PublicationSerializer
     pagination_class = StandardResultsPagination
+    schema_tags = ["Portfolio Management - Publications"]
 
 
 class CertificationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Certification.objects.all()
     serializer_class = CertificationSerializer
     pagination_class = StandardResultsPagination
+    schema_tags = ["Portfolio Management - Certifications"]
 
 
 class AchievementViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Achievement.objects.all()
     serializer_class = AchievementSerializer
     pagination_class = StandardResultsPagination
+    schema_tags = ["Portfolio Management - Achievements"]
 
 
 class ContactMessageViewSet(viewsets.ModelViewSet):
     queryset = ContactMessage.objects.all()
     serializer_class = ContactMessageSerializer
     http_method_names = ["post", "head", "options"]
+    schema_tags = ["Contact & Admin"]
 
 
 class ResumeViewSet(viewsets.ModelViewSet):
     queryset = Resume.objects.all()
     serializer_class = ResumeSerializer
     http_method_names = ["get", "post", "head", "options", "delete"]
+    schema_tags = ["Contact & Admin"]
 
     def perform_create(self, serializer):
         Resume.objects.all().delete()
@@ -112,17 +119,20 @@ class ExperienceViewSet(viewsets.ModelViewSet):
     serializer_class = ExperienceSerializer
     pagination_class = ExperienceResultsPagination
     http_method_names = ["get", "post", "head", "options"]
+    schema_tags = ["Portfolio Management - Experiences"]
 
 
 class ExperiencePhotoViewSet(viewsets.ModelViewSet):
     queryset = ExperiencePhoto.objects.all()
     serializer_class = ExperiencePhotoSerializer
     http_method_names = ["get", "post", "head", "options", "delete"]
+    schema_tags = ["Portfolio Management - Experiences"]
 
 
 class VisitorCountView(APIView):
     authentication_classes = []
     permission_classes = []
+    schema_tags = ["Contact & Admin"]
 
     def post(self, request, format=None):
         try:
