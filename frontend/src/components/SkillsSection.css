@@ -50,12 +50,12 @@
     90deg,
     var(--color-green-accent) 0%,
     #55c43d 100%
-  ); /* Electric bar style */
+  );
   border-radius: 10px;
-  width: 0; /* Initial width for animation */
+  width: 0;
   animation: fill-bar 1.5s ease-out forwards;
   position: relative;
-  overflow: hidden; /* For inner glow effect */
+  overflow: hidden;
 }
 
 /* Inner glow effect for electric bar */
@@ -66,7 +66,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.2); /* Slight light shimmer */
+  background: rgba(255, 255, 255, 0.2);
   animation: shine 2s infinite forwards;
   opacity: 0;
 }
@@ -91,20 +91,23 @@
     width: 0;
   }
   to {
-    width: var(--skill-level); /* `width` will be set by inline style for each skill */
+    width: var(--skill-level);
   }
 }
 
+/* Removed skill-level-text style as the span is removed from HTML */
+/*
 .skill-level-text {
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--color-black-background); /* Dark text on green bar */
+  color: var(--color-black-background);
   font-size: 0.85rem;
   font-weight: bold;
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
+*/
 
 @media (max-width: 768px) {
   .skills-grid {

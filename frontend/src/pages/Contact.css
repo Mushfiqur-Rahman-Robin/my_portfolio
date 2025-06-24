@@ -8,13 +8,13 @@
 
 .contact-container h1 {
   font-size: 3rem;
-  color: var(--color-green-accent); /* Green accent for title */
+  color: var(--color-green-accent);
   margin-bottom: 1.5rem;
 }
 
 .contact-intro {
   font-size: 1.1rem;
-  color: var(--color-light-gray-text); /* Light gray text */
+  color: var(--color-light-gray-text);
   margin-bottom: 2rem;
 }
 
@@ -27,48 +27,55 @@
 }
 
 .contact-item {
-  background-color: var(--color-darker-gray-elements); /* Darker gray background */
+  background-color: var(--color-darker-gray-elements);
   padding: 1.5rem;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4); /* Stronger shadow */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
   min-width: 200px;
   flex: 1;
 }
 
 .contact-item h3 {
-  color: var(--color-white-text); /* White heading */
+  color: var(--color-white-text);
   font-size: 1.6rem;
   margin-bottom: 0.8rem;
 }
 
 .contact-item p {
-  color: var(--color-light-gray-text); /* Light gray text */
+  color: var(--color-light-gray-text);
   font-size: 1rem;
 }
 
 .contact-item a {
-  color: var(--color-green-accent); /* Green accent for links */
+  color: var(--color-green-accent);
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .contact-item a:hover {
-  color: #55c43d; /* Slightly darker green on hover */
+  color: #55c43d;
   text-decoration: underline;
+}
+
+/* Fix for LinkedIn text overflow */
+.contact-info-link a {
+  display: block; /* Ensure the anchor tag takes up full width */
+  overflow-wrap: break-word; /* Break long words */
+  word-break: break-all; /* Break all characters if needed */
 }
 
 .form-heading {
   font-size: 2.5rem;
-  color: var(--color-green-accent); /* Green accent for form heading */
+  color: var(--color-green-accent);
   margin-top: 3rem;
   margin-bottom: 2rem;
 }
 
 .contact-form {
-  background-color: var(--color-darker-gray-elements); /* Darker gray background */
+  background-color: var(--color-darker-gray-elements);
   padding: 2.5rem;
   border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   text-align: left;
 }
 
@@ -79,7 +86,7 @@
 .form-group label {
   display: block;
   font-size: 1rem;
-  color: var(--color-white-text); /* White label text */
+  color: var(--color-white-text);
   margin-bottom: 0.5rem;
   font-weight: bold;
 }
@@ -90,21 +97,21 @@
   padding: 0.8rem;
   border: 1px solid var(--color-border-subtle);
   border-radius: 5px;
-  background-color: var(--color-black-background); /* Black background for inputs */
-  color: var(--color-white-text); /* White text in inputs */
+  background-color: var(--color-black-background);
+  color: var(--color-white-text);
   font-size: 1rem;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: var(--color-green-accent); /* Green border on focus */
-  box-shadow: 0 0 0 3px rgba(110, 230, 78, 0.3); /* Green glow on focus */
+  border-color: var(--color-green-accent);
+  box-shadow: 0 0 0 3px rgba(110, 230, 78, 0.3);
 }
 
 .submit-btn {
-  background-color: var(--color-green-accent); /* Green button */
-  color: var(--color-black-background); /* Black text on button */
+  background-color: var(--color-green-accent);
+  color: var(--color-black-background);
   padding: 0.9rem 2rem;
   border: none;
   border-radius: 8px;
@@ -118,7 +125,7 @@
 }
 
 .submit-btn:hover {
-  background-color: #55c43d; /* Slightly darker green on hover */
+  background-color: #55c43d;
   transform: translateY(-2px);
 }
 
@@ -127,11 +134,11 @@
   font-size: 1rem;
   font-weight: bold;
   text-align: center;
-  color: var(--color-green-accent); /* Green for success */
+  color: var(--color-green-accent);
 }
 
 .form-status.error {
-  color: #ff6b6b; /* Red for errors */
+  color: #ff6b6b;
 }
 
 @media (max-width: 768px) {

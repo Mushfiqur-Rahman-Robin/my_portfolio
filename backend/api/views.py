@@ -1,13 +1,29 @@
+import uuid
+
+from django.db.models import F
 from rest_framework import status, viewsets
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-# Import new models and Tag
-from .models import Achievement, Certification, ContactMessage, Project, Publication, Resume, Tag, VisitorCount
+from .models import (
+    Achievement,
+    Certification,
+    ContactMessage,
+    Experience,
+    ExperiencePhoto,
+    Project,
+    Publication,
+    Resume,
+    Tag,
+    VisitorCount,
+)
 from .serializers import (
     AchievementSerializer,
     CertificationSerializer,
     ContactMessageSerializer,
+    ExperiencePhotoSerializer,
+    ExperienceSerializer,
     ProjectSerializer,
     PublicationSerializer,
     ResumeSerializer,
@@ -15,78 +31,103 @@ from .serializers import (
 )
 
 
+class StandardResultsPagination(PageNumberPagination):
+    page_size = 6
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
 
-class ProjectViewSet(viewsets.ModelViewSet):  # Changed to ModelViewSet to allow POST/PUT/DELETE
+class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    pagination_class = StandardResultsPagination
 
     def get_queryset(self):
         queryset = super().get_queryset()
         tag_name = self.request.query_params.get("tag", None)
+        is_featured = self.request.query_params.get("is_featured", None)
+
         if tag_name:
-            # Filter projects that have a tag with the given name
             queryset = queryset.filter(tags__name__iexact=tag_name)
-        return queryset
+
+        # Correctly convert string 'true'/'false' to boolean True/False
+        if is_featured is not None:
+            if is_featured.lower() == "true":
+                queryset = queryset.filter(is_featured=True)
+            elif is_featured.lower() == "false":
+                queryset = queryset.filter(is_featured=False)
+            # If is_featured is present but not 'true'/'false', then return empty or no filter.
+            # For this case, we just won't apply the filter if it's invalid.
+
+        return queryset.order_by("display_order", "-created_at")
 
 
 class PublicationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Publication.objects.all()
     serializer_class = PublicationSerializer
+    pagination_class = StandardResultsPagination
 
 
 class CertificationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Certification.objects.all()
     serializer_class = CertificationSerializer
+    pagination_class = StandardResultsPagination
 
 
 class AchievementViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Achievement.objects.all()
     serializer_class = AchievementSerializer
+    pagination_class = StandardResultsPagination
 
 
 class ContactMessageViewSet(viewsets.ModelViewSet):
     queryset = ContactMessage.objects.all()
     serializer_class = ContactMessageSerializer
-    http_method_names = ["post", "head", "options"]  # Only allow POST requests for new messages
+    http_method_names = ["post", "head", "options"]
 
 
-# New ViewSet for Resume (Allowing POST for upload, ReadOnly for retrieval)
 class ResumeViewSet(viewsets.ModelViewSet):
     queryset = Resume.objects.all()
     serializer_class = ResumeSerializer
-    # Allow POST for upload, GET for viewing latest resume
-    # You might want to restrict uploads to only authenticated users in a real app
-    http_method_names = ["get", "post", "head", "options", "delete"]  # Added delete for easier management
+    http_method_names = ["get", "post", "head", "options", "delete"]
 
-    # Optional: ensure only one resume can be active
     def perform_create(self, serializer):
-        # Delete old resumes if you only want one active
         Resume.objects.all().delete()
         serializer.save()
 
 
+class ExperienceViewSet(viewsets.ModelViewSet):
+    queryset = Experience.objects.all()
+    serializer_class = ExperienceSerializer
+    pagination_class = StandardResultsPagination
+    http_method_names = ["get", "post", "head", "options"]
+
+
+class ExperiencePhotoViewSet(viewsets.ModelViewSet):
+    queryset = ExperiencePhoto.objects.all()
+    serializer_class = ExperiencePhotoSerializer
+    http_method_names = ["get", "post", "head", "options", "delete"]
+
+
 class VisitorCountView(APIView):
-    authentication_classes = []  # No authentication for this simple counter
-    permission_classes = []  # No permissions needed
+    authentication_classes = []
+    permission_classes = []
 
     def post(self, request, format=None):
         try:
-            visitor_count, created = VisitorCount.objects.get_or_create(pk=1)
-            # Use pk=1 for a single counter instance
-            visitor_count.count += 1
+            pk = uuid.UUID("1a2b3c4d-e5f6-7890-1234-567890abcdef")
+            visitor_count, created = VisitorCount.objects.get_or_create(pk=pk)
+            visitor_count.count = F("count") + 1
             visitor_count.save()
-            return Response({"message": "Visitor count incremented"}, status=status.HTTP_200_OK)
+            visitor_count.refresh_from_db()
+            return Response(
+                {"message": "Visitor count incremented", "count": visitor_count.count},
+                status=status.HTTP_200_OK,
+            )
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    # You could add a GET method here for admin or debug purposes if needed
-    # def get(self, request, format=None):
-    #     try:
-    #         visitor_count = VisitorCount.objects.get(pk=1)
-    #         return Response({"count": visitor_count.count}, status=status.HTTP_200_OK)
-    #     except VisitorCount.DoesNotExist:
-    #         return Response({"count": 0}, status=status.HTTP_200_OK)

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios'; // Ensure axios is imported
+import axios from 'axios';
 import './Contact.css';
 
 const Contact: React.FC = () => {
@@ -21,21 +21,19 @@ const Contact: React.FC = () => {
     e.preventDefault();
     setStatus('Sending message...');
     try {
-      // Real API call to your backend
       const response = await axios.post(`${import.meta.env.VITE_API_URL}messages/`, formData);
       console.log('Message sent successfully:', response.data);
       setStatus('Message sent successfully!');
-      setFormData({ name: '', email: '', message: '' }); // Clear form
+      setFormData({ name: '', email: '', message: '' });
     } catch (err) {
       console.error('Contact form submission error:', err);
-      // More detailed error handling could check err.response.data for specific backend errors
       setStatus('Failed to send message. Please try again later.');
     }
   };
 
   return (
     <div className="contact-container">
-      <h1>Contact Me</h1>
+      <h1>Contact</h1>
       <p className="contact-intro">
         Feel free to reach out to me for collaborations, inquiries, or just to
         say hello!
@@ -44,32 +42,23 @@ const Contact: React.FC = () => {
       <div className="contact-methods">
         <div className="contact-item">
           <h3>Email</h3>
-          <p>
-            <a href="mailto:your.email@example.com">your.email@example.com</a>{' '}
-            {/* Replace with your email */}
+          <p className="contact-info-link">
+            <a href="mailto:mushfiqur.rahman.robin@gmail.com">mushfiqur.rahman.robin@gmail.com</a>
           </p>
         </div>
         <div className="contact-item">
           <h3>LinkedIn</h3>
-          <p>
-            <a
-              href="https://linkedin.com/in/yourusername" // Replace with your LinkedIn
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              linkedin.com/in/yourusername
+          <p className="contact-info-link">
+            <a href="https://linkedin.com/in/mushfiqur--rahman" target="_blank" rel="noopener noreferrer">
+              linkedin.com/in/mushfiqur-rahman
             </a>
           </p>
         </div>
         <div className="contact-item">
           <h3>GitHub</h3>
-          <p>
-            <a
-              href="https://github.com/yourusername" // Replace with your GitHub
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              github.com/yourusername
+          <p className="contact-info-link">
+            <a href="https://github.com/Mushfiqur-Rahman-Robin" target="_blank" rel="noopener noreferrer">
+              github.com/Mushfiqur-Rahman-Robin
             </a>
           </p>
         </div>

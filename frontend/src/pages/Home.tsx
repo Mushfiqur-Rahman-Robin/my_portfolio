@@ -26,12 +26,14 @@ const Home: React.FC = () => {
     // Fetch up to 3 featured projects
     const fetchFeaturedProjects = async () => {
       try {
-        // Fetch projects ordered by display_order, limited to 3
-        const response = await axios.get<Project[]>(`${import.meta.env.VITE_API_URL}projects/?ordering=display_order`);
-        setFeaturedProjects(response.data.slice(0, 3)); // Ensure only top 3
+        // CRITICAL FIX: Explicitly filter for is_featured=true
+        const response = await axios.get<Project[]>(
+          `${import.meta.env.VITE_API_URL}projects/?is_featured=true&ordering=display_order`
+        );
+        setFeaturedProjects(response.data.slice(0, 3)); // Ensure only top 3 are displayed
       } catch (err) {
         setError("Failed to fetch featured projects");
-        console.error(err);
+        console.error("Featured projects fetch error:", err);
       }
     };
     fetchFeaturedProjects();
@@ -41,10 +43,10 @@ const Home: React.FC = () => {
     <div className="home-container">
       <section className="hero-banner">
         <div className="banner-content">
-          <h1>Hello, I'm [Your Name]</h1> {/* Replace with your name */}
-          <p className="tagline">Full-Stack Developer | Innovator | Problem Solver</p>
+          <h1>Hello, I'm Md Mushfiqur Rahman</h1> {/* Updated name */}
+          <p className="tagline">AI/ML Engineer | Innovator | Problem Solver</p> {/* Updated tagline */}
           <p className="intro-text">
-            Crafting robust and scalable web solutions with Django, React, and modern DevOps practices.
+            Crafting robust and scalable AI-powered solutions and web applications with Django, React, and modern DevOps practices.
           </p>
           <div className="banner-cta-buttons">
             <Link to="/projects" className="btn primary">
@@ -65,7 +67,7 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      <SkillsSection /> {/* Integrated Skills Section */}
+      <SkillsSection />
 
       <section className="featured-projects-section">
         <h2>Featured Projects</h2>
@@ -74,25 +76,36 @@ const Home: React.FC = () => {
           {featuredProjects.length > 0 ? (
             featuredProjects.map((project) => (
               <div key={project.id} className="project-preview-card">
-                <h3>{project.title}</h3>
-                {project.image && (
-                  <img src={project.image} alt={project.title} />
-                )}
-                <p className="project-preview-description">{project.description.substring(0, 100)}...</p> {/* Truncate description */}
-                <div className="project-preview-tags">
-                  {project.tags && project.tags.map((tag, index) => (
-                    <span key={index} className="tag-badge">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <Link to={`/projects/${project.id}`} className="btn preview-btn"> {/* Link to detail page */}
-                  View Details
+                <Link to={`/projects/${project.id}`} className="project-card-banner-link"> {/* Link whole image area to detail */}
+                  <h3>{project.title}</h3>
+                  {project.image && (
+                    <img src={project.image} alt={project.title} className="project-preview-image" />
+                  )}
+                  <p className="project-preview-description">{project.description.substring(0, 100)}...</p>
+                  <div className="project-preview-tags">
+                    {project.tags && project.tags.map((tag, index) => (
+                      <span key={index} className="tag-badge">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </Link>
+                <div className="project-preview-actions"> {/* Separate actions from linked area */}
+                  {project.project_url && (
+                    <a href={project.project_url} target="_blank" rel="noopener noreferrer" className="btn primary">
+                      View Live
+                    </a>
+                  )}
+                  {project.repo_url && (
+                    <a href={project.repo_url} target="_blank" rel="noopener noreferrer" className="btn secondary">
+                      View Code
+                    </a>
+                  )}
+                </div>
               </div>
             ))
           ) : (
-            <p>No featured projects to display.</p>
+            <p className="no-featured-projects">No featured projects to display. Mark projects as featured in Django admin!</p>
           )}
         </div>
         <div className="all-projects-link">

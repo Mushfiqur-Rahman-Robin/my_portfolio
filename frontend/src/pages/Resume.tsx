@@ -18,17 +18,20 @@ const Resume: React.FC = () => {
     const fetchResume = async () => {
       try {
         // Fetch the latest resume (assuming backend orders by uploaded_at desc)
-        // Adjust this if your backend uses a different way to get the "active" resume
         const response = await axios.get<ResumeFile[]>(`${import.meta.env.VITE_API_URL}resumes/`);
         if (response.data && response.data.length > 0) {
-          // Assuming the latest resume is the first one if sorted by uploaded_at descending
-          setResume(response.data[0]);
+          setResume(response.data[0]); // Get the latest one
         } else {
           setError("No resume found. Please upload one via Django admin.");
         }
       } catch (err) {
-        setError("Failed to fetch resume. Please check the API and ensure a resume is uploaded.");
+        // This is where we might log more detailed network errors
         console.error("Resume fetch error:", err);
+        if (axios.isAxiosError(err) && err.response) {
+            setError(`Failed to fetch resume: ${err.response.status} ${err.response.statusText}. Ensure resume is uploaded and backend is serving media.`);
+        } else {
+            setError("Failed to fetch resume. Please check your network connection and backend status.");
+        }
       } finally {
         setLoading(false);
       }
@@ -53,10 +56,10 @@ const Resume: React.FC = () => {
           {/* Download button in the top right corner */}
           <a
             href={resume.pdf_file}
-            download
+            download // Added download attribute
             target="_blank"
             rel="noopener noreferrer"
-            className="download-pdf-button" // New class for styling
+            className="download-pdf-button"
           >
             Download PDF
           </a>
@@ -65,7 +68,7 @@ const Resume: React.FC = () => {
             src={resume.pdf_file}
             title={resume.title}
             width="100%"
-            height="800px" // Adjust height as needed
+            height="800px"
             style={{ border: 'none' }}
           >
             This browser does not support PDFs. Please download the PDF to view it:

@@ -1,4 +1,6 @@
 /* frontend/src/index.css */
+/* Import Google Font - Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 /* Define CSS Variables for your color palette */
 :root {
@@ -10,7 +12,7 @@
   --color-darker-gray-elements: #1a1a1a; /* For card backgrounds, inputs */
   --color-border-subtle: #333; /* For subtle borders */
 
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Poppins', system-ui, Avenir, Helvetica, Arial, sans-serif; /* Poppins as primary font */
   line-height: 1.5;
   font-weight: 400;
 
@@ -31,7 +33,7 @@ a {
   text-decoration: none; /* No underline by default */
 }
 a:hover {
-  color: var(--color-green-accent); /* Keep the same for hover or slightly lighter */
+  color: #55c43d; /* Slightly darker green on hover */
   text-decoration: underline; /* Add underline on hover for clarity */
 }
 
@@ -60,8 +62,8 @@ button:focus-visible {
 
 body {
   margin: 0;
-  display: flex; /* Kept for flex layout from App.css */
-  place-items: center; /* Kept for initial centering from App.css, adjust if needed */
+  display: flex;
+  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -69,17 +71,3 @@ body {
 h1, h2, h3, h4, h5, h6 {
   color: var(--color-white-text); /* All headings white by default */
 }
-
-/* Remove light scheme override as you want a consistent dark theme */
-/* @media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-} */

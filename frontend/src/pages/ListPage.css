@@ -1,0 +1,128 @@
+/* frontend/src/pages/ListPage.css */
+.list-page-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.list-page-container h1 {
+  font-size: 3rem;
+  color: var(--color-green-accent);
+  margin-bottom: 2rem;
+}
+
+.loading-message {
+  font-size: 1.2rem;
+  color: var(--color-light-gray-text);
+  margin-top: 2rem;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  justify-content: center;
+}
+
+.list-card {
+  background-color: var(--color-darker-gray-elements);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.list-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+}
+
+.list-card h2 {
+  color: var(--color-white-text);
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  font-size: 1.8rem;
+}
+
+.list-card .item-organization,
+.list-card .item-authors,
+.list-card .item-conference {
+  color: var(--color-green-accent); /* Make organization/authors/conference green */
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.list-card .item-description {
+  color: var(--color-light-gray-text);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  flex-grow: 1;
+}
+
+.list-card .item-image {
+  max-width: 100%;
+  height: 150px; /* Consistent height for list images */
+  object-fit: contain; /* Certificates might be logos or actual certs, so contain fits better */
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.list-card .item-date {
+  color: var(--color-light-gray-text);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.list-card .btn {
+  margin-top: auto; /* Push button to bottom */
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+}
+
+/* Re-using pagination styles from ProjectList.css */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+  gap: 1rem;
+}
+
+.pagination-btn {
+  background-color: var(--color-darker-gray-elements);
+  color: var(--color-white-text);
+  border: 1px solid var(--color-border-subtle);
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pagination-btn:hover:not(:disabled),
+.pagination-btn.active {
+  background-color: var(--color-green-accent);
+  color: var(--color-black-background);
+  border-color: var(--color-green-accent);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+@media (max-width: 768px) {
+  .items-grid {
+    grid-template-columns: 1fr;
+  }
+}

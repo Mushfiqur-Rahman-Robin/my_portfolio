@@ -16,7 +16,7 @@ const Navbar: React.FC = () => {
           </li>
           <li className="nav-item">
             <Link to="/about" className="nav-links">
-              About Me
+              About
             </Link>
           </li>
           <li className="nav-item">
@@ -25,13 +25,33 @@ const Navbar: React.FC = () => {
             </Link>
           </li>
           <li className="nav-item">
-            <Link to="/resume" className="nav-links"> {/* New: Resume link */}
+            <Link to="/certifications" className="nav-links">
+              Certifications
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link to="/publications" className="nav-links">
+              Publications
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link to="/achievements" className="nav-links">
+              Achievements
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link to="/experience" className="nav-links">
+              Experience
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link to="/resume" className="nav-links">
               Resume
             </Link>
           </li>
           <li className="nav-item">
             <Link to="/contact" className="nav-links">
-              Contact Me
+              Contact
             </Link>
           </li>
         </ul>

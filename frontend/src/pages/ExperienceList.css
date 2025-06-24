@@ -1,0 +1,86 @@
+/* frontend/src/pages/ExperienceList.css */
+.experience-list-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.experience-list-container h1 {
+  font-size: 3rem;
+  color: var(--color-green-accent);
+  margin-bottom: 2rem;
+}
+
+.loading-message {
+  font-size: 1.2rem;
+  color: var(--color-light-gray-text);
+  margin-top: 2rem;
+}
+
+.experiences-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  justify-content: center;
+}
+
+.experience-card {
+  background-color: var(--color-darker-gray-elements);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  text-align: left; /* Align text within card */
+}
+
+.experience-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+}
+
+.experience-card h2 {
+  color: var(--color-white-text);
+  font-size: 1.8rem;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.experience-card h3 {
+  color: var(--color-green-accent);
+  font-size: 1.3rem;
+  margin-bottom: 0.8rem;
+}
+
+.experience-card .experience-dates {
+  color: var(--color-light-gray-text);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.experience-card .experience-details-preview {
+  color: var(--color-light-gray-text);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.experience-card .btn {
+  align-self: flex-start; /* Align button to the start of the card */
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+@media (max-width: 768px) {
+  .experiences-grid {
+    grid-template-columns: 1fr;
+  }
+}

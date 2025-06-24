@@ -1,6 +1,17 @@
 from rest_framework import serializers
 
-from .models import Achievement, Certification, ContactMessage, Project, Publication, Resume, Tag
+from .models import (
+    Achievement,
+    Certification,
+    ContactMessage,
+    Experience,
+    ExperiencePhoto,
+    Project,
+    ProjectImage,
+    Publication,
+    Resume,
+    Tag,
+)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -9,15 +20,22 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ["id", "name"]
 
 
+class ProjectImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectImage
+        fields = ["id", "image", "caption", "display_order"]
+
+
 class ProjectSerializer(serializers.ModelSerializer):
-    # Use SlugRelatedField for tags to handle them by name in API
-    tags = serializers.SlugRelatedField(many=True, slug_field="name", queryset=Tag.objects.all(), required=True)
+    tags = serializers.SlugRelatedField(
+        many=True, slug_field="name", queryset=Tag.objects.all(), required=False
+    )  # Changed required to False for flexibility
+    gallery_images = ProjectImageSerializer(many=True, read_only=True)  # Nested serializer for gallery images
 
     class Meta:
         model = Project
         fields = "__all__"
 
-    # Custom create/update to handle tags properly
     def create(self, validated_data):
         tags_data = validated_data.pop("tags", [])
         project = Project.objects.create(**validated_data)
@@ -30,8 +48,8 @@ class ProjectSerializer(serializers.ModelSerializer):
         tags_data = validated_data.pop("tags", None)
         instance = super().update(instance, validated_data)
 
-        if tags_data is not None:  # Only update if tags were provided
-            instance.tags.clear()  # Clear existing tags
+        if tags_data is not None:
+            instance.tags.clear()
             for tag_name in tags_data:
                 tag, _ = Tag.objects.get_or_create(name=tag_name)
                 instance.tags.add(tag)
@@ -68,3 +86,28 @@ class ResumeSerializer(serializers.ModelSerializer):
         model = Resume
         fields = "__all__"
         read_only_fields = ["uploaded_at"]
+
+
+class ExperiencePhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExperiencePhoto
+        fields = ["id", "image", "caption", "display_order"]
+
+
+# New serializer for Professional Experience
+class ExperienceSerializer(serializers.ModelSerializer):
+    photos = ExperiencePhotoSerializer(many=True, read_only=True)  # Nested serializer for photos
+
+    # Custom field to display 'Present' instead of end_date if is_current is true
+    end_date_display = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Experience
+        fields = "__all__"
+
+    def get_end_date_display(self, obj):
+        if obj.is_current:
+            return "Present"
+        elif obj.end_date:
+            return obj.end_date.strftime("%b. %Y")
+        return ""  # Or None, or blank string as appropriate

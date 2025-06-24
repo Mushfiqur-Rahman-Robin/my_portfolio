@@ -1,4 +1,3 @@
-// Removed `import React from 'react';`
 import './About.css';
 
 const About: React.FC = () => {
@@ -12,32 +11,28 @@ const About: React.FC = () => {
         </div>
         <div className="about-text">
           <p>
-            Hello! I'm [Your Name], a passionate Full-Stack Developer with
-            expertise in building robust and scalable web applications. My
-            journey in tech began with a curiosity for how things work, which
-            quickly evolved into a love for crafting efficient and user-friendly
-            software solutions.
+            Hello! I'm **Md Mushfiqur Rahman**, a passionate **AI/ML Engineer** and Full-Stack Developer
+            with expertise in building robust, scalable, and intelligent software solutions.
+            My journey in tech is driven by a deep curiosity for solving complex problems and
+            transforming ideas into practical applications.
           </p>
           <p>
-            I specialize in the **Django** framework for the backend, leveraging
-            its power and flexibility to create secure and performant APIs. On
-            the frontend, I primarily work with **React** and **TypeScript**,
-            building dynamic and responsive user interfaces that deliver
-            excellent user experiences.
+            My core strength lies in **Artificial Intelligence** and **Machine Learning**, where
+            I leverage frameworks like **TensorFlow**, **PyTorch**, and **Scikit-learn** to develop
+            cutting-edge solutions in areas such as **Computer Vision**, **Natural Language Processing (NLP)**,
+            and **Time-Series Forecasting**. I have significant experience crafting AI-powered agents,
+            developing end-to-end data pipelines, and optimizing models for real-world performance.
           </p>
           <p>
-            Beyond coding, I'm deeply interested in **DevOps practices**,
-            including **Docker** for containerization, **GitHub Actions** for CI/CD,
-            and deploying applications on cloud platforms like Render and Vercel. I
-            believe in writing clean, maintainable code and following best
-            practices to ensure long-term project success.
+            On the full-stack side, I build powerful backends with **Django** and **Django REST Framework**,
+            and dynamic, responsive frontends with **React** and **TypeScript**. My work extends to
+            **DevOps practices**, including **Docker** for containerization, and establishing robust **CI/CD pipelines**
+            with **GitHub Actions** for seamless deployments.
           </p>
           <p>
-            When I'm not coding, you can find me exploring new technologies,
-            contributing to open source projects, or [mention a hobby or
-            interest, e.g., reading sci-fi novels, hiking, playing chess]. I'm
-            always eager to learn and grow, and I thrive in collaborative
-            environments.
+            I thrive in collaborative environments, always eager to learn new technologies and contribute
+            to impactful projects. When I'm not coding, you can find me engaged in continuous learning,
+            exploring new research papers, or contributing to open-source initiatives.
           </p>
         </div>
       </div>
