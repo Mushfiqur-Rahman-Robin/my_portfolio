@@ -1,6 +1,7 @@
 import uuid
 
 from django.db.models import F
+from drf_spectacular.utils import extend_schema
 from rest_framework import status, viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -28,6 +29,8 @@ from .serializers import (
     PublicationSerializer,
     ResumeSerializer,
     TagSerializer,
+    VisitorCountPostSerializer,
+    VisitorCountResponseSerializer,
 )
 
 
@@ -134,6 +137,11 @@ class VisitorCountView(APIView):
     permission_classes = []
     schema_tags = ["Contact & Admin"]
 
+    @extend_schema(
+        request=VisitorCountPostSerializer,  # Specify the input serializer (empty, as no body is expected)
+        responses={200: VisitorCountResponseSerializer},  # Specify the output serializer for 200 OK
+        summary="Increment and get total visitor count",
+    )
     def post(self, request, format=None):
         try:
             pk = uuid.UUID("1a2b3c4d-e5f6-7890-1234-567890abcdef")

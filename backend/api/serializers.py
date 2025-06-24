@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from .models import (
@@ -94,7 +95,6 @@ class ExperiencePhotoSerializer(serializers.ModelSerializer):
         fields = ["id", "image", "caption", "display_order"]
 
 
-# New serializer for Professional Experience
 class ExperienceSerializer(serializers.ModelSerializer):
     photos = ExperiencePhotoSerializer(many=True, read_only=True)  # Nested serializer for photos
 
@@ -105,9 +105,21 @@ class ExperienceSerializer(serializers.ModelSerializer):
         model = Experience
         fields = "__all__"
 
+    @extend_schema_field(serializers.CharField)
     def get_end_date_display(self, obj):
         if obj.is_current:
             return "Present"
         elif obj.end_date:
             return obj.end_date.strftime("%b. %Y")
-        return ""  # Or None, or blank string as appropriate
+        return ""
+
+
+class VisitorCountPostSerializer(serializers.Serializer):
+    # The VisitorCountView doesn't actually take any input in its POST body,
+    # it just increments a counter. So we define an empty serializer for its input.
+    pass
+
+
+class VisitorCountResponseSerializer(serializers.Serializer):
+    message = serializers.CharField(read_only=True)
+    count = serializers.IntegerField(read_only=True)
