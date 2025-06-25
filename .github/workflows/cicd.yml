@@ -66,6 +66,7 @@ jobs:
           DATABASE_URL: postgres://${{ secrets.DB_TEST_USER }}:${{ secrets.DB_TEST_PASSWORD }}@localhost:5432/${{ secrets.DB_TEST_NAME }}
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY_TEST }}
           DEBUG: "False"
+          REDIS_URL: redis://localhost:6379/1  # Mock Redis URL for tests
         run: |
           source .venv/bin/activate
           python manage.py migrate
@@ -77,6 +78,7 @@ jobs:
           DATABASE_URL: postgres://${{ secrets.DB_TEST_USER }}:${{ secrets.DB_TEST_PASSWORD }}@localhost:5432/${{ secrets.DB_TEST_NAME }}
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY_TEST }}
           DEBUG: "False"
+          REDIS_URL: redis://localhost:6379/1  # Mock Redis URL for tests
         run: |
           source .venv/bin/activate
           python manage.py check
@@ -88,6 +90,7 @@ jobs:
           DATABASE_URL: postgres://${{ secrets.DB_TEST_USER }}:${{ secrets.DB_TEST_PASSWORD }}@localhost:5432/${{ secrets.DB_TEST_NAME }}
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY_TEST }}
           DEBUG: "False"
+          REDIS_URL: redis://localhost:6379/1  # Mock Redis URL for tests
         run: |
           source .venv/bin/activate
           pytest --ds=core.settings api/tests.py
