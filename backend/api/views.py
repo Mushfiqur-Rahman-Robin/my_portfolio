@@ -66,15 +66,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if tag_name:
             queryset = queryset.filter(tags__name__iexact=tag_name)
 
-        # Correctly convert string 'true'/'false' to boolean True/False
         if is_featured is not None:
             if is_featured.lower() == "true":
                 queryset = queryset.filter(is_featured=True)
             elif is_featured.lower() == "false":
                 queryset = queryset.filter(is_featured=False)
-            # If is_featured is present but not 'true'/'false', then return empty or no filter.
-            # For this case, we just won't apply the filter if it's invalid.
-
         return queryset.order_by("display_order", "-created_at")
 
 
@@ -112,10 +108,6 @@ class ResumeViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "post", "head", "options", "delete"]
     schema_tags = ["Contact & Admin"]
 
-    def perform_create(self, serializer):
-        Resume.objects.all().delete()
-        serializer.save()
-
 
 class ExperienceViewSet(viewsets.ModelViewSet):
     queryset = Experience.objects.all()
@@ -138,8 +130,8 @@ class VisitorCountView(APIView):
     schema_tags = ["Contact & Admin"]
 
     @extend_schema(
-        request=VisitorCountPostSerializer,  # Specify the input serializer (empty, as no body is expected)
-        responses={200: VisitorCountResponseSerializer},  # Specify the output serializer for 200 OK
+        request=VisitorCountPostSerializer,
+        responses={200: VisitorCountResponseSerializer},
         summary="Increment and get total visitor count",
     )
     def post(self, request, format=None):

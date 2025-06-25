@@ -19,6 +19,7 @@ RUN uv venv /opt/venv
 RUN uv pip install --python /opt/venv/bin/python --no-cache-dir -r requirements.txt
 
 COPY . .
+RUN mkdir -p /app/logs && chmod -R 777 /app/logs
 RUN /opt/venv/bin/python manage.py collectstatic --noinput
 RUN /opt/venv/bin/python -m compileall .
 

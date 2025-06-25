@@ -8,6 +8,7 @@ services:
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
+      - ./backend/logs:/app/logs
     expose:
       - 8000
     ports:
@@ -16,6 +17,7 @@ services:
       - ./backend/.env
     depends_on:
       - db
+      - redis
 
   frontend:
     build: ./frontend
@@ -26,7 +28,7 @@ services:
       - static_volume:/usr/share/nginx/html/static
       - media_volume:/usr/share/nginx/html/media
     depends_on:
-      - backend  # Add dependency to ensure backend is up
+      - backend
 
   db:
     image: postgres:15-alpine
@@ -38,7 +40,16 @@ services:
       - POSTGRES_PASSWORD=portfolio
       - POSTGRES_DB=portfolio_db
 
+  redis:
+    image: redis:7-alpine
+    container_name: portfolio_redis
+    expose:
+      - 6379
+    volumes:
+      - redis_data:/data
+
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+  redis_data:
