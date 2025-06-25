@@ -62,11 +62,10 @@ jobs:
       - name: Apply migrations
         working-directory: ./backend
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
           DATABASE_URL: postgres://${{ secrets.DB_TEST_USER }}:${{ secrets.DB_TEST_PASSWORD }}@localhost:5432/${{ secrets.DB_TEST_NAME }}
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY_TEST }}
           DEBUG: "False"
-          REDIS_URL: redis://localhost:6379/1  # Mock Redis URL for tests
         run: |
           source .venv/bin/activate
           python manage.py migrate
@@ -74,11 +73,10 @@ jobs:
       - name: Set up Django
         working-directory: ./backend
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
           DATABASE_URL: postgres://${{ secrets.DB_TEST_USER }}:${{ secrets.DB_TEST_PASSWORD }}@localhost:5432/${{ secrets.DB_TEST_NAME }}
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY_TEST }}
           DEBUG: "False"
-          REDIS_URL: redis://localhost:6379/1  # Mock Redis URL for tests
         run: |
           source .venv/bin/activate
           python manage.py check
@@ -86,14 +84,14 @@ jobs:
       - name: Run tests (Pytest)
         working-directory: ./backend
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
           DATABASE_URL: postgres://${{ secrets.DB_TEST_USER }}:${{ secrets.DB_TEST_PASSWORD }}@localhost:5432/${{ secrets.DB_TEST_NAME }}
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY_TEST }}
           DEBUG: "False"
-          REDIS_URL: redis://localhost:6379/1  # Mock Redis URL for tests
+          PYTHONPATH: .
         run: |
           source .venv/bin/activate
-          pytest --ds=core.settings api/tests.py
+          pytest
 
   frontend-checks:
     runs-on: ubuntu-latest
@@ -107,7 +105,6 @@ jobs:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
-
       - name: Install frontend dependencies
         working-directory: ./frontend
         run: npm ci
