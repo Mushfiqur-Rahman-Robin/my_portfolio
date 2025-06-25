@@ -45,6 +45,10 @@ jobs:
           uv sync
           uv sync --extra dev
 
+      - name: Create logs directory
+        working-directory: ./backend
+        run: mkdir -p logs && chmod -R 777 logs
+
       - name: Run linter (Ruff)
         working-directory: ./backend
         run: |
