@@ -75,6 +75,7 @@ jobs:
           POSTGRES_DB: ${{ secrets.DB_TEST_NAME }}
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY_TEST }}
           DEBUG: "False"
+          PYTHONPATH: .
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
@@ -89,6 +90,7 @@ jobs:
           POSTGRES_DB: ${{ secrets.DB_TEST_NAME }}
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY_TEST }}
           DEBUG: "False"
+          PYTHONPATH: .
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
