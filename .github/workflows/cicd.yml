@@ -109,7 +109,7 @@ jobs:
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
-          pytest
+          pytest --override-ini django_find_project=true
 
   frontend-checks:
     runs-on: ubuntu-latest
