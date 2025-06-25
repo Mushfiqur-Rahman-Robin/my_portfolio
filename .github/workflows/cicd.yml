@@ -59,6 +59,13 @@ jobs:
         working-directory: ./backend
         run: ruff format .
 
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U ${{ secrets.DB_TEST_USER }}; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+
       - name: Apply migrations
         working-directory: ./backend
         env:

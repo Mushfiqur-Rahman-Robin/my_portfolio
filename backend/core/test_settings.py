@@ -1,3 +1,5 @@
+import os
+
 from .settings import MIDDLEWARE
 
 CACHES = {
@@ -16,3 +18,14 @@ MIDDLEWARE = [
         "django.middleware.cache.FetchFromCacheMiddleware",
     ]
 ]
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("POSTGRES_DB", "${{ secrets.DB_TEST_NAME }}"),
+        "USER": os.environ.get("POSTGRES_USER", "${{ secrets.DB_TEST_USER }}"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "${{ secrets.DB_TEST_PASSWORD }}"),
+        "HOST": "localhost",
+        "PORT": "5432",
+    }
+}
