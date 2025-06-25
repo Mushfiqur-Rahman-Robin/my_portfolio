@@ -38,6 +38,7 @@ dependencies = [
     { name = "pre-commit" },
     { name = "psycopg2-binary" },
     { name = "pytest" },
+    { name = "pytest-django" },
     { name = "python-decouple" },
     { name = "redis" },
 ]
@@ -67,6 +68,7 @@ requires-dist = [
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "pytest", specifier = ">=8.4.1" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.4.1" },
+    { name = "pytest-django", specifier = ">=4.11.1" },
     { name = "pytest-django", marker = "extra == 'dev'", specifier = ">=4.11.1" },
     { name = "python-decouple", specifier = ">=3.8" },
     { name = "redis", specifier = "<5.0.0" },

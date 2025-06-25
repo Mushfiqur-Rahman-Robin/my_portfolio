@@ -8,6 +8,10 @@ attrs==25.3.0
     # via
     #   jsonschema
     #   referencing
+cfgv==3.4.0
+    # via pre-commit
+distlib==0.3.9
+    # via virtualenv
 dj-database-url==3.0.0
     # via backend (pyproject.toml)
 django==5.2.3
@@ -28,8 +32,12 @@ djangorestframework==3.16.0
     #   drf-spectacular
 drf-spectacular==0.28.0
     # via backend (pyproject.toml)
+filelock==3.18.0
+    # via virtualenv
 gunicorn==23.0.0
     # via backend (pyproject.toml)
+identify==2.6.12
+    # via pre-commit
 inflection==0.5.1
     # via drf-spectacular
 iniconfig==2.1.0
@@ -40,6 +48,8 @@ jsonschema==4.24.0
     # via drf-spectacular
 jsonschema-specifications==2025.4.1
     # via jsonschema
+nodeenv==1.9.1
+    # via pre-commit
 packaging==25.0
     # via
     #   gunicorn
@@ -48,18 +58,28 @@ pathspec==0.12.1
     # via backend (pyproject.toml)
 pillow==11.2.1
     # via backend (pyproject.toml)
+platformdirs==4.3.8
+    # via virtualenv
 pluggy==1.6.0
     # via pytest
+pre-commit==4.2.0
+    # via backend (pyproject.toml)
 psycopg2-binary==2.9.10
     # via backend (pyproject.toml)
 pygments==2.19.1
     # via pytest
 pytest==8.4.1
+    # via
+    #   backend (pyproject.toml)
+    #   pytest-django
+pytest-django==4.11.1
     # via backend (pyproject.toml)
 python-decouple==3.8
     # via backend (pyproject.toml)
 pyyaml==6.0.2
-    # via drf-spectacular
+    # via
+    #   drf-spectacular
+    #   pre-commit
 redis==4.6.0
     # via
     #   backend (pyproject.toml)
@@ -80,3 +100,5 @@ typing-extensions==4.14.0
     #   referencing
 uritemplate==4.2.0
     # via drf-spectacular
+virtualenv==20.31.2
+    # via pre-commit
