@@ -10,7 +10,7 @@ const About: React.FC = () => {
         <div className="about-text">
           {/* IMAGE IS NOW INSIDE THE ABOUT-TEXT DIV */}
           <div className="about-image">
-            <img src="/src/assets/website_about.png" alt="Profile Picture" />
+            <img src="/website_about.png" alt="Profile Picture" />
           </div>
 
           <p>
