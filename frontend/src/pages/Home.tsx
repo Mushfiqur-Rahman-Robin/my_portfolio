@@ -64,9 +64,9 @@ const Home: React.FC = () => {
       <section className="hero-banner">
         <div className="banner-content">
           <h1>Hello, I'm Md Mushfiqur Rahman</h1>
-          <p className="tagline">AI/ML Engineer | Innovator | Problem Solver</p>
+          <p className="tagline">AI/ML Engineer | Strategist | Problem Solver</p>
           <p className="intro-text">
-            Crafting robust and scalable AI-powered solutions and web applications with Django, React, and modern DevOps practices.
+            Empowering systems with intelligence. I lead the design and implementation of sophisticated ML, Generative AI, and agentic solutions, bridging ideas to impactful outcomes.
           </p>
           <div className="banner-cta-buttons">
             <Link to="/projects" className="btn primary">
@@ -75,14 +75,14 @@ const Home: React.FC = () => {
             <Link to="/contact" className="btn secondary">
               Let's Connect
             </Link>
-            <a
-              href="https://www.buymeacoffee.com/yourusername" // Replace with your Buy Me a Coffee link
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn buy-me-coffee-btn"
+            {/* DISABLED Buy Me A Coffee Button */}
+            <span
+              className="btn buy-me-coffee-btn disabled-bmac"
+              title="Buy Me A Coffee is currently unavailable"
+              aria-disabled="true"
             >
               Buy Me A Coffee
-            </a>
+            </span>
           </div>
         </div>
       </section>

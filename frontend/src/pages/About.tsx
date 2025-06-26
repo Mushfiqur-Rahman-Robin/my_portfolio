@@ -1,39 +1,49 @@
+// frontend/src/pages/About.tsx
 import './css/About.css';
 
 const About: React.FC = () => {
   return (
     <div className="about-container">
       <h1>About Me</h1>
-      <div className="about-content">
-        <div className="about-image">
-          {/* You can replace this with your actual profile picture */}
-          <img src="/src/assets/profile.jpg" alt="Profile Picture" />
-        </div>
+      {/* The main content area where image and text will interact */}
+      <div className="about-content-wrapper"> {/* NEW Wrapper for overall content block */}
         <div className="about-text">
+          {/* IMAGE IS NOW INSIDE THE ABOUT-TEXT DIV */}
+          <div className="about-image">
+            <img src="/src/assets/website_about.png" alt="Profile Picture" />
+          </div>
+
           <p>
-            Hello! I'm **Md Mushfiqur Rahman**, a passionate **AI/ML Engineer** and Full-Stack Developer
-            with expertise in building robust, scalable, and intelligent software solutions.
-            My journey in tech is driven by a deep curiosity for solving complex problems and
-            transforming ideas into practical applications.
+            Hello! I'm Md Mushfiqur Rahman, a full-stack data scientist with around 3 years of professional experience. I strive to tackle real-world challenges using my technical expertise in Data Science. I thrive in environments where research work is valued alongside routine tasks, constantly motivated to learn and stay updated with the latest tools and technologies in the ever-evolving data-driven world.
           </p>
           <p>
-            My core strength lies in **Artificial Intelligence** and **Machine Learning**, where
-            I leverage frameworks like **TensorFlow**, **PyTorch**, and **Scikit-learn** to develop
-            cutting-edge solutions in areas such as **Computer Vision**, **Natural Language Processing (NLP)**,
-            and **Time-Series Forecasting**. I have significant experience crafting AI-powered agents,
-            developing end-to-end data pipelines, and optimizing models for real-world performance.
+            Currently, I serve as an AI/ML Team Lead, focusing on designing and
+            implementing advanced Machine Learning and Generative AI systems. My
+            work involves leading the development of innovative AI solutions,
+            including architecting and deploying complex agentic AI systems
+            and solutions built upon Large Language Models (LLMs). I contribute
+            to system design and ensure the smooth execution and deployment of AI-
+            powered projects. My core areas of interest include Statistics, Data
+            Science, Machine Learning, Deep Learning, Generative AI, and
+            Cryptocurrency. I possess a solid understanding of various machine
+            learning and deep learning algorithms, always making an effort to
+            keep pace with new tools and technologies in the AI domain.
           </p>
           <p>
-            On the full-stack side, I build powerful backends with **Django** and **Django REST Framework**,
-            and dynamic, responsive frontends with **React** and **TypeScript**. My work extends to
-            **DevOps practices**, including **Docker** for containerization, and establishing robust **CI/CD pipelines**
-            with **GitHub Actions** for seamless deployments.
+            I believe in "Learning is Surviving!" – a philosophy that guides my
+            approach to continuous professional development. As an active
+            learner, I constantly keep myself updated with AI trends and
+            innovations by reading LinkedIn posts from top AI figures. I
+            participate in Kaggle contests and maintain a strong presence on
+            LinkedIn and GitHub, alongside conducting research work utilizing my
+            knowledge in machine learning and deep learning. I think like a
+            Software Engineer and work like a Data Scientist, with a particular
+            passion for collecting and analyzing datasets. I am very passionate
+            about my work, adhering strictly to schedules to ensure projects are
+            completed before deadlines. I believe in ultimate professionalism in
+            my work ethic.
           </p>
-          <p>
-            I thrive in collaborative environments, always eager to learn new technologies and contribute
-            to impactful projects. When I'm not coding, you can find me engaged in continuous learning,
-            exploring new research papers, or contributing to open-source initiatives.
-          </p>
+          <div className="clearfix"></div> {/* Used to clear the float */}
         </div>
       </div>
     </div>

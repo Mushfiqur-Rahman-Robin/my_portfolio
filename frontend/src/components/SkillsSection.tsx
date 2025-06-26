@@ -6,45 +6,48 @@ interface Skill {
 }
 
 const skills: Skill[] = [
+  // Programming Languages & Frameworks (prioritized)
   { name: 'Python', level: 95 },
-  // { name: 'JavaScript', level: 80 },
+  { name: 'SQL', level: 80 },
+  { name: 'HTML / CSS', level: 80 },
   { name: 'C / C++', level: 70 },
-  { name: 'HTML / CSS / SQL', level: 90 },
+  { name: 'Flask / FastAPI / Streamlit', level: 85 },
+  { name: 'Django', level: 70 },
+  // { name: 'Django REST Framework', level: 70 },
+  { name: 'React', level: 60 },
 
+  // AI/ML & Data Science Tools
+  { name: 'Scikit-learn', level: 90 },
   { name: 'TensorFlow', level: 90 },
   { name: 'PyTorch', level: 85 },
   { name: 'Keras', level: 85 },
-  { name: 'Scikit-learn', level: 90 },
-  { name: 'Flask / FastAPI / Streamlit', level: 80 },
-  { name: 'Langchain', level: 75 },
+  { name: 'Langchain', level: 85 },
+  { name: 'LangGraph', level: 80 },
+  { name: 'Exploratory Data Analysis', level: 90 },
+  { name: 'Natural Language Processing (NLP)', level: 85 },
+  { name: 'Computer Vision', level: 85 },
+  { name: 'Statistics', level: 85 },
+  { name: 'Supervised ML', level: 95 },
+  { name: 'Unsupervised ML', level: 85 },
+  { name: 'Generative AI', level: 85 },
+  { name: 'Time-Series Forecasting', level: 75 },
+  { name: 'Hypothesis Testing', level: 80 },
 
-  { name: 'Django', level: 90 },
-  { name: 'Django REST Framework', level: 85 },
-  { name: 'React', level: 80 },
-  { name: 'PostgreSQL', level: 85 },
+  // DevOps, Infra, Deployment
   { name: 'Docker', level: 80 },
-  { name: 'Git & GitHub', level: 95 },
+  { name: 'Git & GitHub', level: 90 },
   { name: 'CI/CD (GitHub Actions, CircleCI)', level: 75 },
   { name: 'Nginx', level: 70 },
   { name: 'Monitoring (Prometheus, Grafana)', level: 60 },
-  { name: 'Big Data (PySpark)', level: 65 },
   { name: 'Caching (Redis)', level: 70 },
-  { name: 'Web-scrapping (BeautifulSoup, Selenium)', level: 85 },
-  { name: 'Jira', level: 80 },
-  { name: 'OCR', level: 75 },
-  { name: 'Azure AI Document Intelligence', level: 60 },
-  { name: 'Apify', level: 60 },
 
-  { name: 'Exploratory Data Analysis', level: 90 },
-  { name: 'Statistics', level: 85 },
-  { name: 'Hypothesis Testing', level: 80 },
-  { name: 'Supervised ML', level: 90 },
-  { name: 'Unsupervised ML', level: 80 },
-  { name: 'Computer Vision', level: 85 },
-  { name: 'Natural Language Processing (NLP)', level: 85 },
-  { name: 'Time-Series Forecasting', level: 75 },
-  { name: 'Generative AI', level: 70 },
+  // Other Technical/Support Skills
+  // { name: 'MySQL', level: 80 },
+  // { name: 'PostgreSQL', level: 80 },
+  { name: 'MLOps', level: 75 },
+  { name: 'Web-scrapping (BeautifulSoup, Selenium)', level: 85 },
 ];
+
 
 const SkillsSection: React.FC = () => {
   return (
