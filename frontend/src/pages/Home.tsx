@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import SkillsSection from '../components/SkillsSection.tsx';
-import './Home.css';
+import './css/Home.css';
 
 interface Project {
   id: string;

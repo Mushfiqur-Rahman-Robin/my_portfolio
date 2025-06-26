@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, Link } from 'react-router-dom';
-import './ExperienceDetail.css';
+import './css/ExperienceDetail.css';
 
 interface ExperiencePhoto {
   id: string;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import './ListPage.css';
+import './css/ListPage.css';
 
 interface Certification {
   id: string;

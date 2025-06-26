@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import './Resume.css';
+import './css/Resume.css';
 
 interface ResumeFile {
   id: string;

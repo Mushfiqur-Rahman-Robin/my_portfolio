@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useSearchParams } from 'react-router-dom'; // Import useSearchParams for pagination
-import './ProjectList.css';
+import './css/ProjectList.css';
 
 interface Project {
   id: string;

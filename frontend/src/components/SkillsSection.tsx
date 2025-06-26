@@ -1,4 +1,4 @@
-import './SkillsSection.css';
+import './css/SkillsSection.css';
 
 interface Skill {
   name: string;

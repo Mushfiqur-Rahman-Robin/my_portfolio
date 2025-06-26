@@ -1,4 +1,4 @@
-import './Footer.css';
+import './css/Footer.css';
 
 const Footer: React.FC = () => {
   return (
@@ -6,49 +6,49 @@ const Footer: React.FC = () => {
       <div className="footer-container">
         <div className="social-links">
           <a
-            href="https://github.com/Mushfiqur-Rahman-Robin" // Replaced with your GitHub URL
+            href="https://github.com/Mushfiqur-Rahman-Robin"
             target="_blank"
             rel="noopener noreferrer"
           >
             GitHub
           </a>
           <a
-            href="https://linkedin.com/in/mushfiqur--rahman" // Replaced with your LinkedIn URL
+            href="https://www.linkedin.com/in/mushfiqur--rahman/"
             target="_blank"
             rel="noopener noreferrer"
           >
             LinkedIn
           </a>
           <a
-            href="https://facebook.com/your-facebook-profile" // New: Facebook
+            href="https://www.facebook.com/mushfiqur.rahman.78/"
             target="_blank"
             rel="noopener noreferrer"
           >
             Facebook
           </a>
           <a
-            href="https://www.instagram.com/your-instagram-profile" // New: Instagram (instead of Twitter)
+            href="https://www.instagram.com/mushfiqur._.rahman/"
             target="_blank"
             rel="noopener noreferrer"
           >
             Instagram
           </a>
           <a
-            href="https://huggingface.co/your-huggingface-profile" // New: Hugging Face
+            href="https://huggingface.co/mushfiqurrobin"
             target="_blank"
             rel="noopener noreferrer"
           >
             Hugging Face
           </a>
           <a
-            href="https://scholar.google.com/citations?user=your-google-scholar-id" // New: Google Scholar
+            href="https://scholar.google.com/citations?user=2-Z5fHgAAAAJ"
             target="_blank"
             rel="noopener noreferrer"
           >
             Google Scholar
           </a>
         </div>
-        <p>&copy; {new Date().getFullYear()} Md Mushfiqur Rahman. All rights reserved.</p> {/* Updated name */}
+        <p>&copy; {new Date().getFullYear()} Md Mushfiqur Rahman. All rights reserved.</p>
       </div>
     </footer>
   );
