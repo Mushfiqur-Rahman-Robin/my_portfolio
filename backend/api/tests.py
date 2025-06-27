@@ -4,6 +4,7 @@ import shutil  # Import shutil for directory removal
 from io import BytesIO
 
 from django.conf import settings
+from django.core import mail  # Import the mail module for tests
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -166,3 +167,29 @@ class APITests(TestCase):
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["company_name"], "Test Company")
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_contact_message_sends_email(self):
+        """
+        Test that sending a contact message also sends an email.
+        """
+        self.assertEqual(len(mail.outbox), 0)  # No email sent initially
+
+        message_data = {
+            "name": "Test User",
+            "email": "test@example.com",
+            "message": "This is a test message.",
+        }
+        response = self.client.post(reverse("message-list"), message_data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(len(mail.outbox), 1)  # One email should have been sent
+
+        sent_email = mail.outbox[0]
+        self.assertEqual(sent_email.subject, "New Contact Message from Portfolio Website")
+        self.assertIn("Name: Test User", sent_email.body)
+        self.assertIn("Email: test@example.com", sent_email.body)
+        self.assertIn("Message: This is a test message.", sent_email.body)
+        self.assertEqual(sent_email.from_email, settings.DEFAULT_FROM_EMAIL)
+
+        self.assertIn(settings.ADMIN_EMAIL, sent_email.to)

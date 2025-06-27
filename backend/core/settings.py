@@ -1,4 +1,3 @@
-# backend/core/settings.py
 import os
 from pathlib import Path
 
@@ -15,6 +14,9 @@ ALLOWED_HOSTS = config(
     default="127.0.0.1,localhost,0.0.0.0",
     cast=lambda v: [s.strip() for s in v.split(",")],
 )
+
+# Your administrative email address to receive contact messages
+ADMIN_EMAIL = config("ADMIN_EMAIL", default="your_admin_email@example.com")
 
 if DEBUG:
     ALLOWED_HOSTS = ["*"]
@@ -68,6 +70,18 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.BrowsableAPIRenderer",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    # Global Rate Limiting Configuration (as a baseline for all APIs)
+    # These will apply to all views unless explicitly overridden or an Anon/User throttle is replaced
+    "DEFAULT_THROTTLE_CLASSES": [
+        "api.throttles.CustomAnonRateThrottle",
+        "api.throttles.CustomUserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/minute",  # General rate for anonymous users across all APIs
+        "user": "1000/hour",  # General rate for authenticated users across all APIs
+        "contact_form": "5/day",  # Specific rate for contact form submissions (anonymous users)
+        "visitor_count": "1/second",  # Specific rate for visitor count endpoint
+    },
 }
 
 SPECTACULAR_SETTINGS = {
@@ -122,7 +136,18 @@ CACHES = {
 # This setting is required for the caching middleware to work
 CACHE_MIDDLEWARE_SECONDS = 60 * 5  # Cache for 5 minutes (300 seconds)
 
-# LOGGING configuration for CRITICAL level only
+# Email Backend Configuration (for sending contact form notifications)
+# For development, you might use 'console.EmailBackend' or 'filebased.EmailBackend'
+# For production, use 'django.core.mail.backends.smtp.EmailBackend' with proper settings
+EMAIL_BACKEND = config("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+EMAIL_HOST = config("EMAIL_HOST", default="smtp.example.com")
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="noreply@yourdomain.com")
+
+# LOGGING configuration for CRITICAL level only and a specific email logger
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -148,6 +173,12 @@ LOGGING = {
             "filename": os.path.join(BASE_DIR, "logs/critical_errors.log"),
             "formatter": "verbose",
         },
+        "email_file": {  # Specific handler for email sending logs
+            "level": "ERROR",  # Log email sending errors
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "logs/email_errors.log"),
+            "formatter": "verbose",
+        },
         "null": {
             "class": "logging.NullHandler",
         },
@@ -163,7 +194,12 @@ LOGGING = {
             "level": "CRITICAL",
             "propagate": False,
         },
-        "": {  # Root logger
+        "email_sending": {  # New logger specifically for email sending
+            "handlers": ["console", "email_file"],
+            "level": "INFO",  # Log INFO for successful sends, ERROR for failures
+            "propagate": False,
+        },
+        "": {  # Root logger - catches anything not handled by specific loggers
             "handlers": ["console", "file"],
             "level": "CRITICAL",
             "propagate": False,

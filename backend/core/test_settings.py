@@ -9,6 +9,12 @@ CACHES = {
     }
 }
 
+# Use a memory backend for email in tests
+EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+DEFAULT_FROM_EMAIL = "test@example.com"
+ADMIN_EMAIL = "admin@example.com"
+
+
 # Optionally disable caching middleware for tests
 MIDDLEWARE = [
     mw
