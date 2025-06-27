@@ -1,10 +1,10 @@
 # api/tests.py
 import os
-import shutil  # Import shutil for directory removal
+import shutil
 from io import BytesIO
 
 from django.conf import settings
-from django.core import mail  # Import the mail module for tests
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -189,7 +189,7 @@ class APITests(TestCase):
         self.assertEqual(sent_email.subject, "New Contact Message from Portfolio Website")
         self.assertIn("Name: Test User", sent_email.body)
         self.assertIn("Email: test@example.com", sent_email.body)
-        self.assertIn("Message: This is a test message.", sent_email.body)
+        self.assertIn("Message:\nThis is a test message.", sent_email.body)
         self.assertEqual(sent_email.from_email, settings.DEFAULT_FROM_EMAIL)
 
         self.assertIn(settings.ADMIN_EMAIL, sent_email.to)
