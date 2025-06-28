@@ -76,10 +76,10 @@ jobs:
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY_TEST }}
           DEBUG: "False"
           PYTHONPATH: .
-          # Add email related test env vars
           EMAIL_BACKEND: "django.core.mail.backends.locmem.EmailBackend"
           DEFAULT_FROM_EMAIL: "test@example.com"
           ADMIN_EMAIL: "admin@example.com"
+          CSRF_TRUSTED_ORIGINS: "http://localhost:8000" # A dummy but valid origin for CI checks
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
@@ -95,10 +95,10 @@ jobs:
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY_TEST }}
           DEBUG: "False"
           PYTHONPATH: .
-          # Add email related test env vars
           EMAIL_BACKEND: "django.core.mail.backends.locmem.EmailBackend"
           DEFAULT_FROM_EMAIL: "test@example.com"
           ADMIN_EMAIL: "admin@example.com"
+          CSRF_TRUSTED_ORIGINS: "http://localhost:8000" # A dummy but valid origin for CI checks
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
@@ -114,10 +114,10 @@ jobs:
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY_TEST }}
           DEBUG: "False"
           PYTHONPATH: .
-          # Add email related test env vars for pytest to use the locmem backend
           EMAIL_BACKEND: "django.core.mail.backends.locmem.EmailBackend"
           DEFAULT_FROM_EMAIL: "test@example.com"
           ADMIN_EMAIL: "admin@example.com"
+          CSRF_TRUSTED_ORIGINS: "http://localhost:8000" # A dummy but valid origin for CI tests
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
