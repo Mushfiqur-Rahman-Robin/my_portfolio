@@ -15,6 +15,12 @@ ALLOWED_HOSTS = config(
     cast=lambda v: [s.strip() for s in v.split(",")],
 )
 
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="",
+    cast=lambda v: [s.strip() for s in v.split(",")],
+)
+
 # Your administrative email address to receive contact messages
 ADMIN_EMAIL = config("ADMIN_EMAIL", default="your_admin_email@example.com")
 
