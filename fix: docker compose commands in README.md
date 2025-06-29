@@ -49,7 +49,7 @@ The repository is organized as a monorepo with the following main directories:
     -   Copy `frontend/.env.local.template` to `frontend/.env.local` and fill in the necessary environment variables.
 3.  **Build & Run**:
     ```bash
-    docker-compose up --build
+    docker compose up --build
     ```
 4.  **Access**:
     -   **Frontend**: `http://localhost:5173`
@@ -58,7 +58,7 @@ The repository is organized as a monorepo with the following main directories:
 
 5.  **Create Superuser** (for admin access):
     ```bash
-    docker-compose exec backend python manage.py createsuperuser
+    docker compose exec backend python manage.py createsuperuser
     ```
 
 ## Deployment
