@@ -1,4 +1,24 @@
-# React + TypeScript + Vite
+# Frontend
+
+This directory contains the React (Vite + TypeScript) application that serves as the frontend for the portfolio website.
+
+For detailed information about the project structure, setup, and deployment, please refer to the [main README.md](../README.md).
+
+## Key Components
+
+-   **`src/`**: Main source code (components, pages, assets, styles).
+-   **`public/`**: Static assets.
+-   **`vite.config.ts`**: Vite configuration.
+-   **`Dockerfile`**: Instructions for building the frontend Docker image.
+-   **`package.json`**: Node.js dependencies and scripts.
+
+Please see the [main README.md](../README.md#frontend-details) for more specific details on the frontend architecture and functionalities.
+
+The original Vite boilerplate information can be found below if needed:
+
+---
+
+# React + TypeScript + Vite (Original Boilerplate)
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
