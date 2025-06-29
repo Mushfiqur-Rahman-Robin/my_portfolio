@@ -53,7 +53,7 @@ jobs:
         working-directory: ./backend
         run: |
           curl -LsSf https://astral.sh/ruff/install.sh | sh
-          ruff check .
+          ruff check . --fix
 
       - name: Run formatter check (Ruff)
         working-directory: ./backend
@@ -79,7 +79,7 @@ jobs:
           EMAIL_BACKEND: "django.core.mail.backends.locmem.EmailBackend"
           DEFAULT_FROM_EMAIL: "test@example.com"
           ADMIN_EMAIL: "admin@example.com"
-          CSRF_TRUSTED_ORIGINS: "http://localhost:8000" # A dummy but valid origin for CI checks
+          CSRF_TRUSTED_ORIGINS: "http://localhost:8000"
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
@@ -98,7 +98,7 @@ jobs:
           EMAIL_BACKEND: "django.core.mail.backends.locmem.EmailBackend"
           DEFAULT_FROM_EMAIL: "test@example.com"
           ADMIN_EMAIL: "admin@example.com"
-          CSRF_TRUSTED_ORIGINS: "http://localhost:8000" # A dummy but valid origin for CI checks
+          CSRF_TRUSTED_ORIGINS: "http://localhost:8000"
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
@@ -117,7 +117,7 @@ jobs:
           EMAIL_BACKEND: "django.core.mail.backends.locmem.EmailBackend"
           DEFAULT_FROM_EMAIL: "test@example.com"
           ADMIN_EMAIL: "admin@example.com"
-          CSRF_TRUSTED_ORIGINS: "http://localhost:8000" # A dummy but valid origin for CI tests
+          CSRF_TRUSTED_ORIGINS: "http://localhost:8000"
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
@@ -149,21 +149,21 @@ jobs:
         run: npm run build
 
   deploy:
-  needs: [backend-checks, frontend-checks]
-  runs-on: ubuntu-latest
-  if: github.ref == 'refs/heads/main'
+    needs: [backend-checks, frontend-checks]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
-  steps:
-    - name: Deploy to Production Server
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          set -e
-          cd ~/my_portfolio
-          git pull origin main
-          docker compose up --build -d
-          docker compose exec backend python manage.py migrate --noinput
-          docker system prune -af
+    steps:
+      - name: Deploy to Production Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd ~/my_portfolio
+            git pull origin main
+            docker compose up --build -d
+            docker compose exec backend python manage.py migrate --noinput
+            docker system prune -af
