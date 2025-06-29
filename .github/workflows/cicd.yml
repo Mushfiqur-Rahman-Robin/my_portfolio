@@ -149,25 +149,21 @@ jobs:
         run: npm run build
 
   deploy:
-    needs: [backend-checks, frontend-checks]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+  needs: [backend-checks, frontend-checks]
+  runs-on: ubuntu-latest
+  if: github.ref == 'refs/heads/main'
 
-    steps:
-      - name: Deploy to Production Server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            # Navigate to the project directory
-            cd ~/my_porfolio
-            # Pull the latest changes from the main branch
-            git pull origin main
-            # Rebuild and restart all services in detached mode
-            docker-compose up --build -d
-            # Apply any new database migrations
-            docker-compose exec backend python manage.py migrate --noinput
-            # Clean up unused Docker images and build cache to save space
-            docker system prune -af
+  steps:
+    - name: Deploy to Production Server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          set -e
+          cd ~/my_portfolio
+          git pull origin main
+          docker compose up --build -d
+          docker compose exec backend python manage.py migrate --noinput
+          docker system prune -af
