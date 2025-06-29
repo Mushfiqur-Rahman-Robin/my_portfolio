@@ -21,6 +21,17 @@ CSRF_TRUSTED_ORIGINS = config(
     cast=lambda v: [s.strip() for s in v.split(",")],
 )
 
+USE_X_FORWARDED_HOST = True  # Tells Django to trust the X-Forwarded-Host header from the proxy
+SECURE_PROXY_SSL_HEADER = (
+    "HTTP_X_FORWARDED_PROTO",
+    "https",
+)  # Tells Django that if X-Forwarded-Proto is 'https', it should consider the request secure.
+
+# Recommended for production SSL setup with a proxy (Django will add security headers)
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 # Your administrative email address to receive contact messages
 ADMIN_EMAIL = config("ADMIN_EMAIL", default="your_admin_email@example.com")
 
