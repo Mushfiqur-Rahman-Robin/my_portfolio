@@ -24,8 +24,10 @@ from django.http import HttpResponse
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
+
 def healthcheck_view(request):
     return HttpResponse("OK")
+
 
 urlpatterns = (
     [

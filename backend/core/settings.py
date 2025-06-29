@@ -22,7 +22,7 @@ CSRF_TRUSTED_ORIGINS = config(
 )
 
 USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Your administrative email address to receive contact messages
 ADMIN_EMAIL = config("ADMIN_EMAIL", default="your_admin_email@example.com")

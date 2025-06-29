@@ -52,4 +52,3 @@ CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout",
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f -H "Host: api.mushfiqurrahmanrobin.com" http://localhost:8000/health/ || exit 1
-
