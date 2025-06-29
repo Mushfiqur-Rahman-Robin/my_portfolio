@@ -31,7 +31,7 @@ WORKDIR /app
 
 # Runtime-only tools we still need
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    postgresql-client \
+    curl postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -51,4 +51,5 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "90"]
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/admin/ || exit 1
+  CMD curl -f -H "Host: api.mushfiqurrahmanrobin.com" http://localhost:8000/health/ || exit 1
+

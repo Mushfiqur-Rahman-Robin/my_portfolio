@@ -11,7 +11,7 @@ done
 python manage.py migrate --noinput
 
 # Optionally collect static files if they need runtime updates
-# python manage.py collectstatic --noinput
+python manage.py collectstatic --noinput
 
 # Start Gunicorn (CMD arguments are passed via exec)
 exec "$@"

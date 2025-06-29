@@ -15,6 +15,15 @@ ALLOWED_HOSTS = config(
     cast=lambda v: [s.strip() for s in v.split(",")],
 )
 
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="",
+    cast=lambda v: [s.strip() for s in v.split(",")],
+)
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Your administrative email address to receive contact messages
 ADMIN_EMAIL = config("ADMIN_EMAIL", default="your_admin_email@example.com")
 
