@@ -19,6 +19,9 @@ interface PaginationInfo<T> {
   results: T[];
 }
 
+// Define the number of items per page for this list view
+const PUBLICATIONS_PER_PAGE = 3;
+
 const PublicationList: React.FC = () => {
   const [publications, setPublications] = useState<Publication[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -28,21 +31,27 @@ const PublicationList: React.FC = () => {
 
   useEffect(() => {
     const fetchPublications = async () => {
+      setLoading(true); // Start loading when page changes
       try {
+        // Construct the URL with page and page_size parameters
         const response = await axios.get<PaginationInfo<Publication>>(
-          `${import.meta.env.VITE_API_URL}publications/?page=${currentPage}`,
+          `${import.meta.env.VITE_API_URL}publications/?page=${currentPage}&page_size=${PUBLICATIONS_PER_PAGE}`, // <--- ADDED page_size
         );
-        setPublications(response.data.results); // CRITICAL FIX: Access results array
-        setTotalPages(Math.ceil(response.data.count / 6)); // Assuming 6 items per page
+        setPublications(response.data.results);
+        // CRITICAL FIX: Calculate totalPages based on the new constant
+        setTotalPages(Math.ceil(response.data.count / PUBLICATIONS_PER_PAGE));
+        setError(null); // Clear any previous errors
       } catch (err) {
         setError('Failed to fetch publications.');
         console.error('Publications fetch error:', err);
+        setPublications([]); // Ensure empty state on error
+        setTotalPages(1); // Reset total pages on error
       } finally {
         setLoading(false);
       }
     };
     fetchPublications();
-  }, [currentPage]);
+  }, [currentPage]); // Re-fetch whenever currentPage changes
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

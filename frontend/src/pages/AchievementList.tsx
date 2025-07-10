@@ -18,6 +18,9 @@ interface PaginationInfo<T> {
   results: T[];
 }
 
+// Define the number of items per page for this list view
+const ACHIEVEMENTS_PER_PAGE = 3; // <--- NEW CONSTANT
+
 const AchievementList: React.FC = () => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -27,21 +30,27 @@ const AchievementList: React.FC = () => {
 
   useEffect(() => {
     const fetchAchievements = async () => {
+      setLoading(true); // Start loading when page changes
       try {
+        // Construct the URL with page and page_size parameters
         const response = await axios.get<PaginationInfo<Achievement>>(
-          `${import.meta.env.VITE_API_URL}achievements/?page=${currentPage}`,
+          `${import.meta.env.VITE_API_URL}achievements/?page=${currentPage}&page_size=${ACHIEVEMENTS_PER_PAGE}`, // <--- ADDED page_size
         );
-        setAchievements(response.data.results); // CRITICAL FIX: Access results array
-        setTotalPages(Math.ceil(response.data.count / 6)); // Assuming 6 items per page
+        setAchievements(response.data.results);
+        // CRITICAL FIX: Calculate totalPages based on the new constant
+        setTotalPages(Math.ceil(response.data.count / ACHIEVEMENTS_PER_PAGE));
+        setError(null); // Clear any previous errors
       } catch (err) {
         setError('Failed to fetch achievements.');
         console.error('Achievements fetch error:', err);
+        setAchievements([]); // Ensure empty state on error
+        setTotalPages(1); // Reset total pages on error
       } finally {
         setLoading(false);
       }
     };
     fetchAchievements();
-  }, [currentPage]);
+  }, [currentPage]); // Re-fetch whenever currentPage changes
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
