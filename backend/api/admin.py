@@ -3,6 +3,8 @@ from django.contrib import admin
 from .models import (
     Achievement,
     Certification,
+    ChatMessage,
+    ChatSession,
     ContactMessage,
     Experience,
     ExperiencePhoto,
@@ -55,6 +57,28 @@ class ExperienceAdmin(admin.ModelAdmin):
             },
         ),
     )
+
+
+class ChatMessageInline(admin.TabularInline):
+    """Displays chat messages within the ChatSession view."""
+
+    model = ChatMessage
+    extra = 0  # Don't show any extra forms for new messages
+    readonly_fields = ("sender", "message", "created_at")  # Make fields read-only
+    can_delete = False  # Prevent deleting messages from the session view
+
+    def has_add_permission(self, request, obj=None):
+        return False  # Prevent adding new messages from here
+
+
+@admin.register(ChatSession)
+class ChatSessionAdmin(admin.ModelAdmin):
+    """Admin view for Chat Sessions."""
+
+    list_display = ("id", "created_at")
+    list_filter = ("created_at",)
+    readonly_fields = ("id", "created_at")
+    inlines = [ChatMessageInline]  # Nest the messages inside the session
 
 
 admin.site.register(Publication)

@@ -18,6 +18,7 @@ services:
     depends_on:
       - db
       - redis
+      - chromadb
 
   frontend:
     build: ./frontend
@@ -45,6 +46,18 @@ services:
     volumes:
       - redis_data:/data
 
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: portfolio_chromadb
+    ports:
+      - "127.0.0.1:8001:8000"
+    volumes:
+      - chroma_data:/chroma/.chroma/index # Persistent data storage for ChromaDB
+    environment:
+      - IS_PERSISTENT=TRUE # Ensures data is written to disk
+      - ANONYMIZED_TELEMETRY=FALSE # Optional: Disable ChromaDB's telemetry
+
 volumes:
   postgres_data:
   redis_data:
+  chroma_data:

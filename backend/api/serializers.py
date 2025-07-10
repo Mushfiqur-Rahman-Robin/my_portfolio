@@ -1,18 +1,7 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from .models import (
-    Achievement,
-    Certification,
-    ContactMessage,
-    Experience,
-    ExperiencePhoto,
-    Project,
-    ProjectImage,
-    Publication,
-    Resume,
-    Tag,
-)
+from .models import Achievement, Certification, ContactMessage, Experience, ExperiencePhoto, Project, ProjectImage, Publication, Resume, Tag
 
 
 class TagSerializer(serializers.ModelSerializer):

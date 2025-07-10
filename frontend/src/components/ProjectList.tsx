@@ -27,6 +27,9 @@ interface PaginationInfo {
   results: Project[];
 }
 
+// Define the page size for the frontend calculation
+const PROJECTS_PER_PAGE = 3; // <--- ADD THIS CONSTANT AND USE IT BELOW
+
 const ProjectList: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [allTags, setAllTags] = useState<Tag[]>([]);
@@ -63,14 +66,17 @@ const ProjectList: React.FC = () => {
           params.append('tag', selectedTag);
         }
         params.append('page', currentPage.toString());
-        // Default page_size is 6 from backend StandardResultsPagination
-        // params.append('page_size', '6');
+        // Add page_size to the request if you want to explicitly control it from frontend,
+        // otherwise rely on backend default which we just changed.
+        // For consistency, it's good to explicitly ask for the same page size.
+        params.append('page_size', PROJECTS_PER_PAGE.toString()); // <--- ADD THIS LINE
 
         url = `${url}?${params.toString()}`;
 
         const response = await axios.get<PaginationInfo>(url);
         setProjects(response.data.results);
-        setTotalPages(Math.ceil(response.data.count / 6)); // Assuming 6 items per page
+        // CRITICAL FIX: Base totalPages on the new PROJECTS_PER_PAGE
+        setTotalPages(Math.ceil(response.data.count / PROJECTS_PER_PAGE));
       } catch (err) {
         setError('Failed to fetch projects');
         console.error(err);
