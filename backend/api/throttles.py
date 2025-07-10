@@ -35,3 +35,12 @@ class VisitorCountRateThrottle(AnonRateThrottle):
     """
 
     scope = "visitor_count"
+
+
+class ChatbotRateThrottle(AnonRateThrottle):
+    """
+    Limits the rate of chatbot queries for anonymous users to prevent abuse
+    and manage API costs.
+    """
+
+    scope = "chatbot"

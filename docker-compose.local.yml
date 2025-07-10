@@ -1,3 +1,5 @@
+# docker-compose.local.yml
+
 services:
   backend:
     build:
@@ -8,7 +10,7 @@ services:
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
-      - ./backend/logs:/app/logs
+      - ./backend:/app
     expose:
       - 8000
     ports:
@@ -18,6 +20,7 @@ services:
     depends_on:
       - db
       - redis
+      - chromadb
 
   frontend:
     build: ./frontend
@@ -48,8 +51,20 @@ services:
     volumes:
       - redis_data:/data
 
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: portfolio_chromadb
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/.chroma/index
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE # Optional: disable telemetry
+
 volumes:
   postgres_data:
   static_volume:
   media_volume:
   redis_data:
+  chroma_data:

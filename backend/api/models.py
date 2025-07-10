@@ -26,12 +26,8 @@ class Project(models.Model):
     repo_url = models.URLField(blank=True, null=True)
     tags = models.ManyToManyField(Tag, related_name="projects", blank=True)
     display_order = models.PositiveIntegerField(default=0)
-    is_featured = models.BooleanField(
-        default=False, help_text="Select to show on homepage featured section"
-    )  # New field
-    code_snippet = models.TextField(
-        blank=True, null=True, help_text="Code snippet for syntax highlighting"
-    )  # New field for code
+    is_featured = models.BooleanField(default=False, help_text="Select to show on homepage featured section")  # New field
+    code_snippet = models.TextField(blank=True, null=True, help_text="Code snippet for syntax highlighting")  # New field for code
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -145,9 +141,7 @@ class Resume(models.Model):
 
 
 class VisitorCount(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False
-    )  # Changed to UUID for consistency
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Changed to UUID for consistency
     count = models.PositiveIntegerField(default=0)
     last_updated = models.DateTimeField(auto_now=True)
 
@@ -193,3 +187,40 @@ class ExperiencePhoto(models.Model):
 
     def __str__(self):
         return f"Photo for {self.experience.company_name} - {self.caption or self.image.name}"
+
+
+class ChatSession(models.Model):
+    """Represents a single, unique chat conversation."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Chat Session"
+        verbose_name_plural = "Chat Sessions"
+
+    def __str__(self):
+        return f"Chat Session {self.id} on {self.created_at.strftime('%Y-%m-%d')}"
+
+
+class ChatMessage(models.Model):
+    """Represents a single message within a chat session."""
+
+    SENDER_CHOICES = (
+        ("user", "User"),
+        ("bot", "Bot"),
+    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    session = models.ForeignKey(ChatSession, related_name="messages", on_delete=models.CASCADE)
+    sender = models.CharField(max_length=4, choices=SENDER_CHOICES)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+        verbose_name = "Chat Message"
+        verbose_name_plural = "Chat Messages"
+
+    def __str__(self):
+        return f"{self.get_sender_display()} message at {self.created_at.strftime('%H:%M')}"

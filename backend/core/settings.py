@@ -9,6 +9,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
 
+# Load the OpenAI API Key from the .env file
+OPENAI_API_KEY = config("OPENAI_API_KEY", default="")
+
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS",
     default="127.0.0.1,localhost,0.0.0.0",
@@ -95,6 +98,7 @@ REST_FRAMEWORK = {
         "user": "1000/hour",  # General rate for authenticated users across all APIs
         "contact_form": "5/day",  # Specific rate for contact form submissions (anonymous users)
         "visitor_count": "1/second",  # Specific rate for visitor count endpoint
+        "chatbot": "30/day",  # Specific rate for chatbot queries
     },
 }
 

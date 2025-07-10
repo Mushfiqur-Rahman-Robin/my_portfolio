@@ -131,9 +131,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="project",
             name="image",
-            field=models.ImageField(
-                help_text="Main image for project preview/banner", upload_to="projects/banners/"
-            ),
+            field=models.ImageField(help_text="Main image for project preview/banner", upload_to="projects/banners/"),
         ),
         migrations.RemoveField(
             model_name="project",
@@ -148,9 +146,7 @@ class Migration(migrations.Migration):
                 ("display_order", models.PositiveIntegerField(default=0)),
                 (
                     "experience",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, related_name="photos", to="api.experience"
-                    ),
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="photos", to="api.experience"),
                 ),
             ],
             options={
