@@ -19,6 +19,9 @@ interface PaginationInfo<T> {
   results: T[];
 }
 
+// Define the number of items per page for this list view
+const CERTIFICATIONS_PER_PAGE = 3;
+
 const CertificationList: React.FC = () => {
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -28,21 +31,27 @@ const CertificationList: React.FC = () => {
 
   useEffect(() => {
     const fetchCertifications = async () => {
+      setLoading(true); // Start loading when page changes
       try {
+        // Construct the URL with page and page_size parameters
         const response = await axios.get<PaginationInfo<Certification>>(
-          `${import.meta.env.VITE_API_URL}certifications/?page=${currentPage}`,
+          `${import.meta.env.VITE_API_URL}certifications/?page=${currentPage}&page_size=${CERTIFICATIONS_PER_PAGE}`, // <--- ADDED page_size
         );
-        setCertifications(response.data.results); // CRITICAL FIX: Access results array
-        setTotalPages(Math.ceil(response.data.count / 6)); // Assuming 6 items per page
+        setCertifications(response.data.results);
+        // CRITICAL FIX: Calculate totalPages based on the new constant
+        setTotalPages(Math.ceil(response.data.count / CERTIFICATIONS_PER_PAGE));
+        setError(null); // Clear any previous errors
       } catch (err) {
         setError('Failed to fetch certifications.');
         console.error('Certifications fetch error:', err);
+        setCertifications([]); // Ensure empty state on error
+        setTotalPages(1); // Reset total pages on error
       } finally {
         setLoading(false);
       }
     };
     fetchCertifications();
-  }, [currentPage]);
+  }, [currentPage]); // Re-fetch whenever currentPage changes
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
