@@ -31,7 +31,7 @@ WORKDIR /app
 
 # Runtime-only tools we still need
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl postgresql-client \
+    curl postgresql-client build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

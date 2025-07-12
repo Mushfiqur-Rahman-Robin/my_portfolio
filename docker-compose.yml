@@ -47,8 +47,7 @@ services:
       - redis_data:/data
 
   chromadb:
-    # --- FIXED TO 1.0.15 ---
-    image: chromadb/chroma:1.0.15
+    image: chromadb/chroma:0.4.14
     container_name: portfolio_chromadb
     ports:
       - "127.0.0.1:8001:8000"
