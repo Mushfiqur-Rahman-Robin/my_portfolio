@@ -190,7 +190,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
+  text-align: center; /* Ensure overall card content is centered */
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
@@ -230,7 +230,7 @@
   line-height: 1.5;
   margin-bottom: 1rem;
   flex-grow: 1;
-  text-align: left;
+  text-align: center; /* IMPORTANT: Center paragraph text here */
   font-size: 1rem; /* Desktop font size */
 }
 
@@ -239,7 +239,7 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.5rem;
-  justify-content: center;
+  justify-content: center; /* IMPORTANT: Center tag badges */
   margin-bottom: 1.5rem;
 }
 
@@ -352,16 +352,25 @@
   }
   .project-preview-description {
     font-size: 0.95rem;
+    text-align: center; /* Ensure mobile description is centered */
   }
+
+  /* FIX: Center buttons on mobile */
   .project-preview-actions {
-    flex-direction: column;
+    flex-direction: row; /* Keep as row to have buttons side-by-side */
+    justify-content: center; /* Center the buttons in the row */
     gap: 0.8rem;
   }
 
   .project-preview-actions .btn {
-    width: 100%;
-    flex: none; /* Override flex: 1 */
+    width: auto; /* Let buttons take their natural width */
+    flex: 1; /* Allow buttons to grow and fill space evenly */
+    max-width: 150px; /* Optional: constrain max width */
     font-size: 0.95rem;
+  }
+
+  .project-preview-tags {
+    justify-content: center; /* Ensure mobile tags are centered */
   }
 }
 
