@@ -183,19 +183,20 @@ class VisitorCountView(APIView):
     )
     def post(self, request, format=None):
         try:
-            # --- UPDATED LOGIC ---
             # 1. Increment the total visitor count
             total_count, _ = TotalVisitorCount.objects.get_or_create()
             total_count.count = F("count") + 1
             total_count.save()
             total_count.refresh_from_db()
 
-            # 2. Increment today's visitor count
+            # 2. Increment today's visitor count (FIXED LOGIC)
             today = timezone.now().date()
-            daily_count, created = DailyVisitorCount.objects.get_or_create(date=today)
+            daily_count, created = DailyVisitorCount.objects.get_or_create(date=today, defaults={"count": 1})  # Set initial count to 1 for new entries
             if not created:
+                # If record already exists, increment it
                 daily_count.count = F("count") + 1
                 daily_count.save()
+                daily_count.refresh_from_db()
 
             return Response(
                 {"message": "Visitor count incremented", "count": total_count.count},

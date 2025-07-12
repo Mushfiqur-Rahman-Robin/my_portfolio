@@ -111,7 +111,9 @@ class DailyVisitorCountAdmin(admin.ModelAdmin):
     list_display = ("date", "count")
     list_filter = ("date",)
     readonly_fields = ("date", "count")
+    ordering = ["-date"]
 
+    # Allow viewing but prevent modifications
     def has_add_permission(self, request):
         return False  # Prevent manual creation
 
@@ -120,3 +122,20 @@ class DailyVisitorCountAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False  # Prevent deletion from the admin
+
+    # Override to ensure the changelist view works
+    def changelist_view(self, request, extra_context=None):
+        try:
+            return super().changelist_view(request, extra_context)
+        except Exception as e:
+            # Log the error for debugging
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error in DailyVisitorCount changelist: {e}", exc_info=True)
+
+            # Return a basic response to prevent 500 error
+            from django.contrib import messages
+
+            messages.error(request, f"Error loading daily visitor counts: {e}")
+            return super().changelist_view(request, extra_context)
