@@ -3,7 +3,7 @@
 import os
 
 from django.conf import settings
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
 from .chromadb_utils import add_or_update_node, delete_node
@@ -171,21 +171,84 @@ def delete_resume_file(sender, instance, **kwargs):
     delete_file_if_exists(instance.pdf_file)
 
 
-# ============================================================================
-# OPTIONAL: FILE DELETION ON UPDATE (consider if needed, currently off)
-# (Uncomment and modify if you want old files replaced by new ones to be deleted)
-# ============================================================================
+# --- On File Update (using pre_save) ---
+@receiver(pre_save, sender=Project)
+def delete_old_project_image_on_update(sender, instance, **kwargs):
+    """Delete the old main image file when a new one is uploaded for Project."""
+    if not instance.pk:  # Object is being created, not updated
+        return
+    try:
+        old_instance = sender.objects.get(pk=instance.pk)
+        if old_instance.image and old_instance.image.name != instance.image.name:
+            delete_file_if_exists(old_instance.image)
+    except sender.DoesNotExist:
+        pass  # Old instance not found, nothing to delete (shouldn't happen with instance.pk check)
 
-# from django.db.models.signals import pre_save
 
-# @receiver(pre_save, sender=Project)
-# def delete_old_project_image_on_update(sender, instance, **kwargs):
-#     """Delete the old image file when a new one is uploaded for Project."""
-#     if not instance.pk: # Object is being created, not updated
-#         return
-#     try:
-#         old_instance = sender.objects.get(pk=instance.pk)
-#         if old_instance.image and old_instance.image.name != instance.image.name:
-#             delete_file_if_exists(old_instance.image)
-#     except sender.DoesNotExist:
-#         pass # Old instance not found, nothing to delete
+@receiver(pre_save, sender=ProjectImage)
+def delete_old_project_gallery_image_on_update(sender, instance, **kwargs):
+    """Delete the old gallery image file when a new one is uploaded for ProjectImage."""
+    if not instance.pk:
+        return
+    try:
+        old_instance = sender.objects.get(pk=instance.pk)
+        if old_instance.image and old_instance.image.name != instance.image.name:
+            delete_file_if_exists(old_instance.image)
+    except sender.DoesNotExist:
+        pass
+
+
+@receiver(pre_save, sender=Certification)
+def delete_old_certification_image_on_update(sender, instance, **kwargs):
+    """Delete the old image file when a new one is uploaded for Certification."""
+    if not instance.pk:
+        return
+    try:
+        old_instance = sender.objects.get(pk=instance.pk)
+        if old_instance.image and old_instance.image.name != instance.image.name:
+            delete_file_if_exists(old_instance.image)
+    except sender.DoesNotExist:
+        pass
+
+
+@receiver(pre_save, sender=Achievement)
+def delete_old_achievement_image_on_update(sender, instance, **kwargs):
+    """Delete the old image file when a new one is uploaded for Achievement."""
+    if not instance.pk:
+        return
+    try:
+        old_instance = sender.objects.get(pk=instance.pk)
+        if old_instance.image and old_instance.image.name != instance.image.name:
+            delete_file_if_exists(old_instance.image)
+    except sender.DoesNotExist:
+        pass
+
+
+@receiver(pre_save, sender=ExperiencePhoto)
+def delete_old_experience_photo_on_update(sender, instance, **kwargs):
+    """Delete the old image file when a new one is uploaded for ExperiencePhoto."""
+    if not instance.pk:
+        return
+    try:
+        old_instance = sender.objects.get(pk=instance.pk)
+        if old_instance.image and old_instance.image.name != instance.image.name:
+            delete_file_if_exists(old_instance.image)
+    except sender.DoesNotExist:
+        pass
+
+
+@receiver(pre_save, sender=Resume)
+def delete_old_resume_file_on_update(sender, instance, **kwargs):
+    """Delete the old PDF file when a new one is uploaded for Resume."""
+    # Special handling for Resume because you typically only want one resume
+    # and the ChromaDB signal already handles deleting other resume nodes.
+    # This pre_save ensures the *previous file for this specific instance* is deleted
+    # if a new one is uploaded.
+    if not instance.pk:
+        return
+    try:
+        old_instance = sender.objects.get(pk=instance.pk)
+        if old_instance.pdf_file and old_instance.pdf_file.name != instance.pdf_file.name:
+            delete_file_if_exists(old_instance.pdf_file)
+    except sender.DoesNotExist:
+        pass
