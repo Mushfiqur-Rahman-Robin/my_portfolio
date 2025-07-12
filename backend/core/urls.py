@@ -27,6 +27,7 @@ urlpatterns = (
     [
         path("admin/", admin.site.urls),
         path("api/", include("api.urls")),
+        path("ckeditor/", include("ckeditor_uploader.urls")),
         path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
         path(
             "api/docs/",

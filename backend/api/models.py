@@ -1,5 +1,6 @@
 import uuid
 
+from ckeditor_uploader.fields import RichTextUploadingField
 from django.db import models
 
 
@@ -17,17 +18,16 @@ class Tag(models.Model):
 class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=200)
-    description = models.TextField()
+    description = RichTextUploadingField(help_text="Full project details, including text, images, and code snippets.")
     image = models.ImageField(
         upload_to="projects/banners/",
         help_text="Main image for project preview/banner",
-    )  # Renamed to clarify purpose
+    )
     project_url = models.URLField(blank=True, null=True)
     repo_url = models.URLField(blank=True, null=True)
     tags = models.ManyToManyField(Tag, related_name="projects", blank=True)
     display_order = models.PositiveIntegerField(default=0)
-    is_featured = models.BooleanField(default=False, help_text="Select to show on homepage featured section")  # New field
-    code_snippet = models.TextField(blank=True, null=True, help_text="Code snippet for syntax highlighting")  # New field for code
+    is_featured = models.BooleanField(default=False, help_text="Select to show on homepage featured section")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -140,17 +140,36 @@ class Resume(models.Model):
         return self.title
 
 
-class VisitorCount(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Changed to UUID for consistency
+class TotalVisitorCount(models.Model):
+    """Stores the single, cumulative total of all site visitors."""
+
+    # Use a fixed UUID to ensure only one row ever exists.
+    id = models.UUIDField(primary_key=True, default=uuid.UUID("1a2b3c4d-e5f6-7890-1234-567890abcdef"), editable=False)
     count = models.PositiveIntegerField(default=0)
     last_updated = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Visitor Count"
-        verbose_name_plural = "Visitor Counts"
+        verbose_name = "Total Visitor Count"
+        verbose_name_plural = "Total Visitor Counts"
 
     def __str__(self):
         return f"Total Visitors: {self.count}"
+
+
+class DailyVisitorCount(models.Model):
+    """Stores the visitor count for a specific day."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    date = models.DateField(unique=True)
+    count = models.PositiveIntegerField(default=1)
+
+    class Meta:
+        ordering = ["-date"]
+        verbose_name = "Daily Visitor Count"
+        verbose_name_plural = "Daily Visitor Counts"
+
+    def __str__(self):
+        return f"{self.date.strftime('%Y-%m-%d')}: {self.count} visitors"
 
 
 class Experience(models.Model):
