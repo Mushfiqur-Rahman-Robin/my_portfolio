@@ -26,15 +26,20 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Base font size for desktop */
+html {
+  font-size: 16px;
+}
+
 /* General Link Styling (updated to accent green) */
 a {
   font-weight: 500;
-  color: var(--color-green-accent); /* Use your new green */
-  text-decoration: none; /* No underline by default */
+  color: var(--color-green-accent);
+  text-decoration: none;
 }
 a:hover {
-  color: #55c43d; /* Slightly darker green on hover */
-  text-decoration: underline; /* Add underline on hover for clarity */
+  color: #55c43d;
+  text-decoration: underline;
 }
 
 /* General Button Styling (updated to match concept) */
@@ -45,29 +50,152 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: var(--color-green-accent); /* Green button background */
-  color: var(--color-black-background); /* Black text on green button */
+  background-color: var(--color-green-accent);
+  color: var(--color-black-background);
   cursor: pointer;
   transition: background-color 0.25s, border-color 0.25s, color 0.25s;
+  min-height: 44px; /* Minimum touch target size */
+  min-width: 44px; /* Minimum touch target size */
 }
 button:hover {
-  background-color: #55c43d; /* Slightly darker green on hover */
+  background-color: #55c43d;
   border-color: #55c43d;
   color: var(--color-black-background);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto var(--color-green-accent); /* Green focus outline */
+  outline: 4px auto var(--color-green-accent);
 }
 
 body {
   margin: 0;
   display: flex;
-  place-items: center;
+  flex-direction: column; /* Ensure content stacks vertically */
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: var(--color-white-text); /* All headings white by default */
+  color: var(--color-white-text);
+  line-height: 1.2;
+  margin-bottom: 0.5em;
+  font-weight: 700; /* Ensure headings are bold */
+}
+
+/* Specific desktop heading sizes */
+h1 { font-size: 3rem; }
+h2 { font-size: 2.5rem; }
+h3 { font-size: 2rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; }
+h6 { font-size: 1.1rem; }
+
+/* General text color for paragraphs etc. */
+p {
+  color: var(--color-light-gray-text);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* Better mobile scrolling */
+* {
+  box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+}
+
+body, html {
+  -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
+}
+
+/* Better mobile input styling to prevent zoom */
+input, textarea, select {
+  font-size: 16px;
+}
+
+/* Loading and error states */
+.loading-message {
+  color: var(--color-light-gray-text);
+  text-align: center;
+  font-size: 1.2rem;
+  margin: 2rem 0;
+}
+
+.error {
+  color: #ff6b6b;
+  text-align: center;
+  font-size: 1.1rem;
+  margin: 1rem 0;
+}
+
+/* Basic responsive image handling */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block; /* Remove extra space below images */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 900px) { /* Adjust html font size for tablets/smaller desktops */
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 768px) { /* Adjust html font size for medium screens (e.g., larger phones) */
+  html {
+    font-size: 14px;
+  }
+
+  /* Adjust button padding for better touch targets */
+  button {
+    padding: 0.8em 1.5em;
+  }
+
+  /* Headings for medium screens */
+  h1 { font-size: 2.5rem; }
+  h2 { font-size: 2rem; }
+  h3 { font-size: 1.6rem; }
+  h4 { font-size: 1.3rem; }
+  h5 { font-size: 1.1rem; }
+  h6 { font-size: 1rem; }
+
+  p {
+    font-size: 0.95rem;
+  }
+  .loading-message {
+    font-size: 1.1rem;
+  }
+  .error {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) { /* Adjust html font size for small screens (e.g., most phones) */
+  html {
+    font-size: 13px;
+  }
+
+  /* Adjust button padding for smallest screens */
+  button {
+    padding: 0.7em 1.2em;
+    min-height: 40px; /* Slightly smaller min-height for very small screens */
+  }
+
+  /* Headings for small screens */
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.8rem; }
+  h3 { font-size: 1.4rem; }
+  h4 { font-size: 1.2rem; }
+  h5 { font-size: 1rem; }
+  h6 { font-size: 0.9rem; }
+
+  p {
+    font-size: 0.9rem;
+  }
+  .loading-message {
+    font-size: 1rem;
+  }
+  .error {
+    font-size: 0.95rem;
+  }
 }

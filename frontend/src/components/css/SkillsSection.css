@@ -3,10 +3,11 @@
   margin-top: 4rem;
   margin-bottom: 4rem;
   text-align: center;
+  padding: 0 1rem; /* Desktop padding */
 }
 
 .skills-section h2 {
-  font-size: 2.8rem;
+  font-size: 2.8rem; /* Desktop font size */
   color: var(--color-green-accent);
   margin-bottom: 3rem;
   text-shadow: 0 0 10px rgba(110, 230, 78, 0.5);
@@ -14,7 +15,7 @@
 
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Desktop min width */
   gap: 1.5rem;
   max-width: 900px;
   margin: 0 auto;
@@ -30,40 +31,35 @@
 
 .skill-name {
   display: block;
-  font-size: 1.2rem;
+  font-size: 1.2rem; /* Desktop font size */
   font-weight: bold;
   color: var(--color-white-text);
   margin-bottom: 0.8rem;
+  line-height: 1.3;
 }
 
 .skill-bar-container {
-  /* This container will now be responsible for the full bar background */
-  background-color: var(--color-white-text); /* White background for the empty part */
+  background-color: var(--color-white-text);
   border-radius: 10px;
   height: 20px;
   overflow: hidden;
   position: relative;
-  /* Add a subtle border to the container for definition */
   border: 1px solid var(--color-border-subtle);
 }
 
 .skill-bar-fill {
   height: 100%;
-  /* Use a gradient from green to green for the filled part, so it looks solid green. */
-  /* The width will be controlled by inline style, showing this green portion. */
   background: linear-gradient(
     90deg,
     var(--color-green-accent) 0%,
     #55c43d 100%
   );
   border-radius: 10px;
-  /* Removed animation and initial width here */
-  transition: width 1.5s ease-out; /* Smooth transition for width change */
+  transition: width 1.5s ease-out;
   position: relative;
   overflow: hidden;
 }
 
-/* Inner glow effect for electric bar (kept as it looks good on green) */
 .skill-bar-fill::before {
   content: '';
   position: absolute;
@@ -90,8 +86,47 @@
   }
 }
 
+/* Mobile Responsive */
 @media (max-width: 768px) {
+  .skills-section {
+    margin-top: 2.5rem;
+    margin-bottom: 2.5rem;
+    padding: 0 0.8rem;
+  }
+
+  .skills-section h2 {
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
+  }
+
   .skills-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Stack on mobile */
+    gap: 1rem;
+  }
+
+  .skill-item {
+    padding: 1.2rem;
+  }
+
+  .skill-name {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .skills-section {
+    padding: 0 0.5rem;
+  }
+
+  .skill-item {
+    padding: 1rem;
+  }
+
+  .skill-name {
+    font-size: 1rem;
+  }
+
+  .skill-bar-container {
+    height: 16px;
   }
 }
