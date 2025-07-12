@@ -1,4 +1,4 @@
-/* frontend/src/pages/ProjectDetail.css */
+/* frontend/src/pages/css/ProjectDetail.css */
 .project-detail-container {
   padding: 2rem;
   max-width: 900px;
@@ -123,13 +123,14 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
-/* FIX: Ensure images within CKEditor content are properly centered */
+/* FIX: Ensure images within CKEditor content are properly centered and not floated */
 .project-rich-content img {
   max-width: 100%;
   height: auto;
   border-radius: 8px;
-  margin: 1.5rem auto; /* Crucial for centering */
-  display: block; /* Ensures margin auto works */
+  float: none !important; /* Force no float */
+  display: block !important; /* Force block to use margin auto */
+  margin: 1.5rem auto !important; /* Force centering */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
@@ -256,7 +257,7 @@
 
 .project-actions {
   display: flex;
-  justify-content: center;
+  justify-content: center; /* Center buttons horizontally */
   gap: 1.5rem;
   margin-bottom: 3rem;
   flex-wrap: wrap;
@@ -270,6 +271,7 @@
 
 .back-link {
   margin-top: 2rem;
+  text-align: center; /* Ensures content inside is text-aligned if not flex */
 }
 
 .back-link .btn {
@@ -306,15 +308,30 @@
     padding: 1rem;
     gap: 0.8rem; /* Reduced gap */
   }
+  /* FIX: Project Detail buttons alignment */
   .project-actions {
-    flex-direction: column;
+    flex-direction: column; /* Stack the buttons vertically */
+    align-items: center; /* Center buttons horizontally */
     gap: 1rem; /* Reduced gap */
   }
   .project-action-btn {
-    width: 100%;
+    display: block; /* Make button block to use margin auto */
+    margin: 0 auto; /* Center the button itself */
+    width: 90%; /* Give it a substantial width */
+    max-width: 250px; /* Constrain max width */
     padding: 0.9rem 1.5rem; /* Adjusted padding */
     font-size: 1rem;
   }
+  /* FIX: Back to All Projects button alignment */
+  .back-link .btn {
+    display: block; /* Make button block to use margin auto */
+    margin: 1.5rem auto; /* Center the button itself with some top margin */
+    width: 90%;
+    max-width: 250px;
+    padding: 0.8rem 1.2rem;
+    font-size: 0.95rem;
+  }
+
   .selected-gallery-image-container {
     height: 250px;
   }
@@ -362,8 +379,11 @@
   .project-rich-content li code {
     font-size: 0.75em;
   }
-  .project-action-btn {
+  .project-action-btn,
+  .back-link .btn { /* Apply same small mobile styles to both */
+    width: 95%; /* Make buttons slightly wider on very small screens */
+    max-width: 280px;
     padding: 0.8rem 1.2rem;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 }

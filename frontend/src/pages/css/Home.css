@@ -1,4 +1,4 @@
-/* frontend/src/pages/Home.css */
+/* frontend/src/pages/css/Home.css */
 .home-container {
   padding: 2rem; /* Desktop padding */
   max-width: 1200px;
@@ -355,18 +355,21 @@
     text-align: center; /* Ensure mobile description is centered */
   }
 
-  /* FIX: Center buttons on mobile */
+  /* FIX: Center buttons in the row layout on mobile for Featured Projects */
   .project-preview-actions {
     flex-direction: row; /* Keep as row to have buttons side-by-side */
-    justify-content: center; /* Center the buttons in the row */
+    justify-content: center; /* Center the group of buttons horizontally */
     gap: 0.8rem;
+    align-items: center; /* Vertically center if heights differ */
+    /* No change needed for width: 100% on parent flex container */
   }
 
   .project-preview-actions .btn {
-    width: auto; /* Let buttons take their natural width */
-    flex: 1; /* Allow buttons to grow and fill space evenly */
-    max-width: 150px; /* Optional: constrain max width */
+    /* REMOVED display: block; and margin: 0 auto; from here */
+    flex: 0 0 auto; /* Prevent stretching, allow content-based size */
+    width: 140px; /* Give buttons a consistent fixed width for side-by-side display */
     font-size: 0.95rem;
+    padding: 0.7rem 1.2rem; /* Adjusted padding */
   }
 
   .project-preview-tags {
@@ -415,5 +418,18 @@
   }
   .tag-badge {
     font-size: 0.75rem;
+  }
+
+  /* Ensure buttons stack and are centered on very small mobile */
+  .project-preview-actions {
+    flex-direction: column; /* Stack buttons vertically */
+    gap: 0.6rem;
+    align-items: center; /* Center the stacked buttons */
+  }
+  .project-preview-actions .btn {
+    width: 90%; /* Take up most of the width */
+    max-width: 200px; /* Control max size */
+    /* No margin auto needed if parent align-items: center is present and buttons have defined width */
+    padding: 0.8rem 1.2rem;
   }
 }
