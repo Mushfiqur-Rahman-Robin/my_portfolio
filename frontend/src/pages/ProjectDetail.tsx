@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, Link } from 'react-router-dom';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './css/ProjectDetail.css';
 
 interface ProjectImage {
   id: string;
-  image: string; // URL of the gallery image
+  image: string;
   caption: string;
   display_order: number;
 }
@@ -15,13 +13,12 @@ interface ProjectImage {
 interface Project {
   id: string;
   title: string;
-  description: string;
-  image: string; // Main banner image
+  description: string; // This contains the rich HTML content
+  image: string;
   project_url?: string;
   repo_url?: string;
   tags: string[];
-  code_snippet?: string; // New field
-  gallery_images: ProjectImage[]; // New field for gallery
+  gallery_images: ProjectImage[];
   display_order: number;
   created_at: string;
 }
@@ -44,7 +41,7 @@ const ProjectDetail: React.FC = () => {
         const response = await axios.get<Project>(`${import.meta.env.VITE_API_URL}projects/${id}/`);
         setProject(response.data);
         if (response.data.gallery_images && response.data.gallery_images.length > 0) {
-          setSelectedGalleryImage(response.data.gallery_images[0].image); // Set first gallery image as default
+          setSelectedGalleryImage(response.data.gallery_images[0].image);
         }
       } catch (err) {
         console.error('Failed to fetch project details:', err);
@@ -55,6 +52,18 @@ const ProjectDetail: React.FC = () => {
     };
     fetchProject();
   }, [id]);
+
+  // Highlight code blocks after content is loaded
+  useEffect(() => {
+    if (!loading && project) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        if (window.hljs) {
+          window.hljs.highlightAll();
+        }
+      }, 100);
+    }
+  }, [loading, project]);
 
   if (loading) {
     return <div className="project-detail-container"><p className="loading-message">Loading project details...</p></div>;
@@ -68,21 +77,14 @@ const ProjectDetail: React.FC = () => {
     return <div className="project-detail-container"><p className="no-project-found">Project not found.</p><Link to="/projects" className="btn secondary">Back to Projects</Link></div>;
   }
 
-  // Determine the language for syntax highlighting (can be made dynamic based on tags or a new field)
-  const codeLanguage = project.tags.includes('Python') ? 'python' :
-                       project.tags.includes('JavaScript') || project.tags.includes('TypeScript') || project.tags.includes('React') ? 'javascript' :
-                       'plaintext'; // Default to plaintext if language not found
-
   return (
     <div className="project-detail-container">
       <h1 className="project-title">{project.title}</h1>
 
-      {/* Main project banner image (from 'image' field) */}
       {project.image && (
         <img src={project.image} alt={project.title} className="project-main-image" />
       )}
 
-      {/* Project Gallery */}
       {project.gallery_images && project.gallery_images.length > 0 && (
         <div className="project-gallery">
           <div className="selected-gallery-image-container">
@@ -102,16 +104,10 @@ const ProjectDetail: React.FC = () => {
         </div>
       )}
 
-      <p className="project-description">{project.description}</p>
-
-      {project.code_snippet && (
-        <div className="code-snippet-section">
-          <h2>Code Snippet</h2>
-          <SyntaxHighlighter language={codeLanguage} style={dark} showLineNumbers>
-            {project.code_snippet}
-          </SyntaxHighlighter>
-        </div>
-      )}
+      <div
+        className="project-rich-content"
+        dangerouslySetInnerHTML={{ __html: project.description }}
+      />
 
       <div className="project-meta">
         <div className="project-tags-detail">
