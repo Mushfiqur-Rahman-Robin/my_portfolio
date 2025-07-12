@@ -6,6 +6,7 @@ from .models import (
     ChatMessage,
     ChatSession,
     ContactMessage,
+    DailyVisitorCount,
     Experience,
     ExperiencePhoto,
     Project,
@@ -13,7 +14,7 @@ from .models import (
     Publication,
     Resume,
     Tag,
-    VisitorCount,
+    TotalVisitorCount,
 )
 
 
@@ -89,12 +90,33 @@ admin.site.register(Resume)
 admin.site.register(Tag)
 
 
-@admin.register(VisitorCount)
-class VisitorCountAdmin(admin.ModelAdmin):
+@admin.register(TotalVisitorCount)
+class TotalVisitorCountAdmin(admin.ModelAdmin):
+    """Admin view for the single, cumulative visitor count."""
+
     list_display = ("count", "last_updated")
+    readonly_fields = ("id", "last_updated", "count")
 
     def has_add_permission(self, request):
-        return False if VisitorCount.objects.exists() else True
+        return not TotalVisitorCount.objects.exists()
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(DailyVisitorCount)
+class DailyVisitorCountAdmin(admin.ModelAdmin):
+    """Admin view for daily visitor counts."""
+
+    list_display = ("date", "count")
+    list_filter = ("date",)
+    readonly_fields = ("date", "count")
+
+    def has_add_permission(self, request):
+        return False  # Prevent manual creation
+
+    def has_change_permission(self, request, obj=None):
+        return False  # Prevent manual editing
+
+    def has_delete_permission(self, request, obj=None):
+        return False  # Prevent deletion from the admin

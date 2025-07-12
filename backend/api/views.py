@@ -1,9 +1,9 @@
 import logging
-import uuid
 
 from django.conf import settings
 from django.core.mail import send_mail
 from django.db.models import F
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from openai import OpenAI
 from rest_framework import status, viewsets
@@ -18,13 +18,14 @@ from .models import (
     ChatMessage,
     ChatSession,
     ContactMessage,
+    DailyVisitorCount,
     Experience,
     ExperiencePhoto,
     Project,
     Publication,
     Resume,
     Tag,
-    VisitorCount,
+    TotalVisitorCount,
 )
 from .serializers import (
     AchievementSerializer,
@@ -182,14 +183,22 @@ class VisitorCountView(APIView):
     )
     def post(self, request, format=None):
         try:
-            # Use a fixed UUID for the single VisitorCount entry
-            pk = uuid.UUID("1a2b3c4d-e5f6-7890-1234-567890abcdef")
-            visitor_count, created = VisitorCount.objects.get_or_create(pk=pk)
-            visitor_count.count = F("count") + 1
-            visitor_count.save()
-            visitor_count.refresh_from_db()
+            # --- UPDATED LOGIC ---
+            # 1. Increment the total visitor count
+            total_count, _ = TotalVisitorCount.objects.get_or_create()
+            total_count.count = F("count") + 1
+            total_count.save()
+            total_count.refresh_from_db()
+
+            # 2. Increment today's visitor count
+            today = timezone.now().date()
+            daily_count, created = DailyVisitorCount.objects.get_or_create(date=today)
+            if not created:
+                daily_count.count = F("count") + 1
+                daily_count.save()
+
             return Response(
-                {"message": "Visitor count incremented", "count": visitor_count.count},
+                {"message": "Visitor count incremented", "count": total_count.count},
                 status=status.HTTP_200_OK,
             )
         except Exception as e:

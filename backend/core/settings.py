@@ -33,6 +33,19 @@ ADMIN_EMAIL = config("ADMIN_EMAIL", default="your_admin_email@example.com")
 if DEBUG:
     ALLOWED_HOSTS = ["*"]
 
+# --- CKEDITOR CONFIGURATION ---
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    "default": {
+        "toolbar": "full",
+        "height": 400,
+        "width": "100%",
+        # Add the 'codesnippet' plugin and its styles
+        "extraPlugins": ",".join(["codesnippet"]),
+        "codeSnippet_theme": "monokai_sublime",
+    },
+}
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -44,6 +57,8 @@ INSTALLED_APPS = [
     "corsheaders",
     "drf_spectacular",
     "api",
+    "ckeditor",
+    "ckeditor_uploader",
 ]
 
 # CORRECT MIDDLEWARE ORDER FOR SITE-WIDE CACHING
