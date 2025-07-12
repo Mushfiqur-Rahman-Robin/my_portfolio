@@ -1,14 +1,17 @@
 # backend/api/chromadb_utils.py
 
+import os
+
 import chromadb
 from django.conf import settings
 from openai import OpenAI
 
 # --- Configuration ---
 CHROMA_COLLECTION = "portfolio_knowledge"
-# Use the Docker service name for inter-container communication
-CHROMA_HOST = "chromadb"
-CHROMA_PORT = 8000
+# Use the Docker service name for inter-container communication by default,
+# but allow overriding via environment variables for CI/CD.
+CHROMA_HOST = os.environ.get("CHROMA_HOST", "chromadb")
+CHROMA_PORT = int(os.environ.get("CHROMA_PORT", 8000))
 
 
 def get_chroma_client():
@@ -25,7 +28,12 @@ def get_collection():
 def embed_text(text):
     """Generates an embedding for the given text using OpenAI."""
     try:
-        client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        # Ensure OPENAI_API_KEY is set, especially for CI environments
+        api_key = settings.OPENAI_API_KEY
+        if not api_key:
+            print("Warning: OPENAI_API_KEY is not set. Embedding will fail.")
+            return None
+        client = OpenAI(api_key=api_key)
         resp = client.embeddings.create(input=[text], model="text-embedding-3-small")
         return resp.data[0].embedding
     except Exception as e:

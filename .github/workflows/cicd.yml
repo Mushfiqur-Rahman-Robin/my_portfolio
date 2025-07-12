@@ -26,6 +26,17 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      # --- ADD THIS CHROMA SERVICE ---
+      chromadb:
+        image: chromadb/chroma:latest
+        ports:
+          - 8001:8000
+        options: >-
+          --health-cmd "curl -f http://localhost:8000/api/v1/heartbeat || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -66,6 +77,14 @@ jobs:
             sleep 2
           done
 
+      # --- ADD THIS STEP TO WAIT FOR CHROMA ---
+      - name: Wait for ChromaDB
+        run: |
+          until curl -f http://localhost:8001/api/v1/heartbeat; do
+            echo "Waiting for ChromaDB..."
+            sleep 2
+          done
+
       - name: Apply migrations
         working-directory: ./backend
         env:
@@ -80,6 +99,9 @@ jobs:
           DEFAULT_FROM_EMAIL: "test@example.com"
           ADMIN_EMAIL: "admin@example.com"
           CSRF_TRUSTED_ORIGINS: "http://localhost:8000"
+          # --- ADD THIS ENV VAR FOR TESTS ---
+          CHROMA_HOST: localhost
+          CHROMA_PORT: 8001
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
@@ -99,6 +121,9 @@ jobs:
           DEFAULT_FROM_EMAIL: "test@example.com"
           ADMIN_EMAIL: "admin@example.com"
           CSRF_TRUSTED_ORIGINS: "http://localhost:8000"
+          # --- ADD THIS ENV VAR FOR TESTS ---
+          CHROMA_HOST: localhost
+          CHROMA_PORT: 8001
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
@@ -118,6 +143,9 @@ jobs:
           DEFAULT_FROM_EMAIL: "test@example.com"
           ADMIN_EMAIL: "admin@example.com"
           CSRF_TRUSTED_ORIGINS: "http://localhost:8000"
+          # --- ADD THIS ENV VAR FOR TESTS ---
+          CHROMA_HOST: localhost
+          CHROMA_PORT: 8001
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
