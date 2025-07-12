@@ -8,13 +8,13 @@ until pg_isready -h db -p 5432 -U portfolio; do
 done
 
 # Apply migrations
-# python manage.py migrate --noinput
+python manage.py migrate --noinput
 
 # Optionally collect static files if they need runtime updates
 python manage.py collectstatic --noinput
 
 # Index content on chromadb
-# python manage.py index_content --reindex
+python manage.py index_content --reindex
 
 # Start Gunicorn (CMD arguments are passed via exec)
 exec "$@"
