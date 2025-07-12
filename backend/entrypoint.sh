@@ -14,7 +14,7 @@ done
 python manage.py collectstatic --noinput
 
 # Index content on chromadb
-python manage.py index_content --reindex
+# python manage.py index_content --reindex
 
 # Start Gunicorn (CMD arguments are passed via exec)
 exec "$@"
