@@ -226,17 +226,18 @@
     text-align: center; /* Ensure mobile description is centered */
   }
 
-  /* FIX: Center buttons on mobile */
+  /* FIX: Center buttons for project cards on mobile */
   .project-card-actions {
     flex-direction: column; /* Stack the buttons vertically */
-    align-items: center; /* Center the buttons horizontally */
+    align-items: center; /* Center buttons horizontally */
     gap: 0.8rem;
   }
 
   .project-card-actions .btn {
-    width: 80%; /* Let buttons take a substantial width, but not full */
+    display: block; /* Make button block to use margin auto */
+    margin: 0 auto; /* Center the button itself */
+    width: 80%; /* Give it a substantial width */
     max-width: 250px; /* Constrain max width */
-    flex: none; /* Override flex: 1 */
     font-size: 0.9rem;
     padding: 0.7em 1em;
   }
@@ -282,5 +283,11 @@
 
   .tag-badge {
     font-size: 0.75rem;
+  }
+
+  /* Further constrain button width on very small mobile for Project List */
+  .project-card-actions .btn {
+    width: 90%;
+    max-width: 280px;
   }
 }
