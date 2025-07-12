@@ -1,8 +1,11 @@
 /* frontend/src/components/Navbar.css */
 .navbar {
-  background-color: var(--color-darker-gray-elements); /* Darker gray for navbar background */
+  background-color: var(--color-darker-gray-elements);
   padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); /* Darker shadow */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .navbar-container {
@@ -12,13 +15,16 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem;
+  position: relative;
 }
 
 .navbar-logo {
-  color: var(--color-green-accent); /* Logo in green accent color */
+  color: var(--color-green-accent);
   text-decoration: none;
-  font-size: 1.8rem;
+  font-size: 1.8rem; /* Desktop font size */
   font-weight: bold;
+  z-index: 1001; /* Ensure logo is above menu when open */
+  flex-shrink: 0; /* Prevent logo from shrinking */
 }
 
 .nav-menu {
@@ -26,6 +32,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  transition: all 0.3s ease-in-out;
 }
 
 .nav-item {
@@ -33,26 +40,101 @@
 }
 
 .nav-links {
-  color: var(--color-white-text); /* White links by default */
+  color: var(--color-white-text);
   text-decoration: none;
-  font-size: 1.1rem;
+  font-size: 1.1rem; /* Desktop font size */
   padding: 0.5rem 0;
   transition: color 0.3s ease-in-out;
+  display: block;
 }
 
 .nav-links:hover {
-  color: var(--color-green-accent); /* Green on hover */
+  color: var(--color-green-accent);
 }
 
-@media (max-width: 768px) {
+/* Hamburger Menu (Hidden by default on desktop) */
+.hamburger {
+  display: none; /* Hide on desktop */
+  flex-direction: column;
+  cursor: pointer;
+  z-index: 1001; /* Ensure hamburger is above menu when open */
+}
+
+.hamburger span {
+  width: 25px;
+  height: 3px;
+  background-color: var(--color-white-text);
+  margin: 3px 0;
+  transition: 0.3s;
+  border-radius: 2px;
+}
+
+.hamburger.active span:nth-child(1) {
+  transform: rotate(-45deg) translate(-5px, 6px);
+  background-color: var(--color-green-accent);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+  transform: rotate(45deg) translate(-5px, -6px);
+  background-color: var(--color-green-accent);
+}
+
+/* Mobile Responsive */
+@media (max-width: 900px) { /* Breakpoint for menu collapse */
+  .hamburger {
+    display: flex; /* Show hamburger on smaller screens */
+  }
+
   .nav-menu {
+    position: fixed;
+    left: -100%; /* Start off-screen */
+    top: 60px; /* Slightly more compact from top */
     flex-direction: column;
+    background-color: var(--color-darker-gray-elements);
     width: 100%;
-    margin-top: 1rem;
-    align-items: center;
+    text-align: center;
+    transition: 0.3s;
+    box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem 0; /* Slightly reduced padding for compactness */
+    height: calc(100vh - 60px); /* Full height minus adjusted navbar height */
+    overflow-y: auto;
+  }
+
+  .nav-menu.active {
+    left: 0; /* Slide in when active */
   }
 
   .nav-item {
-    margin: 0.5rem 0;
+    margin: 0.8rem 0; /* Slightly reduced margin */
+  }
+
+  .nav-links {
+    padding: 0.8rem; /* Slightly reduced padding for compactness */
+    font-size: 1.1rem; /* Slightly smaller links for mobile touch */
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-container {
+    padding: 0 1rem;
+  }
+
+  .navbar-logo {
+    font-size: 1.6rem; /* Slightly smaller logo on smaller phones */
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-logo {
+    font-size: 1.4rem;
+  }
+
+  .nav-links {
+    font-size: 1rem; /* Further reduced for smallest screens */
   }
 }
