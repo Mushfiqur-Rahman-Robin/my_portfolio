@@ -6,5 +6,8 @@ class ApiConfig(AppConfig):
     name = "api"
 
     def ready(self):
-        # This imports the signals so they are connected when the app is ready.
-        pass
+        """
+        This method is called when the Django application is ready.
+        We import our signals here to ensure they are connected.
+        """
+        import api.signals  # noqa: F401
