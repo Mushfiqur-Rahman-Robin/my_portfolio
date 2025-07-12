@@ -13,6 +13,8 @@ python manage.py migrate --noinput
 # Optionally collect static files if they need runtime updates
 python manage.py collectstatic --noinput
 
+python manage.py create_missing_tables
+
 # Index content on chromadb
 python manage.py index_content --reindex
 
