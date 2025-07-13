@@ -8,7 +8,7 @@ from django.dispatch import receiver
 
 from .chromadb_utils import add_or_update_node, delete_node
 from .models import Achievement, Certification, Experience, ExperiencePhoto, Project, ProjectImage, Publication, Resume
-from .utils import extract_pdf_text
+from .utils import clean_html, extract_pdf_text  # ADDED clean_html import
 
 
 def get_doc_id(instance):
@@ -27,12 +27,14 @@ def get_metadata(instance, title_field="title", url_path=None):
     }
 
 
-# --- Existing ChromaDB Signal Handlers (KEEP ALL EXISTING ONES) ---
+# --- Existing ChromaDB Signal Handlers ---
 
 
 @receiver(post_save, sender=Project)
 def sync_project_chroma(sender, instance, **kwargs):
-    content = f"Project Title: {instance.title}\nDescription: {instance.description}"
+    # Apply clean_html to project description (it's RichTextUploadingField, storing HTML)
+    cleaned_description = clean_html(instance.description)  # ADDED clean_html
+    content = f"Project Title: {instance.title}\nDescription: {cleaned_description}"
     add_or_update_node(get_doc_id(instance), content, get_metadata(instance, url_path="projects"))
 
 
@@ -96,7 +98,9 @@ def delete_achievement_chroma(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Experience)
 def sync_experience_chroma(sender, instance, **kwargs):
-    content = f"Experience at {instance.company_name} as {instance.job_title}\nDetails: {instance.work_details}"
+    # Apply clean_html to experience work_details (which now stores HTML from CKEditor)
+    cleaned_work_details = clean_html(instance.work_details)  # ADDED clean_html
+    content = f"Experience at {instance.company_name} as {instance.job_title}\nDetails: {cleaned_work_details}"
     add_or_update_node(get_doc_id(instance), content, get_metadata(instance, title_field="company_name", url_path="experience"))
 
 
@@ -106,7 +110,7 @@ def delete_experience_chroma(sender, instance, **kwargs):
 
 
 # ============================================================================
-# NEW: FILE DELETION SIGNALS
+# FILE DELETION SIGNALS (NO CHANGE NEEDED HERE, ALREADY HANDLED)
 # ============================================================================
 
 
@@ -150,7 +154,6 @@ def delete_certification_image(sender, instance, **kwargs):
     delete_file_if_exists(instance.image)
 
 
-# --- Achievement Image Deletion ---
 @receiver(post_delete, sender=Achievement)
 def delete_achievement_image(sender, instance, **kwargs):
     """Delete achievement image when an Achievement is deleted."""
