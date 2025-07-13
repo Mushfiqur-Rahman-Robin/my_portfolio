@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import './css/ExperienceList.css';
+import { stripHtmlTags } from '../utils/html_cleaner'; // Import the utility
+
 
 interface Experience {
     id: string;
@@ -9,7 +11,7 @@ interface Experience {
     job_title: string;
     start_date: string;
     end_date_display: string;
-    work_details: string;
+    work_details: string; // This now contains HTML
     is_current: boolean;
     display_order: number;
 }
@@ -40,12 +42,7 @@ const ExperienceList: React.FC = () => {
                 setExperiences(response.data.results);
                 setTotalPages(Math.ceil(response.data.count / 2));  // items per page from backend
                 setError(null);
-            // } catch (err: any) {
-            //     setError(`Failed to fetch experiences: ${err.message}`);
-            //     console.error('Error fetching experiences:', err);
-            //     setExperiences([]);  // Ensure empty state on error
-            //     setTotalPages(1);
-              } catch (error: unknown) {
+            } catch (error: unknown) {
               let errorMessage = "Failed to fetch experiences: An unexpected error occurred."; // Provide a default message
               if (axios.isAxiosError(error)) { // Check if it's an Axios error
                 errorMessage = `Failed to fetch experiences: ${error.message}`;  // Now we are sure it has .message
@@ -92,7 +89,8 @@ const ExperienceList: React.FC = () => {
                             {new Date(exp.start_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })} - {exp.end_date_display}
                         </p>
                         <p className="experience-details-preview">
-                            {exp.work_details.substring(0, 200)}...
+                            {/* Apply stripHtmlTags here before substring */}
+                            {stripHtmlTags(exp.work_details).substring(0, 200)}...
                         </p>
                         <Link to={`/experience/${exp.id}`} className="btn secondary">
                             View Details
@@ -106,7 +104,7 @@ const ExperienceList: React.FC = () => {
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="btn pagination-btn"  // Use existing classes for style consistency
+                    className="btn pagination-btn"
                 >
                     Previous
                 </button>
@@ -114,7 +112,7 @@ const ExperienceList: React.FC = () => {
                     <button
                         key={page}
                         onClick={() => handlePageChange(page)}
-                        className={`btn pagination-btn ${currentPage === page ? 'active' : ''}`} // Use existing classes
+                        className={`btn pagination-btn ${currentPage === page ? 'active' : ''}`}
                     >
                         {page}
                     </button>
@@ -122,7 +120,7 @@ const ExperienceList: React.FC = () => {
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="btn pagination-btn"  // Existing class to apply styles you have
+                    className="btn pagination-btn"
                 >
                     Next
                 </button>

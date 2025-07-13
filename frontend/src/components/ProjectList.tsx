@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link, useSearchParams } from 'react-router-dom'; // Import useSearchParams for pagination
+import { Link, useSearchParams } from 'react-router-dom';
 import './css/ProjectList.css';
+import { stripHtmlTags } from '../utils/html_cleaner'; // Import the utility
+
 
 interface Project {
   id: string;
@@ -28,7 +30,7 @@ interface PaginationInfo {
 }
 
 // Define the page size for the frontend calculation
-const PROJECTS_PER_PAGE = 3; // <--- ADD THIS CONSTANT AND USE IT BELOW
+const PROJECTS_PER_PAGE = 3;
 
 const ProjectList: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -66,16 +68,12 @@ const ProjectList: React.FC = () => {
           params.append('tag', selectedTag);
         }
         params.append('page', currentPage.toString());
-        // Add page_size to the request if you want to explicitly control it from frontend,
-        // otherwise rely on backend default which we just changed.
-        // For consistency, it's good to explicitly ask for the same page size.
-        params.append('page_size', PROJECTS_PER_PAGE.toString()); // <--- ADD THIS LINE
+        params.append('page_size', PROJECTS_PER_PAGE.toString());
 
         url = `${url}?${params.toString()}`;
 
         const response = await axios.get<PaginationInfo>(url);
         setProjects(response.data.results);
-        // CRITICAL FIX: Base totalPages on the new PROJECTS_PER_PAGE
         setTotalPages(Math.ceil(response.data.count / PROJECTS_PER_PAGE));
       } catch (err) {
         setError('Failed to fetch projects');
@@ -118,13 +116,15 @@ const ProjectList: React.FC = () => {
         {projects.length > 0 ? (
           projects.map((project) => (
             <div key={project.id} className="project-card">
-              <Link to={`/projects/${project.id}`} className="project-card-link"> {/* Link whole card preview */}
+              <Link to={`/projects/${project.id}`} className="project-card-link">
                 <h2>{project.title}</h2>
                 {project.image && (
                   <img src={project.image} alt={project.title} />
                 )}
-                <p>{project.description.substring(0, 150)}...</p>{' '}
-                {/* Truncate for preview */}
+                <p>
+                  {/* Apply stripHtmlTags here before substring */}
+                  {stripHtmlTags(project.description).substring(0, 150)}...
+                </p>
                 <div className="project-tags">
                   {project.tags &&
                     project.tags.map((tag, index) => (
@@ -134,7 +134,7 @@ const ProjectList: React.FC = () => {
                     ))}
                 </div>
               </Link>
-              <div className="project-card-actions"> {/* Separate container for action buttons */}
+              <div className="project-card-actions">
                 {project.project_url && (
                   <a
                     href={project.project_url}
