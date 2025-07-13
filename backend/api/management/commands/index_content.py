@@ -9,7 +9,7 @@ from api.chromadb_utils import add_or_update_node, get_collection
 
 # Import all your models and utilities
 from api.models import Achievement, Certification, Experience, Project, Publication, Resume
-from api.utils import extract_pdf_text
+from api.utils import clean_html, extract_pdf_text  # Import clean_html
 
 
 class Command(BaseCommand):
@@ -51,7 +51,7 @@ class Command(BaseCommand):
         My core areas of interest include Statistics, Data Science, Machine Learning, Deep Learning, Generative AI, and Cryptocurrency. \
         I possess a solid understanding of various machine learning and deep learning algorithms, \
         always making an effort to keep pace with new tools and technologies in the AI domain. \
-        I believe in "Learning is Surviving!" – a philosophy that guides my approach to continuous professional development. \
+        I believe in "Learning is Surviving!" – a philosophy that guides my proactive approach to continuous professional development. \
         As an active learner, I constantly keep myself updated with AI trends and innovations by reading LinkedIn posts from top AI figures. \
         I participate in Kaggle contests and maintain a strong presence on LinkedIn and GitHub, \
         alongside conducting research work utilizing my knowledge in machine learning and deep learning. \
@@ -102,7 +102,7 @@ class Command(BaseCommand):
         add_or_update_node(doc_id="static-skills", content=skills_text, metadata={"type": "skills", "title": "Skills"})
         self.stdout.write(self.style.SUCCESS("Indexed 'Skills' content."))
 
-        # --- NEW: Index Contact Information ---
+        # NEW: Index Contact Information
         contact_info_text = """
         Contact Information for Md Mushfiqur Rahman:
         - Email: mushfiqur.rahman.robin@gmail.com
@@ -116,15 +116,17 @@ class Command(BaseCommand):
         # --- 2. Index Dynamic Content from Database ---
         self.stdout.write(self.style.NOTICE("\nIndexing dynamic content from database..."))
 
-        # Index Projects
+        # Index Projects (description is RichTextUploadingField, so clean it)
         for project in Project.objects.all():
-            content = f"Project Title: {project.title}\nDescription: {project.description}"
+            cleaned_description = clean_html(project.description)
+            content = f"Project Title: {project.title}\nDescription: {cleaned_description}"
             add_or_update_node(f"project-{project.id}", content, {"type": "project", "title": project.title})
         self.stdout.write(self.style.SUCCESS(f"Indexed {Project.objects.count()} projects."))
 
-        # Index Experiences
+        # Index Experiences (work_details now stores HTML, so clean it)
         for exp in Experience.objects.all():
-            content = f"Experience at {exp.company_name} as {exp.job_title}\nDetails: {exp.work_details}"
+            cleaned_work_details = clean_html(exp.work_details)
+            content = f"Experience at {exp.company_name} as {exp.job_title}\nDetails: {cleaned_work_details}"
             add_or_update_node(f"experience-{exp.id}", content, {"type": "experience", "title": f"{exp.job_title} at {exp.company_name}"})
         self.stdout.write(self.style.SUCCESS(f"Indexed {Experience.objects.count()} experiences."))
 

@@ -18,7 +18,7 @@ interface Experience {
   end_date: string | null;
   is_current: boolean;
   end_date_display: string;
-  work_details: string;
+  work_details: string; // This will now contain HTML
   photos: ExperiencePhoto[]; // Nested photos
 }
 
@@ -91,7 +91,8 @@ const ExperienceDetail: React.FC = () => {
         </div>
       )}
 
-      <div className="experience-details" dangerouslySetInnerHTML={{ __html: experience.work_details.replace(/\n/g, '<br/>') }} />
+      {/* REMOVED .replace(/\n/g, '<br/>') because work_details will now be HTML */}
+      <div className="experience-details" dangerouslySetInnerHTML={{ __html: experience.work_details }} />
 
       <div className="back-link">
         <Link to="/experience" className="btn secondary">
