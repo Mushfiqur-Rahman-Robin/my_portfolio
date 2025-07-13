@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "drf_spectacular",
+    "adminsortable2",
     "api",
     "ckeditor",
     "ckeditor_uploader",

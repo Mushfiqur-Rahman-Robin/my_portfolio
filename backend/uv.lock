@@ -56,6 +56,7 @@ dependencies = [
     { name = "chromadb" },
     { name = "dj-database-url" },
     { name = "django" },
+    { name = "django-admin-sortable2" },
     { name = "django-ckeditor" },
     { name = "django-cors-headers" },
     { name = "django-redis" },
@@ -92,6 +93,7 @@ requires-dist = [
     { name = "chromadb", specifier = ">=1.0.15" },
     { name = "dj-database-url", specifier = ">=3.0.0" },
     { name = "django", specifier = ">=5.2.3" },
+    { name = "django-admin-sortable2", specifier = ">=2.2.8" },
     { name = "django-ckeditor", specifier = ">=6.7.3" },
     { name = "django-cors-headers", specifier = ">=4.7.0" },
     { name = "django-redis", specifier = "==5.4.0" },
@@ -418,6 +420,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c6/af/77b403926025dc6f7fd7b31256394d643469418965eb528eab45d0505358/django-5.2.3.tar.gz", hash = "sha256:335213277666ab2c5cac44a792a6d2f3d58eb79a80c14b6b160cd4afc3b75684", size = 10850303 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1b/11/7aff961db37e1ea501a2bb663d27a8ce97f3683b9e5b83d3bfead8b86fa4/django-5.2.3-py3-none-any.whl", hash = "sha256:c517a6334e0fd940066aa9467b29401b93c37cec2e61365d663b80922542069d", size = 8301935 },
+]
+
+[[package]]
+name = "django-admin-sortable2"
+version = "2.2.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d4/76/8af26a825442fb33688c820cf79e4b769d8c4b976a2ddaa7434b96706e05/django_admin_sortable2-2.2.8.tar.gz", hash = "sha256:59dfd7ced63e66adfb471b2a4d89ba3faae49c0148827047c8cf65759fc54c9e", size = 64599 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8a/97/7d0b28f52027f36751cec372f0eaf3a5bc1be169a141818acece40628e04/django_admin_sortable2-2.2.8-py3-none-any.whl", hash = "sha256:b4cf66d75450b0f89c883d94b10e6133a4e7832c5bfed1568e3e71e400dc2b48", size = 90597 },
 ]
 
 [[package]]
