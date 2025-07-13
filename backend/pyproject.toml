@@ -10,6 +10,7 @@ dependencies = [
     "chromadb==0.4.14",
     "dj-database-url>=3.0.0",
     "django>=5.2.3",
+    "django-admin-sortable2>=2.2.8",
     "django-ckeditor>=6.7.3",
     "django-cors-headers>=4.7.0",
     "django-redis==5.4.0",

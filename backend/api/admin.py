@@ -1,3 +1,5 @@
+# backend/api/admin.py
+from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin
 
 from .models import (
@@ -24,12 +26,20 @@ class ProjectImageInline(admin.TabularInline):
 
 
 @admin.register(Project)
-class ProjectAdmin(admin.ModelAdmin):
-    list_display = ("title", "display_order", "is_featured", "created_at")
+class ProjectAdmin(SortableAdminMixin, admin.ModelAdmin):  # Apply SortableAdminMixin first
+    # IMPORTANT: The ordering_field_name tells the mixin which field on your model
+    # is used for sorting. Here, it's 'display_order'.
+    ordering_field_name = "display_order"
+
+    # Remove 'display_order' from list_display, as the mixin will add its own drag handle column.
+    list_display = ("title", "is_featured", "created_at")
     list_filter = ("is_featured", "tags")
     search_fields = ("title", "description")
     inlines = [ProjectImageInline]  # Add inline for images
     filter_horizontal = ("tags",)  # Better many-to-many widget
+
+    # You typically don't need to include the 'display_order' in fieldsets
+    # as it's automatically managed by the sortable mixin.
 
 
 # Inline for Experience photos
@@ -38,9 +48,17 @@ class ExperiencePhotoInline(admin.TabularInline):
     extra = 1
 
 
+# If you also want to make Experience sortable, apply the mixin similarly:
 @admin.register(Experience)
-class ExperienceAdmin(admin.ModelAdmin):
-    list_display = ("company_name", "job_title", "start_date", "end_date", "is_current", "display_order")
+class ExperienceAdmin(SortableAdminMixin, admin.ModelAdmin):  # Apply SortableAdminMixin
+    ordering_field_name = "display_order"  # Assuming Experience also has 'display_order'
+    list_display = (
+        "company_name",
+        "job_title",
+        "start_date",
+        "end_date",
+        "is_current",
+    )  # Remove 'display_order' from here
     list_filter = ("is_current", "start_date", "end_date")
     search_fields = ("company_name", "work_details")
     inlines = [ExperiencePhotoInline]  # Add inline for photos
@@ -53,7 +71,7 @@ class ExperienceAdmin(admin.ModelAdmin):
                     "job_title",
                     ("start_date", "end_date", "is_current"),
                     "work_details",
-                    "display_order",
+                    # "display_order", # Do not include in fieldsets if it's auto-managed
                 )
             },
         ),
@@ -111,9 +129,7 @@ class DailyVisitorCountAdmin(admin.ModelAdmin):
     list_display = ("date", "count")
     list_filter = ("date",)
     readonly_fields = ("date", "count")
-    ordering = ["-date"]
 
-    # Allow viewing but prevent modifications
     def has_add_permission(self, request):
         return False  # Prevent manual creation
 

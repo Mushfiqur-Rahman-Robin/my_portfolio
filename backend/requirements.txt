@@ -54,12 +54,15 @@ django==5.2.3
     # via
     #   backend (pyproject.toml)
     #   dj-database-url
+    #   django-admin-sortable2
     #   django-ckeditor
     #   django-cors-headers
     #   django-js-asset
     #   django-redis
     #   djangorestframework
     #   drf-spectacular
+django-admin-sortable2==2.2.8
+    # via backend (pyproject.toml)
 django-ckeditor==6.7.3
     # via backend (pyproject.toml)
 django-cors-headers==4.7.0
