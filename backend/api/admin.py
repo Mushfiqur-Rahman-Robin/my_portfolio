@@ -109,9 +109,74 @@ class ChatSessionAdmin(admin.ModelAdmin):
     inlines = [ChatMessageInline]  # Nest the messages inside the session
 
 
-admin.site.register(Publication)
-admin.site.register(Certification)
-admin.site.register(Achievement)
+@admin.register(Publication)
+class PublicationAdmin(SortableAdminMixin, admin.ModelAdmin):
+    ordering_field_name = "display_order"
+    list_display = ("title", "authors", "conference", "published_date", "display_order")
+    list_filter = ("published_date", "conference")
+    search_fields = ("title", "authors", "conference")
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "title",
+                    "authors",
+                    "conference",
+                    "publication_url",
+                    "published_date",
+                    "display_order",
+                )
+            },
+        ),
+    )
+
+
+@admin.register(Certification)
+class CertificationAdmin(SortableAdminMixin, admin.ModelAdmin):
+    ordering_field_name = "display_order"
+    list_display = ("name", "issuing_organization", "issue_date", "display_order")
+    list_filter = ("issue_date", "issuing_organization")
+    search_fields = ("name", "issuing_organization")
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "name",
+                    "issuing_organization",
+                    "credential_url",
+                    "issue_date",
+                    "image",
+                    "display_order",
+                )
+            },
+        ),
+    )
+
+
+@admin.register(Achievement)
+class AchievementAdmin(SortableAdminMixin, admin.ModelAdmin):
+    ordering_field_name = "display_order"
+    list_display = ("title", "date", "display_order")
+    list_filter = ("date",)
+    search_fields = ("title", "description")
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "title",
+                    "description",
+                    "date",
+                    "image",
+                    "display_order",
+                )
+            },
+        ),
+    )
+
+
 admin.site.register(ContactMessage)
 admin.site.register(Resume)
 admin.site.register(Tag)
