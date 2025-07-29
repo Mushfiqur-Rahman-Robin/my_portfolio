@@ -33,6 +33,17 @@ const skills: Skill[] = [
   { name: 'Time-Series Forecasting', level: 75 },
   { name: 'Hypothesis Testing', level: 80 },
 
+  // MLOps Tools
+  { name: 'MLOps', level: 75 },
+  { name: 'MLflow', level: 75 },
+  { name: 'DVC', level: 70 },
+  { name: 'Airflow', level: 70 },
+
+  // Cloud Platforms
+  { name: 'AWS', level: 70 },
+  // { name: 'Azure', level: 70 },
+  // { name: 'GCP', level: 70 },
+
   // DevOps, Infra, Deployment
   { name: 'Docker', level: 80 },
   { name: 'Git & GitHub', level: 90 },
@@ -44,7 +55,6 @@ const skills: Skill[] = [
   // Other Technical/Support Skills
   // { name: 'MySQL', level: 80 },
   // { name: 'PostgreSQL', level: 80 },
-  { name: 'MLOps', level: 75 },
   { name: 'Web-scrapping (BeautifulSoup, Selenium)', level: 85 },
 ];
 
