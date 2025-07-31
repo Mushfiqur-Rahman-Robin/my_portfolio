@@ -66,7 +66,8 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
-    queryset = Project.objects.all()
+    # OPTIMIZATION: Use prefetch_related for tags to avoid N+1 queries
+    queryset = Project.objects.prefetch_related("tags").all()
     serializer_class = ProjectSerializer
     pagination_class = StandardResultsPagination
     schema_tags = ["Portfolio Management - Projects"]
@@ -189,14 +190,16 @@ class VisitorCountView(APIView):
             total_count.save()
             total_count.refresh_from_db()
 
-            # 2. Increment today's visitor count (FIXED LOGIC)
+            # 2. Increment today's visitor count (IMPROVED LOGIC)
             today = timezone.now().date()
-            daily_count, created = DailyVisitorCount.objects.get_or_create(date=today, defaults={"count": 1})  # Set initial count to 1 for new entries
+            # Use defaults to ensure count is 1 on creation, aligns with your model's default
+            daily_count, created = DailyVisitorCount.objects.get_or_create(date=today, defaults={"count": 1})
             if not created:
                 # If record already exists, increment it
                 daily_count.count = F("count") + 1
                 daily_count.save()
-                daily_count.refresh_from_db()
+            # Refresh from DB to get the new count value, important if used later
+            daily_count.refresh_from_db()
 
             return Response(
                 {"message": "Visitor count incremented", "count": total_count.count},
@@ -242,16 +245,16 @@ class ChatbotView(APIView):
             # --- Smart Context Injection ---
             special_context = []
 
-            # 1. Handle "Latest Experience"
+            # 1. Handle "Latest Experience" (RETAINING ORIGINAL LOGIC due to models.py constraint)
             latest_experience = Experience.objects.order_by("-is_current", "-start_date").first()
             if latest_experience:
                 special_context.append(
                     f"Md Mushfiqur Rahman's most recent professional experience is as a "
-                    f"{latest_experience.job_title} at {latest_experience.company_name}."
+                    f"{latest_experience.job_title} at {latest_experience.company_name}."  # Keep company_name
                 )
 
-            # 2. Handle "Publications" list
-            publications = Publication.objects.all()
+            # 2. Handle "Publications" list (OPTIMIZED)
+            publications = Publication.objects.only("title").all()  # Use .only("title")
             if publications.exists():
                 pub_titles = ", ".join([f'"{p.title}"' for p in publications])
                 special_context.append(f"He has the following publications: {pub_titles}.")
@@ -301,5 +304,5 @@ class ChatbotView(APIView):
             return Response({"answer": answer, "session_id": str(session.id)}, status=status.HTTP_200_OK)
 
         except Exception as e:
-            print(f"Chatbot error: {e}")
+            logger.error(f"Chatbot error: {e}", exc_info=True)
             return Response({"error": "An internal error occurred while processing your request."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

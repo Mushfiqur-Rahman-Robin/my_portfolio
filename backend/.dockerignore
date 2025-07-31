@@ -26,3 +26,5 @@ logs/
 node_modules
 frontend/
 docker-compose*.yml
+uv.lock
+pytest.ini
