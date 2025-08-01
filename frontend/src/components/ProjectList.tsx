@@ -120,8 +120,9 @@ const ProjectList: React.FC = () => {
     if (selectedTag) {
       newParams.append('tag', selectedTag);
     }
-    // Change: Removed { replace: true } to allow sequential back navigation.
-    setSearchParams(newParams.toString());
+    // FIX: Use { replace: true } to prevent pushing duplicate history entries.
+    // This is crucial for correct browser back button behavior on the same logical page.
+    setSearchParams(newParams.toString(), { replace: true });
   }, [currentPage, selectedTag, setSearchParams]);
 
   const handlePageChange = (page: number) => {
@@ -153,7 +154,7 @@ const ProjectList: React.FC = () => {
         <select
           id="tag-select"
           value={selectedTag}
-          onChange={handleTagChange}
+          onChange={handleTagChange} // Use the new handler
         >
           <option value="">All Tags</option>
           {allTags.map((tag) => (
