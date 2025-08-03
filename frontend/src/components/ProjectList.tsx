@@ -3,8 +3,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useSearchParams } from 'react-router-dom';
 import './css/ProjectList.css';
-import { stripHtmlTags } from '../utils/html_cleaner'; // Import the utility
-
+import { stripHtmlTags } from '../utils/html_cleaner';
 
 interface Project {
   id: string;
@@ -37,7 +36,7 @@ const ProjectList: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); // Add loading state
+  const [loading, setLoading] = useState<boolean>(true);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -51,8 +50,6 @@ const ProjectList: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
 
   // Effect to synchronize internal state from URL search params (for back/forward navigation)
-  // This ensures that if the browser's back/forward button changes the URL,
-  // our component's internal state updates to match.
   useEffect(() => {
     const pageFromUrl = parseInt(searchParams.get('page') || '1');
     const tagFromUrl = searchParams.get('tag') || '';
@@ -64,7 +61,7 @@ const ProjectList: React.FC = () => {
     if (selectedTag !== tagFromUrl) {
       setSelectedTag(tagFromUrl);
     }
-  }, [searchParams]); // Depend only on searchParams itself, React Router ensures it changes when the URL does.
+  }, [searchParams]);
 
   // Effect to fetch all tags (runs once on mount)
   useEffect(() => {
@@ -84,7 +81,7 @@ const ProjectList: React.FC = () => {
   // Effect to fetch projects based on selectedTag and currentPage state
   useEffect(() => {
     const fetchProjects = async () => {
-      setLoading(true); // Set loading true at the start of fetch
+      setLoading(true);
       try {
         let url = `${import.meta.env.VITE_API_URL}projects/`;
         const params = new URLSearchParams();
@@ -99,42 +96,52 @@ const ProjectList: React.FC = () => {
         const response = await axios.get<PaginationInfo>(url);
         setProjects(response.data.results);
         setTotalPages(Math.ceil(response.data.count / PROJECTS_PER_PAGE));
-        setError(null); // Clear any previous errors on successful fetch
+        setError(null);
       } catch (err) {
         setError('Failed to fetch projects');
         console.error(err);
-        setProjects([]); // Clear projects on error to show empty state/error message
+        setProjects([]);
       } finally {
-        setLoading(false); // Set loading false after fetch (success or failure)
+        setLoading(false);
       }
     };
 
     fetchProjects();
-  }, [selectedTag, currentPage]); // Data fetching depends only on these state variables
+  }, [selectedTag, currentPage]);
 
-  // Effect to update URL search params when selectedTag or currentPage state changes
-  // This effect ensures the URL in the browser matches the component's state.
-  useEffect(() => {
-    const newParams = new URLSearchParams();
-    newParams.append('page', currentPage.toString());
-    if (selectedTag) {
-      newParams.append('tag', selectedTag);
-    }
-    // FIX: Use { replace: true } to prevent pushing duplicate history entries.
-    // This is crucial for correct browser back button behavior on the same logical page.
-    setSearchParams(newParams.toString(), { replace: true });
-  }, [currentPage, selectedTag, setSearchParams]);
+  // REMOVED the problematic useEffect that was causing the feedback loop
 
   const handlePageChange = (page: number) => {
-    if (page < 1 || page > totalPages) return; // Prevent invalid page numbers
+    if (page < 1 || page > totalPages) return;
+    // This state update will trigger the data fetching useEffect
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top on page change
+
+    // Create new search params based on the current ones to preserve other filters
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('page', page.toString());
+    // This update to the URL is now only triggered by a direct user click
+    setSearchParams(newParams);
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleTagChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedTag(e.target.value);
+    const newTag = e.target.value;
+    setSelectedTag(newTag);
     setCurrentPage(1); // Reset to first page on tag change
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top on tag change
+
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('page', '1'); // Always reset to page 1
+    if (newTag) {
+      newParams.set('tag', newTag);
+    } else {
+      // If "All Tags" is selected, remove the tag param for a cleaner URL
+      newParams.delete('tag');
+    }
+    // This update to the URL is also only triggered by a direct user action
+    setSearchParams(newParams);
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (loading) {
@@ -154,7 +161,7 @@ const ProjectList: React.FC = () => {
         <select
           id="tag-select"
           value={selectedTag}
-          onChange={handleTagChange} // Use the new handler
+          onChange={handleTagChange}
         >
           <option value="">All Tags</option>
           {allTags.map((tag) => (
@@ -179,7 +186,6 @@ const ProjectList: React.FC = () => {
                   <img src={project.image} alt={project.title} />
                 )}
                 <p>
-                  {/* Apply stripHtmlTags here before substring */}
                   {stripHtmlTags(project.description).substring(0, 150)}...
                 </p>
                 <div className="project-tags">
