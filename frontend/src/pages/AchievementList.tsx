@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useSearchParams } from 'react-router-dom'; // 1. Import useSearchParams
 import './css/ListPage.css';
 
 interface Achievement {
@@ -18,42 +19,64 @@ interface PaginationInfo<T> {
   results: T[];
 }
 
-// Define the number of items per page for this list view
-const ACHIEVEMENTS_PER_PAGE = 3; // <--- NEW CONSTANT
+const ACHIEVEMENTS_PER_PAGE = 3;
 
 const AchievementList: React.FC = () => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+
+  // 2. Initialize searchParams to manage URL state
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // 3. Initialize currentPage state from the URL, defaulting to 1
+  const [currentPage, setCurrentPage] = useState<number>(() => {
+    const page = searchParams.get('page');
+    return page ? parseInt(page, 10) : 1;
+  });
+
+  // 4. Effect to sync state from URL (for back/forward buttons)
+  useEffect(() => {
+    const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
+    if (currentPage !== pageFromUrl) {
+      setCurrentPage(pageFromUrl);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchAchievements = async () => {
-      setLoading(true); // Start loading when page changes
+      setLoading(true);
       try {
-        // Construct the URL with page and page_size parameters
         const response = await axios.get<PaginationInfo<Achievement>>(
-          `${import.meta.env.VITE_API_URL}achievements/?page=${currentPage}&page_size=${ACHIEVEMENTS_PER_PAGE}`, // <--- ADDED page_size
+          `${import.meta.env.VITE_API_URL}achievements/?page=${currentPage}&page_size=${ACHIEVEMENTS_PER_PAGE}`,
         );
         setAchievements(response.data.results);
-        // CRITICAL FIX: Calculate totalPages based on the new constant
         setTotalPages(Math.ceil(response.data.count / ACHIEVEMENTS_PER_PAGE));
-        setError(null); // Clear any previous errors
+        setError(null);
       } catch (err) {
         setError('Failed to fetch achievements.');
         console.error('Achievements fetch error:', err);
-        setAchievements([]); // Ensure empty state on error
-        setTotalPages(1); // Reset total pages on error
+        setAchievements([]);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
     };
     fetchAchievements();
-  }, [currentPage]); // Re-fetch whenever currentPage changes
+  }, [currentPage]);
 
+  // 5. Update handlePageChange to modify the URL
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    if (page < 1 || page > totalPages) return;
+
+    setCurrentPage(page); // Update state
+
+    // Update the URL search parameter to create a history entry
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('page', page.toString());
+    setSearchParams(newParams);
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

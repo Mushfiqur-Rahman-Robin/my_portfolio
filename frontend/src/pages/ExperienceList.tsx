@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom'; // 1. Import useSearchParams
 import './css/ExperienceList.css';
-import { stripHtmlTags } from '../utils/html_cleaner'; // Import the utility
-
+import { stripHtmlTags } from '../utils/html_cleaner';
 
 interface Experience {
     id: string;
@@ -11,7 +10,7 @@ interface Experience {
     job_title: string;
     start_date: string;
     end_date_display: string;
-    work_details: string; // This now contains HTML
+    work_details: string;
     is_current: boolean;
     display_order: number;
 }
@@ -23,38 +22,54 @@ interface PaginationInfo<T> {
     results: T[];
 }
 
+const EXPERIENCES_PER_PAGE = 2; // Define page size constant
+
 const ExperienceList: React.FC = () => {
     const [experiences, setExperiences] = useState<Experience[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
+
+    // 2. Initialize searchParams to manage URL state
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // 3. Initialize currentPage state from the URL, defaulting to 1
+    const [currentPage, setCurrentPage] = useState<number>(() => {
+        const page = searchParams.get('page');
+        return page ? parseInt(page, 10) : 1;
+    });
+
+    // 4. Effect to sync state from URL (for back/forward buttons)
+    useEffect(() => {
+        const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
+        if (currentPage !== pageFromUrl) {
+            setCurrentPage(pageFromUrl);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         const fetchExperiences = async () => {
             setLoading(true);
             try {
-                // Correct URL with page parameter
                 const response = await axios.get<PaginationInfo<Experience>>(
-                    `${import.meta.env.VITE_API_URL}experiences/?page=${currentPage}`
+                    `${import.meta.env.VITE_API_URL}experiences/?page=${currentPage}&page_size=${EXPERIENCES_PER_PAGE}`
                 );
-                // Update state with results and pagination info
                 setExperiences(response.data.results);
-                setTotalPages(Math.ceil(response.data.count / 2));  // items per page from backend
+                setTotalPages(Math.ceil(response.data.count / EXPERIENCES_PER_PAGE));
                 setError(null);
             } catch (error: unknown) {
-              let errorMessage = "Failed to fetch experiences: An unexpected error occurred."; // Provide a default message
-              if (axios.isAxiosError(error)) { // Check if it's an Axios error
-                errorMessage = `Failed to fetch experiences: ${error.message}`;  // Now we are sure it has .message
+              let errorMessage = "Failed to fetch experiences: An unexpected error occurred.";
+              if (axios.isAxiosError(error)) {
+                errorMessage = `Failed to fetch experiences: ${error.message}`;
                 console.error('Axios error fetching experiences:', error);
-              } else if (error instanceof Error) { // Standard JS error.
+              } else if (error instanceof Error) {
                 errorMessage = `Failed to fetch experiences: ${error.message}`;
                 console.error('Generic JS error fetching experiences:', error);
               } else {
-                console.error("Unexpected error during experience fetch:", error); // Fallback if it's neither Axios nor standard error
+                console.error("Unexpected error during experience fetch:", error);
               }
               setError(errorMessage);
-              setExperiences([]);  // Ensure empty state on error
+              setExperiences([]);
               setTotalPages(1);
             } finally {
                 setLoading(false);
@@ -64,8 +79,16 @@ const ExperienceList: React.FC = () => {
         fetchExperiences();
     }, [currentPage]);
 
+    // 5. Update handlePageChange to modify the URL
     const handlePageChange = (newPage: number) => {
-        setCurrentPage(newPage);
+        if (newPage < 1 || newPage > totalPages) return;
+
+        setCurrentPage(newPage); // Update state
+
+        // Update the URL search parameter to create a history entry
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('page', newPage.toString());
+        setSearchParams(newParams);
     };
 
     if (loading) {
@@ -89,7 +112,6 @@ const ExperienceList: React.FC = () => {
                             {new Date(exp.start_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })} - {exp.end_date_display}
                         </p>
                         <p className="experience-details-preview">
-                            {/* Apply stripHtmlTags here before substring */}
                             {stripHtmlTags(exp.work_details).substring(0, 200)}...
                         </p>
                         <Link to={`/experience/${exp.id}`} className="btn secondary">
@@ -99,7 +121,6 @@ const ExperienceList: React.FC = () => {
                 ))}
             </div>
 
-            {/* Pagination Controls */}
             <div className="pagination">
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
