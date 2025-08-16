@@ -20,13 +20,21 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.http import HttpResponse
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+
+
+def healthcheck_view(request):
+    return HttpResponse("OK")
+
 
 urlpatterns = (
     [
         path("admin/", admin.site.urls),
+        path("health/", healthcheck_view, name="healthcheck"),
         path("api/", include("api.urls")),
+        path("ckeditor/", include("ckeditor_uploader.urls")),
         path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
         path(
             "api/docs/",

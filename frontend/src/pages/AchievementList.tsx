@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useSearchParams } from 'react-router-dom'; // 1. Import useSearchParams
 import './css/ListPage.css';
 
 interface Achievement {
@@ -18,24 +19,46 @@ interface PaginationInfo<T> {
   results: T[];
 }
 
+const ACHIEVEMENTS_PER_PAGE = 3;
+
 const AchievementList: React.FC = () => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+
+  // 2. Initialize searchParams to manage URL state
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // 3. Initialize currentPage state from the URL, defaulting to 1
+  const [currentPage, setCurrentPage] = useState<number>(() => {
+    const page = searchParams.get('page');
+    return page ? parseInt(page, 10) : 1;
+  });
+
+  // 4. Effect to sync state from URL (for back/forward buttons)
+  useEffect(() => {
+    const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
+    if (currentPage !== pageFromUrl) {
+      setCurrentPage(pageFromUrl);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchAchievements = async () => {
+      setLoading(true);
       try {
         const response = await axios.get<PaginationInfo<Achievement>>(
-          `${import.meta.env.VITE_API_URL}achievements/?page=${currentPage}`,
+          `${import.meta.env.VITE_API_URL}achievements/?page=${currentPage}&page_size=${ACHIEVEMENTS_PER_PAGE}`,
         );
-        setAchievements(response.data.results); // CRITICAL FIX: Access results array
-        setTotalPages(Math.ceil(response.data.count / 6)); // Assuming 6 items per page
+        setAchievements(response.data.results);
+        setTotalPages(Math.ceil(response.data.count / ACHIEVEMENTS_PER_PAGE));
+        setError(null);
       } catch (err) {
         setError('Failed to fetch achievements.');
         console.error('Achievements fetch error:', err);
+        setAchievements([]);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
@@ -43,8 +66,17 @@ const AchievementList: React.FC = () => {
     fetchAchievements();
   }, [currentPage]);
 
+  // 5. Update handlePageChange to modify the URL
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    if (page < 1 || page > totalPages) return;
+
+    setCurrentPage(page); // Update state
+
+    // Update the URL search parameter to create a history entry
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('page', page.toString());
+    setSearchParams(newParams);
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

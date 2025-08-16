@@ -26,6 +26,12 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      chromadb:
+        # Pinned version to 0.4.14 (stable and widely used)
+        image: chromadb/chroma:0.4.14
+        ports:
+          - 8001:8000
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -53,7 +59,7 @@ jobs:
         working-directory: ./backend
         run: |
           curl -LsSf https://astral.sh/ruff/install.sh | sh
-          ruff check .
+          ruff check . --fix
 
       - name: Run formatter check (Ruff)
         working-directory: ./backend
@@ -63,6 +69,14 @@ jobs:
         run: |
           until pg_isready -h localhost -p 5432 -U ${{ secrets.DB_TEST_USER }}; do
             echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+
+      - name: Wait for ChromaDB
+        run: |
+          # --- FIX: Use the /heartbeat endpoint for ChromaDB 0.4.14 ---
+          until curl -f http://localhost:8001/api/v1/heartbeat; do
+            echo "Waiting for ChromaDB..."
             sleep 2
           done
 
@@ -79,7 +93,9 @@ jobs:
           EMAIL_BACKEND: "django.core.mail.backends.locmem.EmailBackend"
           DEFAULT_FROM_EMAIL: "test@example.com"
           ADMIN_EMAIL: "admin@example.com"
-          CSRF_TRUSTED_ORIGINS: "http://localhost:8000" # A dummy but valid origin for CI checks
+          CSRF_TRUSTED_ORIGINS: "http://localhost:8000"
+          CHROMA_HOST: localhost
+          CHROMA_PORT: 8001
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
@@ -98,7 +114,9 @@ jobs:
           EMAIL_BACKEND: "django.core.mail.backends.locmem.EmailBackend"
           DEFAULT_FROM_EMAIL: "test@example.com"
           ADMIN_EMAIL: "admin@example.com"
-          CSRF_TRUSTED_ORIGINS: "http://localhost:8000" # A dummy but valid origin for CI checks
+          CSRF_TRUSTED_ORIGINS: "http://localhost:8000"
+          CHROMA_HOST: localhost
+          CHROMA_PORT: 8001
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
@@ -117,7 +135,9 @@ jobs:
           EMAIL_BACKEND: "django.core.mail.backends.locmem.EmailBackend"
           DEFAULT_FROM_EMAIL: "test@example.com"
           ADMIN_EMAIL: "admin@example.com"
-          CSRF_TRUSTED_ORIGINS: "http://localhost:8000" # A dummy but valid origin for CI tests
+          CSRF_TRUSTED_ORIGINS: "http://localhost:8000"
+          CHROMA_HOST: localhost
+          CHROMA_PORT: 8001
         run: |
           source .venv/bin/activate
           export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB
@@ -147,3 +167,23 @@ jobs:
       - name: Build project
         working-directory: ./frontend
         run: npm run build
+
+  deploy:
+    needs: [backend-checks, frontend-checks]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to Production Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd ~/my_portfolio
+            git pull origin main
+            docker compose up --build -d
+            docker compose exec backend python manage.py migrate --noinput
+            docker system prune -af

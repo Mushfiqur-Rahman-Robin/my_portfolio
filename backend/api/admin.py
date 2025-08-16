@@ -1,9 +1,17 @@
+# backend/api/admin.py
+
+from adminsortable2.admin import SortableAdminMixin
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
+from django import forms  # Import forms
 from django.contrib import admin
 
 from .models import (
     Achievement,
     Certification,
+    ChatMessage,
+    ChatSession,
     ContactMessage,
+    DailyVisitorCount,
     Experience,
     ExperiencePhoto,
     Project,
@@ -11,7 +19,7 @@ from .models import (
     Publication,
     Resume,
     Tag,
-    VisitorCount,
+    TotalVisitorCount,
 )
 
 
@@ -21,8 +29,9 @@ class ProjectImageInline(admin.TabularInline):
 
 
 @admin.register(Project)
-class ProjectAdmin(admin.ModelAdmin):
-    list_display = ("title", "display_order", "is_featured", "created_at")
+class ProjectAdmin(SortableAdminMixin, admin.ModelAdmin):
+    ordering_field_name = "display_order"
+    list_display = ("title", "is_featured", "created_at")
     list_filter = ("is_featured", "tags")
     search_fields = ("title", "description")
     inlines = [ProjectImageInline]  # Add inline for images
@@ -35,9 +44,30 @@ class ExperiencePhotoInline(admin.TabularInline):
     extra = 1
 
 
+# Define a custom form for the Experience model to use CKEditor for work_details
+class ExperienceAdminForm(forms.ModelForm):
+    # This line tells Django's form to use the CKEditor widget for this field.
+    # The underlying model field (models.TextField) remains unchanged.
+    work_details = forms.CharField(widget=CKEditorUploadingWidget())
+
+    class Meta:
+        model = Experience
+        fields = "__all__"
+
+
 @admin.register(Experience)
-class ExperienceAdmin(admin.ModelAdmin):
-    list_display = ("company_name", "job_title", "start_date", "end_date", "is_current", "display_order")
+class ExperienceAdmin(SortableAdminMixin, admin.ModelAdmin):
+    # Use the custom form
+    form = ExperienceAdminForm
+
+    ordering_field_name = "display_order"
+    list_display = (
+        "company_name",
+        "job_title",
+        "start_date",
+        "end_date",
+        "is_current",
+    )
     list_filter = ("is_current", "start_date", "end_date")
     search_fields = ("company_name", "work_details")
     inlines = [ExperiencePhotoInline]  # Add inline for photos
@@ -49,7 +79,7 @@ class ExperienceAdmin(admin.ModelAdmin):
                     "company_name",
                     "job_title",
                     ("start_date", "end_date", "is_current"),
-                    "work_details",
+                    "work_details",  # This field will now display the CKEditor
                     "display_order",
                 )
             },
@@ -57,20 +87,128 @@ class ExperienceAdmin(admin.ModelAdmin):
     )
 
 
-admin.site.register(Publication)
-admin.site.register(Certification)
-admin.site.register(Achievement)
+class ChatMessageInline(admin.TabularInline):
+    """Displays chat messages within the ChatSession view."""
+
+    model = ChatMessage
+    extra = 0  # Don't show any extra forms for new messages
+    readonly_fields = ("sender", "message", "created_at")  # Make fields read-only
+    can_delete = False  # Prevent deleting messages from the session view
+
+    def has_add_permission(self, request, obj=None):
+        return False  # Prevent adding new messages from here
+
+
+@admin.register(ChatSession)
+class ChatSessionAdmin(admin.ModelAdmin):
+    """Admin view for Chat Sessions."""
+
+    list_display = ("id", "created_at")
+    list_filter = ("created_at",)
+    readonly_fields = ("id", "created_at")
+    inlines = [ChatMessageInline]  # Nest the messages inside the session
+
+
+@admin.register(Publication)
+class PublicationAdmin(SortableAdminMixin, admin.ModelAdmin):
+    ordering_field_name = "display_order"
+    list_display = ("title", "authors", "conference", "published_date", "display_order")
+    list_filter = ("published_date", "conference")
+    search_fields = ("title", "authors", "conference")
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "title",
+                    "authors",
+                    "conference",
+                    "publication_url",
+                    "published_date",
+                    "display_order",
+                )
+            },
+        ),
+    )
+
+
+@admin.register(Certification)
+class CertificationAdmin(SortableAdminMixin, admin.ModelAdmin):
+    ordering_field_name = "display_order"
+    list_display = ("name", "issuing_organization", "issue_date", "display_order")
+    list_filter = ("issue_date", "issuing_organization")
+    search_fields = ("name", "issuing_organization")
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "name",
+                    "issuing_organization",
+                    "credential_url",
+                    "issue_date",
+                    "image",
+                    "display_order",
+                )
+            },
+        ),
+    )
+
+
+@admin.register(Achievement)
+class AchievementAdmin(SortableAdminMixin, admin.ModelAdmin):
+    ordering_field_name = "display_order"
+    list_display = ("title", "date", "display_order")
+    list_filter = ("date",)
+    search_fields = ("title", "description")
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "title",
+                    "description",
+                    "date",
+                    "image",
+                    "display_order",
+                )
+            },
+        ),
+    )
+
+
 admin.site.register(ContactMessage)
 admin.site.register(Resume)
 admin.site.register(Tag)
 
 
-@admin.register(VisitorCount)
-class VisitorCountAdmin(admin.ModelAdmin):
+@admin.register(TotalVisitorCount)
+class TotalVisitorCountAdmin(admin.ModelAdmin):
+    """Admin view for the single, cumulative visitor count."""
+
     list_display = ("count", "last_updated")
+    readonly_fields = ("id", "last_updated", "count")
 
     def has_add_permission(self, request):
-        return False if VisitorCount.objects.exists() else True
+        return not TotalVisitorCount.objects.exists()
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(DailyVisitorCount)
+class DailyVisitorCountAdmin(admin.ModelAdmin):
+    """Admin view for daily visitor counts."""
+
+    list_display = ("date", "count")
+    list_filter = ("date",)
+    readonly_fields = ("date", "count")
+
+    def has_add_permission(self, request):
+        return False  # Prevent manual creation
+
+    def has_change_permission(self, request, obj=None):
+        return False  # Prevent manual editing
+
+    def has_delete_permission(self, request, obj=None):
+        return False  # Prevent deletion from the admin

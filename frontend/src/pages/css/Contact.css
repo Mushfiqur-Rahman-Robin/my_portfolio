@@ -1,29 +1,32 @@
 /* frontend/src/pages/Contact.css */
 .contact-container {
-  padding: 2rem;
+  padding: 2rem; /* Desktop padding */
   max-width: 800px;
   margin: 0 auto;
   text-align: center;
 }
 
 .contact-container h1 {
-  font-size: 3rem;
+  font-size: 3rem; /* Desktop font size */
   color: var(--color-green-accent);
   margin-bottom: 1.5rem;
 }
 
 .contact-intro {
-  font-size: 1.1rem;
+  font-size: 1.1rem; /* Desktop font size */
   color: var(--color-light-gray-text);
   margin-bottom: 2rem;
+  line-height: 1.6;
 }
 
 .contact-methods {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  /* Default: will typically render as 1 column on very small screens,
+     or expand as needed with auto-fit if no other rules apply.
+     However, explicit rules below will override this. */
   gap: 1.5rem;
   margin-bottom: 3rem;
+  justify-content: center; /* Center the grid itself if it doesn't take full width */
 }
 
 .contact-item {
@@ -31,25 +34,30 @@
   padding: 1.5rem;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
-  min-width: 200px;
-  flex: 1;
+  transition: transform 0.3s ease;
+}
+
+.contact-item:hover {
+  transform: translateY(-2px);
 }
 
 .contact-item h3 {
   color: var(--color-white-text);
-  font-size: 1.6rem;
+  font-size: 1.6rem; /* Desktop font size */
   margin-bottom: 0.8rem;
 }
 
 .contact-item p {
   color: var(--color-light-gray-text);
-  font-size: 1rem;
+  font-size: 1rem; /* Desktop font size */
+  word-break: break-word; /* Good for long URLs */
 }
 
 .contact-item a {
   color: var(--color-green-accent);
   text-decoration: none;
   transition: color 0.3s ease;
+  word-break: break-all; /* Ensure long URLs break correctly */
 }
 
 .contact-item a:hover {
@@ -57,15 +65,14 @@
   text-decoration: underline;
 }
 
-/* Fix for LinkedIn text overflow */
 .contact-info-link a {
-  display: block; /* Ensure the anchor tag takes up full width */
-  overflow-wrap: break-word; /* Break long words */
-  word-break: break-all; /* Break all characters if needed */
+  display: block;
+  overflow-wrap: break-word;
+  word-break: break-all;
 }
 
 .form-heading {
-  font-size: 2.5rem;
+  font-size: 2.5rem; /* Desktop font size */
   color: var(--color-green-accent);
   margin-top: 3rem;
   margin-bottom: 2rem;
@@ -73,7 +80,7 @@
 
 .contact-form {
   background-color: var(--color-darker-gray-elements);
-  padding: 2.5rem;
+  padding: 2.5rem; /* Desktop padding */
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   text-align: left;
@@ -85,7 +92,7 @@
 
 .form-group label {
   display: block;
-  font-size: 1rem;
+  font-size: 1rem; /* Desktop font size */
   color: var(--color-white-text);
   margin-bottom: 0.5rem;
   font-weight: bold;
@@ -99,7 +106,9 @@
   border-radius: 5px;
   background-color: var(--color-black-background);
   color: var(--color-white-text);
-  font-size: 1rem;
+  font-size: 1rem; /* Desktop font size */
+  transition: border-color 0.3s ease;
+  box-sizing: border-box; /* Ensures padding is included in element's total width/height */
 }
 
 .form-group input:focus,
@@ -109,19 +118,25 @@
   box-shadow: 0 0 0 3px rgba(110, 230, 78, 0.3);
 }
 
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
 .submit-btn {
   background-color: var(--color-green-accent);
   color: var(--color-black-background);
   padding: 0.9rem 2rem;
   border: none;
   border-radius: 8px;
-  font-size: 1.1rem;
+  font-size: 1.1rem; /* Desktop font size */
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease;
-  width: auto;
+  width: auto; /* Allow button to size naturally */
   display: block;
-  margin: 0 auto;
+  margin: 0 auto; /* Center button */
+  min-width: 150px;
 }
 
 .submit-btn:hover {
@@ -129,9 +144,15 @@
   transform: translateY(-2px);
 }
 
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none; /* Remove hover effect when disabled */
+}
+
 .form-status {
   margin-top: 1.5rem;
-  font-size: 1rem;
+  font-size: 1rem; /* Desktop font size */
   font-weight: bold;
   text-align: center;
   color: var(--color-green-accent);
@@ -141,8 +162,122 @@
   color: #ff6b6b;
 }
 
-@media (max-width: 768px) {
+/* Responsive adjustments */
+
+/* Desktop & Larger Tablets: 3 columns */
+@media (min-width: 769px) { /* Changed from max-width to min-width for desktop-first approach */
   .contact-methods {
-    flex-direction: column;
+    grid-template-columns: repeat(3, 1fr); /* Explicitly 3 columns for desktop */
+    /* Remove max-width and margin auto here as container already handles it */
+  }
+}
+
+/* Medium Tablets: 2 columns */
+@media (max-width: 768px) { /* This will apply to screens from 768px down */
+  .contact-container {
+    padding: 1.5rem;
+  }
+
+  .contact-container h1 {
+    font-size: 2.5rem;
+  }
+
+  .contact-intro {
+    font-size: 1rem;
+  }
+
+  .contact-methods {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
+    gap: 1rem;
+    max-width: 550px; /* Constrain grid to prevent items from being too wide */
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .contact-item {
+    padding: 1.2rem;
+  }
+
+  .contact-item h3 {
+    font-size: 1.4rem;
+  }
+  .contact-item p {
+    font-size: 0.95rem;
+  }
+
+  .form-heading {
+    font-size: 2rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .contact-form {
+    padding: 1.8rem;
+  }
+
+  .form-group label {
+    font-size: 0.95rem;
+  }
+  .form-group input,
+  .form-group textarea {
+    font-size: 0.95rem;
+    padding: 0.7rem;
+  }
+
+  .submit-btn {
+    width: 100%; /* Full width button on mobile */
+    padding: 1rem;
+    font-size: 1rem;
+  }
+  .form-status {
+    font-size: 0.95rem;
+  }
+}
+
+/* Small Phones: 1 column */
+@media (max-width: 576px) { /* New breakpoint for smaller phones to switch to 1 column */
+  .contact-container {
+    padding: 1rem;
+  }
+
+  .contact-container h1 {
+    font-size: 2rem;
+  }
+
+  .contact-methods {
+    grid-template-columns: 1fr; /* Stack into 1 column */
+    max-width: 350px; /* Adjust max-width for very small screens if needed */
+  }
+
+  .contact-item {
+    padding: 1rem;
+  }
+
+  .contact-item h3 {
+    font-size: 1.2rem;
+  }
+
+  .form-heading {
+    font-size: 1.8rem;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    padding: 0.6rem;
+  }
+
+  .submit-btn {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Further reduce padding for very small screens if necessary */
+@media (max-width: 400px) {
+  .contact-container {
+    padding: 0.8rem;
+  }
+  .contact-form {
+    padding: 1rem;
   }
 }

@@ -9,6 +9,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
 
+# Load the OpenAI API Key from the .env file
+OPENAI_API_KEY = config("OPENAI_API_KEY", default="")
+
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS",
     default="127.0.0.1,localhost,0.0.0.0",
@@ -21,11 +24,27 @@ CSRF_TRUSTED_ORIGINS = config(
     cast=lambda v: [s.strip() for s in v.split(",")],
 )
 
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 # Your administrative email address to receive contact messages
 ADMIN_EMAIL = config("ADMIN_EMAIL", default="your_admin_email@example.com")
 
 if DEBUG:
     ALLOWED_HOSTS = ["*"]
+
+# --- CKEDITOR CONFIGURATION ---
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    "default": {
+        "toolbar": "full",
+        "height": 400,
+        "width": "100%",
+        # Add the 'codesnippet' plugin and its styles
+        "extraPlugins": ",".join(["codesnippet"]),
+        "codeSnippet_theme": "monokai_sublime",
+    },
+}
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -37,7 +56,10 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "drf_spectacular",
+    "adminsortable2",
     "api",
+    "ckeditor",
+    "ckeditor_uploader",
 ]
 
 # CORRECT MIDDLEWARE ORDER FOR SITE-WIDE CACHING
@@ -87,6 +109,7 @@ REST_FRAMEWORK = {
         "user": "1000/hour",  # General rate for authenticated users across all APIs
         "contact_form": "5/day",  # Specific rate for contact form submissions (anonymous users)
         "visitor_count": "1/second",  # Specific rate for visitor count endpoint
+        "chatbot": "30/day",  # Specific rate for chatbot queries
     },
 }
 

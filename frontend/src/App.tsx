@@ -12,6 +12,7 @@ import ExperienceDetail from './pages/ExperienceDetail.tsx';
 import CertificationList from './pages/CertificationList.tsx';
 import AchievementList from './pages/AchievementList.tsx';
 import PublicationList from './pages/PublicationList.tsx';
+import ChatbotWidget from './components/ChatbotWidget.tsx';
 
 import './App.css';
 
@@ -37,6 +38,7 @@ function App() {
         </main>
         <Footer />
       </div>
+      <ChatbotWidget />
     </Router>
   );
 }

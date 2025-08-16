@@ -1,9 +1,10 @@
-// frontend/src/pages/Home.tsx
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import SkillsSection from '../components/SkillsSection.tsx';
 import './css/Home.css';
+import { stripHtmlTags } from '../utils/html_cleaner'; // Import the utility
+
 
 interface Project {
   id: string;
@@ -25,7 +26,7 @@ interface PaginationInfo<T> {
 const Home: React.FC = () => {
   const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [loadingFeaturedProjects, setLoadingFeaturedProjects] = useState<boolean>(true); // New loading state for featured projects
+  const [loadingFeaturedProjects, setLoadingFeaturedProjects] = useState<boolean>(true);
 
   useEffect(() => {
     // Increment visitor count on page load (backend-only)
@@ -34,7 +35,7 @@ const Home: React.FC = () => {
 
     // Fetch up to 3 featured projects
     const fetchFeaturedProjects = async () => {
-      setLoadingFeaturedProjects(true); // Start loading
+      setLoadingFeaturedProjects(true);
       try {
         const response = await axios.get<PaginationInfo<Project>>(
           `${import.meta.env.VITE_API_URL}projects/?is_featured=true&ordering=display_order`
@@ -53,7 +54,7 @@ const Home: React.FC = () => {
         setError("Failed to fetch featured projects.");
         console.error("Featured projects fetch error:", err);
       } finally {
-        setLoadingFeaturedProjects(false); // End loading
+        setLoadingFeaturedProjects(false);
       }
     };
     fetchFeaturedProjects();
@@ -75,7 +76,6 @@ const Home: React.FC = () => {
             <Link to="/contact" className="btn secondary">
               Let's Connect
             </Link>
-            {/* DISABLED Buy Me A Coffee Button */}
             <span
               className="btn buy-me-coffee-btn disabled-bmac"
               title="Buy Me A Coffee is currently unavailable"
@@ -93,10 +93,6 @@ const Home: React.FC = () => {
       {!loadingFeaturedProjects && featuredProjects.length === 3 && (
         <section className="featured-projects-section">
           <h2>Featured Projects</h2>
-          {/* We handle error/no projects within the useEffect now,
-              so if featuredProjects.length === 3, there's no general error.
-              The specific error message is handled by the "Not enough..." text below.
-              If `error` is set from a network failure, it will still display. */}
           {error && <p className="error">{error}</p>}
           <div className="projects-preview-grid">
             {featuredProjects.map((project) => (
@@ -106,7 +102,10 @@ const Home: React.FC = () => {
                     {project.image && (
                       <img src={project.image} alt={project.title} className="project-preview-image" />
                     )}
-                    <p className="project-preview-description">{project.description.substring(0, 100)}...</p>
+                    <p className="project-preview-description">
+                      {/* Apply stripHtmlTags here before substring */}
+                      {stripHtmlTags(project.description).substring(0, 100)}...
+                    </p>
                     <div className="project-preview-tags">
                       {project.tags && project.tags.map((tag, index) => (
                         <span key={index} className="tag-badge">
