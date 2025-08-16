@@ -9,6 +9,7 @@ const skills: Skill[] = [
   // Programming Languages & Frameworks (prioritized)
   { name: 'Python', level: 95 },
   { name: 'SQL', level: 80 },
+  { name: 'Go', level: 65 },
   { name: 'HTML / CSS', level: 80 },
   { name: 'C / C++', level: 70 },
   { name: 'Flask / FastAPI / Streamlit', level: 85 },
@@ -31,7 +32,7 @@ const skills: Skill[] = [
   { name: 'Unsupervised ML', level: 85 },
   { name: 'Generative AI', level: 85 },
   { name: 'Time-Series Forecasting', level: 75 },
-  { name: 'Hypothesis Testing', level: 80 },
+  // { name: 'Hypothesis Testing', level: 80 },
 
   // MLOps Tools
   { name: 'MLOps', level: 75 },
