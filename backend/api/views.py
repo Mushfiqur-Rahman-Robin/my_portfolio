@@ -239,32 +239,13 @@ class ChatbotView(APIView):
             # Save the user's message
             ChatMessage.objects.create(session=session, sender="user", message=query)
 
-            # --- Smart Context Injection ---
-            special_context = []
+            # --- Context Retrieval from ChromaDB ---
+            results = query_nodes(query, n_results=5)
+            retrieved_documents = results.get("documents")
 
-            # 1. Handle "Latest Experience"
-            latest_experience = Experience.objects.order_by("-is_current", "-start_date").first()
-            if latest_experience:
-                special_context.append(
-                    f"Md Mushfiqur Rahman's most recent professional experience is as a "
-                    f"{latest_experience.job_title} at {latest_experience.company_name}."
-                )
-
-            # 2. Handle "Publications" list
-            publications = Publication.objects.all()
-            if publications.exists():
-                pub_titles = ", ".join([f'"{p.title}"' for p in publications])
-                special_context.append(f"He has the following publications: {pub_titles}.")
-
-            # 3. Retrieve general context from ChromaDB
-            results = query_nodes(query, n_results=4)
-            retrieved_context = "\n\n".join(results["documents"][0]) if results.get("documents") and results["documents"][0] else ""
-
-            # Combine all context
-            final_context = "\n\n".join(special_context) + "\n\n" + retrieved_context
-            final_context = final_context.strip()
-
-            if not final_context:
+            if retrieved_documents and retrieved_documents[0]:
+                final_context = "\n\n".join(retrieved_documents[0])
+            else:
                 final_context = "No relevant information found in the knowledge base."
 
             # --- Updated Prompt with Privacy Guardrails ---

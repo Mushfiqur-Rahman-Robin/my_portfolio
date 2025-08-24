@@ -1,5 +1,3 @@
-# backend/api/management/commands/index_content.py
-
 import os
 
 from django.conf import settings
@@ -66,14 +64,16 @@ class Command(BaseCommand):
         )
         self.stdout.write(self.style.SUCCESS("Indexed 'About Me' content."))
 
-        # Skills Content (taken from your SkillsSection.tsx)
+        # Skills Content (UPDATED to match frontend)
         skills_list = [
             "Python",
             "SQL",
+            "Go",
             "HTML / CSS",
             "C / C++",
             "Flask / FastAPI / Streamlit",
             "Django",
+            "React",
             "Scikit-learn",
             "TensorFlow",
             "PyTorch",
@@ -89,13 +89,18 @@ class Command(BaseCommand):
             "Generative AI",
             "Time-Series Forecasting",
             "Hypothesis Testing",
+            "MLOps",
+            "MLflow",
+            "DVC",
+            "Airflow",
+            "AWS",
             "Docker",
             "Git & GitHub",
             "CI/CD (GitHub Actions, CircleCI)",
             "Nginx",
             "Monitoring (Prometheus, Grafana)",
             "Caching (Redis)",
-            "MLOps",
+            "n8n",
             "Web-scrapping (BeautifulSoup, Selenium)",
         ]
         skills_text = f"Md Mushfiqur Rahman's skills include: {', '.join(skills_list)}."
