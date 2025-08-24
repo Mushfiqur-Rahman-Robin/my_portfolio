@@ -72,15 +72,19 @@ const ChatbotWidget = () => {
       setMessages((prev) => [...prev, botMessage]);
 
       // If this was a new session, save the new session ID
-      if (!sessionId && res.data.session_id) {
+      if (sessionId !== res.data.session_id) {
         const newSessionId = res.data.session_id;
         setSessionId(newSessionId);
         localStorage.setItem(LOCAL_STORAGE_KEY, newSessionId);
       }
     } catch (error) {
       console.error("Chatbot API error:", error);
+      let errorMessageText = "Sorry, I encountered an error. Please try again later.";
+      if (axios.isAxiosError(error) && error.response?.status === 429) {
+          errorMessageText = "You've reached the daily message limit. Please try again tomorrow.";
+      }
       const errorMessage = {
-        text: "Sorry, I encountered an error. Please try again later.",
+        text: errorMessageText,
         sender: "bot" as const,
       };
       setMessages((prev) => [...prev, errorMessage]);
