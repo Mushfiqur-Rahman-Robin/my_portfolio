@@ -56,7 +56,7 @@ const skills: Skill[] = [
   // Other Technical/Support Skills
   // { name: 'MySQL', level: 80 },
   // { name: 'PostgreSQL', level: 80 },
-  { name: 'n8n', level: 75 },
+  { name: 'n8n', level: 75 }, // newly added
   { name: 'Web-scrapping (BeautifulSoup, Selenium)', level: 85 },
 ];
 
