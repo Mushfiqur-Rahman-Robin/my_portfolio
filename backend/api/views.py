@@ -286,7 +286,7 @@ class ChatbotView(APIView):
             # 4. Call OpenAI API
             client = OpenAI(api_key=settings.OPENAI_API_KEY)
             completion = client.chat.completions.create(
-                model="gpt-5-mini",
+                model="gpt-4.1-mini",
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=512,
                 temperature=0.2,
