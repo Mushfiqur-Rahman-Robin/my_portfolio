@@ -183,20 +183,19 @@ class VisitorCountView(APIView):
     )
     def post(self, request, format=None):
         try:
+            # --- UPDATED LOGIC ---
             # 1. Increment the total visitor count
             total_count, _ = TotalVisitorCount.objects.get_or_create()
             total_count.count = F("count") + 1
             total_count.save()
             total_count.refresh_from_db()
 
-            # 2. Increment today's visitor count (FIXED LOGIC)
+            # 2. Increment today's visitor count
             today = timezone.now().date()
-            daily_count, created = DailyVisitorCount.objects.get_or_create(date=today, defaults={"count": 1})  # Set initial count to 1 for new entries
+            daily_count, created = DailyVisitorCount.objects.get_or_create(date=today)
             if not created:
-                # If record already exists, increment it
                 daily_count.count = F("count") + 1
                 daily_count.save()
-                daily_count.refresh_from_db()
 
             return Response(
                 {"message": "Visitor count incremented", "count": total_count.count},
@@ -239,13 +238,32 @@ class ChatbotView(APIView):
             # Save the user's message
             ChatMessage.objects.create(session=session, sender="user", message=query)
 
-            # --- Context Retrieval from ChromaDB ---
-            results = query_nodes(query, n_results=5)
-            retrieved_documents = results.get("documents")
+            # --- Smart Context Injection ---
+            special_context = []
 
-            if retrieved_documents and retrieved_documents[0]:
-                final_context = "\n\n".join(retrieved_documents[0])
-            else:
+            # 1. Handle "Latest Experience"
+            latest_experience = Experience.objects.order_by("-is_current", "-start_date").first()
+            if latest_experience:
+                special_context.append(
+                    f"Md Mushfiqur Rahman's most recent professional experience is as a "
+                    f"{latest_experience.job_title} at {latest_experience.company_name}."
+                )
+
+            # 2. Handle "Publications" list
+            publications = Publication.objects.all()
+            if publications.exists():
+                pub_titles = ", ".join([f'"{p.title}"' for p in publications])
+                special_context.append(f"He has the following publications: {pub_titles}.")
+
+            # 3. Retrieve general context from ChromaDB
+            results = query_nodes(query, n_results=4)
+            retrieved_context = "\n\n".join(results["documents"][0]) if results.get("documents") and results["documents"][0] else ""
+
+            # Combine all context
+            final_context = "\n\n".join(special_context) + "\n\n" + retrieved_context
+            final_context = final_context.strip()
+
+            if not final_context:
                 final_context = "No relevant information found in the knowledge base."
 
             # --- Updated Prompt with Privacy Guardrails ---
@@ -268,7 +286,7 @@ class ChatbotView(APIView):
             # 4. Call OpenAI API
             client = OpenAI(api_key=settings.OPENAI_API_KEY)
             completion = client.chat.completions.create(
-                model="gpt-4.1-mini",
+                model="gpt-5-mini",
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=512,
                 temperature=0.2,
