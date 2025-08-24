@@ -32,7 +32,7 @@ const skills: Skill[] = [
   { name: 'Unsupervised ML', level: 85 },
   { name: 'Generative AI', level: 85 },
   { name: 'Time-Series Forecasting', level: 75 },
-  // { name: 'Hypothesis Testing', level: 80 },
+  { name: 'Hypothesis Testing', level: 80 },
 
   // MLOps Tools
   { name: 'MLOps', level: 75 },
@@ -56,6 +56,7 @@ const skills: Skill[] = [
   // Other Technical/Support Skills
   // { name: 'MySQL', level: 80 },
   // { name: 'PostgreSQL', level: 80 },
+  { name: 'n8n', level: 75 },
   { name: 'Web-scrapping (BeautifulSoup, Selenium)', level: 85 },
 ];
 
