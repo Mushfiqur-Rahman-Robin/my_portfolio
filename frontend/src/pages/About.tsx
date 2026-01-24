@@ -14,7 +14,7 @@ const About: React.FC = () => {
           </div>
 
           <p>
-            Hello! I'm Md Mushfiqur Rahman, a full-stack data scientist with around 3 years of professional experience. I strive to tackle real-world challenges using my technical expertise in Data Science. I thrive in environments where research work is valued alongside routine tasks, constantly motivated to learn and stay updated with the latest tools and technologies in the ever-evolving data-driven world.
+            Hello! I'm Md Mushfiqur Rahman, a full-stack data scientist with more than 3 years of professional experience. I strive to tackle real-world challenges using my technical expertise in Data Science. I thrive in environments where research work is valued alongside routine tasks, constantly motivated to learn and stay updated with the latest tools and technologies in the ever-evolving data-driven world.
           </p>
           <p>
             Currently, I serve as an AI/ML Team Lead, focusing on designing and
