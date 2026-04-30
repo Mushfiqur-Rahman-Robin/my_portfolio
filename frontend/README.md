@@ -1,74 +1,62 @@
-# Frontend
+# Frontend (React + Vite + TypeScript)
 
-This directory contains the React (Vite + TypeScript) application that serves as the frontend for the portfolio website.
+This app renders the portfolio UI and consumes the Django API.
 
-For detailed information about the project structure, setup, and deployment, please refer to the [main README.md](../README.md).
+## UI direction
 
-## Key Components
+- Theme: dark + teal accent (`rgb(8, 145, 178)`).
+- Focus: cleaner spacing, stronger visual hierarchy, and mobile-first responsiveness.
+- Scope: frontend presentation only (no backend business logic changes).
 
--   **`src/`**: Main source code (components, pages, assets, styles).
--   **`public/`**: Static assets.
--   **`vite.config.ts`**: Vite configuration.
--   **`Dockerfile`**: Instructions for building the frontend Docker image.
--   **`package.json`**: Node.js dependencies and scripts.
+## Current UI conventions
 
-Please see the [main README.md](../README.md#frontend-details) for more specific details on the frontend architecture and functionalities.
+- Navbar desktop alignment: logo left, nav links right-aligned to match main content boundaries.
+- Hero CTA buttons: equal-height button styling for consistent vertical alignment.
+- Skills section: unified, compact skill grid (no category headers) with responsive columns.
+- Project images (home featured + all projects): fixed-size framed image area with contained fit for consistent card alignment across mixed image sizes.
 
-The original Vite boilerplate information can be found below if needed:
+## Run options
 
----
+### 1) Vite dev mode (recommended while iterating UI)
 
-# React + TypeScript + Vite (Original Boilerplate)
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- Frontend URL: `http://localhost:5174`
+- Dev proxy forwards `/api/*` and `/media/*` to backend `http://127.0.0.1:8000`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 2) Docker mode
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+From repository root:
+
+```bash
+docker compose up -d --build frontend backend db redis chromadb
+```
+
+- Frontend URL: `http://127.0.0.1:5173`
+
+## Environment
+
+`frontend/.env.local` contains:
+
+```dotenv
+VITE_API_URL=/api/v1/
+```
+
+This keeps API calls same-origin in both Docker and local dev proxy mode.
+
+## Key folders
+
+- `src/components/`: Reusable UI blocks (navbar, footer, project list, skills).
+- `src/pages/`: Route-level pages and page-scoped CSS.
+- `src/index.css`: Global design tokens and base typography/colors.
+
+## Build
+
+```bash
+cd frontend
+npm run build
 ```

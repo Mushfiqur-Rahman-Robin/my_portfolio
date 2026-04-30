@@ -1,20 +1,20 @@
 /* frontend/src/components/ProjectList.css */
 .project-list-container {
-  padding: 2rem;
-  max-width: 1200px;
+  padding: 1.5rem 1rem 2rem;
+  max-width: 1280px;
   margin: 0 auto;
 }
 
 .project-list-container h1 {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.2rem;
   color: var(--color-green-accent);
-  font-size: 3rem;
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
 }
 
 .tag-filter-section {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.2rem;
   color: var(--color-white-text);
 }
 
@@ -27,12 +27,12 @@
 }
 
 .tag-filter-section select {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  border-radius: 10px;
   border: 1px solid var(--color-border-subtle);
   background-color: var(--color-darker-gray-elements);
   color: var(--color-white-text);
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -46,23 +46,23 @@
 }
 
 .tag-filter-section select:focus {
-  outline: 4px auto var(--color-green-accent);
+  outline: 3px solid rgba(8, 145, 178, 0.35);
   border-color: var(--color-green-accent);
 }
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.1rem;
   justify-content: center;
 }
 
 .project-card {
   background-color: var(--color-darker-gray-elements);
   border: 1px solid var(--color-border-subtle);
-  border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -71,8 +71,8 @@
 }
 
 .project-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
 }
 
 .project-card-link {
@@ -88,43 +88,70 @@
 .project-card-link h2 {
   color: var(--color-white-text);
   margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.8rem;
+  margin-bottom: 0.7rem;
+  font-size: 1.25rem;
   text-decoration: none;
   line-height: 1.3;
+  min-height: 2.6em;
+  max-height: 2.6em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .project-card-link img {
-  max-width: 100%;
-  height: 200px;
-  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   border-radius: 8px;
+}
+
+.project-card-image-frame {
+  width: 100%;
+  height: 180px;
+  border-radius: 10px;
+  border: 1px solid rgba(8, 145, 178, 0.22);
+  background-color: rgba(3, 16, 24, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
   margin-bottom: 1rem;
 }
 
 .project-card-link p {
   color: var(--color-light-gray-text);
-  line-height: 1.6;
-  margin-bottom: 1rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
   flex-grow: 1;
   text-align: center; /* Ensure paragraph text is centered */
-  font-size: 1rem;
+  font-size: 0.92rem;
+  min-height: 4.5em;
+  max-height: 4.5em;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .project-card-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: 0.55rem;
+  margin-top: 0.7rem;
   justify-content: center; /* Center buttons */
 }
 
 .project-card-actions .btn {
-  padding: 0.6em 1em;
-  font-size: 0.9rem;
+  padding: 0.55em 0.85em;
+  font-size: 0.86rem;
   flex: 1;
-  min-width: 100px;
+  min-width: 94px;
   text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .project-tags {
@@ -134,15 +161,19 @@
   margin-top: 1rem;
   justify-content: center; /* Ensure tag badges are centered */
   margin-bottom: 1rem;
+  min-height: 4.3rem;
+  max-height: 4.3rem;
+  overflow: hidden;
+  align-content: flex-start;
 }
 
 .tag-badge {
   background-color: var(--color-green-accent);
-  color: var(--color-black-background);
+  color: var(--color-white-text);
   padding: 0.3rem 0.6rem;
   border-radius: 5px;
   font-size: 0.85rem;
-  border: 1px solid #55c43d;
+  border: 1px solid var(--color-green-accent-hover);
 }
 
 .error {
@@ -157,8 +188,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 3rem;
-  gap: 1rem;
+  margin-top: 1.8rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
@@ -166,11 +197,11 @@
   background-color: var(--color-darker-gray-elements);
   color: var(--color-white-text);
   border: 1px solid var(--color-border-subtle);
-  padding: 0.7rem 1rem;
+  padding: 0.55rem 0.8rem;
   cursor: pointer;
   border-radius: 5px;
   transition: background-color 0.3s ease, color 0.3s ease;
-  font-size: 1rem;
+  font-size: 0.9rem;
   min-width: 44px;
   text-align: center;
 }
@@ -190,11 +221,7 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .project-list-container {
-    padding: 1.5rem;
-  }
-
-  .project-list-container h1 {
-    font-size: 2.5rem;
+    padding: 1rem 0.7rem 1.5rem;
   }
 
   .tag-filter-section label {
@@ -211,35 +238,37 @@
 
   .projects-grid {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 0.9rem;
   }
 
   .project-card {
-    padding: 1.2rem;
+    padding: 0.9rem;
   }
 
   .project-card-link h2 {
-    font-size: 1.6rem;
+    font-size: 1.15rem;
   }
   .project-card-link p {
     font-size: 0.9rem;
     text-align: center; /* Ensure mobile description is centered */
   }
 
-  /* FIX: Center buttons for project cards on mobile */
   .project-card-actions {
-    flex-direction: column; /* Stack the buttons vertically */
-    align-items: center; /* Center buttons horizontally */
-    gap: 0.8rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .project-card-actions .btn {
-    display: block; /* Make button block to use margin auto */
-    margin: 0 auto; /* Center the button itself */
-    width: 80%; /* Give it a substantial width */
-    max-width: 250px; /* Constrain max width */
-    font-size: 0.9rem;
-    padding: 0.7em 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    width: 86%;
+    max-width: 260px;
+    font-size: 0.86rem;
+    padding: 0.65em 0.9em;
+    line-height: 1.2;
   }
 
   .project-tags {
@@ -259,11 +288,7 @@
 
 @media (max-width: 480px) {
   .project-list-container {
-    padding: 1rem;
-  }
-
-  .project-list-container h1 {
-    font-size: 2rem;
+    padding: 0.8rem 0.55rem 1.3rem;
   }
 
   .project-card {
@@ -271,11 +296,15 @@
   }
 
   .project-card-link img {
-    height: 150px;
+    height: 100%;
+  }
+
+  .project-card-image-frame {
+    height: 155px;
   }
 
   .project-card-link h2 {
-    font-size: 1.4rem;
+    font-size: 1.05rem;
   }
   .project-card-link p {
     font-size: 0.85rem;
@@ -287,6 +316,9 @@
 
   /* Further constrain button width on very small mobile for Project List */
   .project-card-actions .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 90%;
     max-width: 280px;
   }

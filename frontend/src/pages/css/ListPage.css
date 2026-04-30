@@ -1,15 +1,15 @@
 /* frontend/src/pages/ListPage.css */
 .list-page-container {
-  padding: 2rem;
-  max-width: 1200px;
+  padding: 1.5rem 1rem 2rem;
+  max-width: 1280px;
   margin: 0 auto;
   text-align: center;
 }
 
 .list-page-container h1 {
-  font-size: 3rem;
+  font-size: clamp(1.8rem, 3.1vw, 2.5rem);
   color: var(--color-green-accent);
-  margin-bottom: 2rem;
+  margin-bottom: 1.1rem;
 }
 
 .loading-message {
@@ -20,17 +20,17 @@
 
 .items-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
   justify-content: center;
 }
 
 .list-card {
   background-color: var(--color-darker-gray-elements);
   border: 1px solid var(--color-border-subtle);
-  border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -39,15 +39,15 @@
 }
 
 .list-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
 }
 
 .list-card h2 {
   color: var(--color-white-text);
   margin-top: 0;
   margin-bottom: 0.8rem;
-  font-size: 1.8rem;
+  font-size: 1.2rem;
 }
 
 .list-card .item-organization,
@@ -67,8 +67,8 @@
 
 .list-card .item-image {
   max-width: 100%;
-  height: 150px; /* Consistent height for list images */
-  object-fit: contain; /* Certificates might be logos or actual certs, so contain fits better */
+  height: 140px;
+  object-fit: contain;
   border-radius: 8px;
   margin-bottom: 1rem;
 }
@@ -91,15 +91,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 3rem;
-  gap: 1rem;
+  margin-top: 1.6rem;
+  gap: 0.5rem;
 }
 
 .pagination-btn {
   background-color: var(--color-darker-gray-elements);
   color: var(--color-white-text);
   border: 1px solid var(--color-border-subtle);
-  padding: 0.7rem 1rem;
+  padding: 0.55rem 0.85rem;
   cursor: pointer;
   border-radius: 5px;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -108,7 +108,7 @@
 .pagination-btn:hover:not(:disabled),
 .pagination-btn.active {
   background-color: var(--color-green-accent);
-  color: var(--color-black-background);
+  color: var(--color-white-text);
   border-color: var(--color-green-accent);
 }
 
@@ -122,6 +122,10 @@
 }
 
 @media (max-width: 768px) {
+  .list-page-container {
+    padding: 1rem 0.7rem 1.5rem;
+  }
+
   .items-grid {
     grid-template-columns: 1fr;
   }

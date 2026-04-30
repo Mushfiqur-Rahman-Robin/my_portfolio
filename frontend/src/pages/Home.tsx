@@ -23,6 +23,13 @@ interface PaginationInfo<T> {
   results: T[];
 }
 
+const truncateText = (text: string, maxLength: number): string => {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return `${text.substring(0, maxLength).trim()}....`;
+};
+
 const Home: React.FC = () => {
   const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -40,14 +47,14 @@ const Home: React.FC = () => {
         const response = await axios.get<PaginationInfo<Project>>(
           `${import.meta.env.VITE_API_URL}projects/?is_featured=true&ordering=display_order`
         );
-        // Ensure only top 3 are displayed AND that the array has at least 3
+        // Show up to top 3 featured projects
         const projects = response.data.results.slice(0, 3);
-        if (projects.length === 3) { // Only set if exactly 3 projects are available
+        if (projects.length > 0) {
           setFeaturedProjects(projects);
-          setError(null); // Clear any previous errors
+          setError(null);
         } else {
-          setFeaturedProjects([]); // Clear projects if not exactly 3
-          setError("Not enough featured projects to display. Need exactly 3."); // Provide specific error message
+          setFeaturedProjects([]);
+          setError('No featured projects found yet. Please mark at least one project as featured in Django admin.');
         }
       } catch (err) {
         setFeaturedProjects([]); // Clear projects on error
@@ -90,7 +97,7 @@ const Home: React.FC = () => {
       <SkillsSection />
 
       {/* Conditional rendering for Featured Projects section */}
-      {!loadingFeaturedProjects && featuredProjects.length === 3 && (
+      {!loadingFeaturedProjects && featuredProjects.length > 0 && (
         <section className="featured-projects-section">
           <h2>Featured Projects</h2>
           {error && <p className="error">{error}</p>}
@@ -98,13 +105,14 @@ const Home: React.FC = () => {
             {featuredProjects.map((project) => (
                 <div key={project.id} className="project-preview-card">
                   <Link to={`/projects/${project.id}`} className="project-card-banner-link">
-                    <h3>{project.title}</h3>
+                    <h3>{truncateText(project.title, 74)}</h3>
                     {project.image && (
-                      <img src={project.image} alt={project.title} className="project-preview-image" />
+                      <div className="project-preview-image-frame">
+                        <img src={project.image} alt={project.title} className="project-preview-image" />
+                      </div>
                     )}
                     <p className="project-preview-description">
-                      {/* Apply stripHtmlTags here before substring */}
-                      {stripHtmlTags(project.description).substring(0, 100)}...
+                      {truncateText(stripHtmlTags(project.description), 165)}
                     </p>
                     <div className="project-preview-tags">
                       {project.tags && project.tags.map((tag, index) => (
@@ -136,11 +144,11 @@ const Home: React.FC = () => {
           </div>
         </section>
       )}
-      {!loadingFeaturedProjects && featuredProjects.length !== 3 && (
+      {!loadingFeaturedProjects && featuredProjects.length === 0 && (
         <section className="featured-projects-section">
           <h2>Featured Projects</h2>
           {error && <p className="error">{error}</p>}
-          <p className="no-featured-projects">No featured projects to display. Mark exactly 3 projects as featured in Django admin to show this section!</p>
+          <p className="no-featured-projects">No featured projects to display right now. Please mark projects as featured in Django admin to show this section.</p>
           <div className="all-projects-link">
             <Link to="/projects" className="btn secondary">
               View All Projects

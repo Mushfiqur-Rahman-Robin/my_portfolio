@@ -29,6 +29,13 @@ interface PaginationInfo {
   results: Project[];
 }
 
+const truncateText = (text: string, maxLength: number): string => {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return `${text.substring(0, maxLength).trim()}....`;
+};
+
 // Define the page size for the frontend calculation
 const PROJECTS_PER_PAGE = 3;
 
@@ -181,12 +188,14 @@ const ProjectList: React.FC = () => {
                 to={`/projects/${project.id}`}
                 className="project-card-link"
               >
-                <h2>{project.title}</h2>
+                <h2>{truncateText(project.title, 74)}</h2>
                 {project.image && (
-                  <img src={project.image} alt={project.title} />
+                  <div className="project-card-image-frame">
+                    <img src={project.image} alt={project.title} />
+                  </div>
                 )}
                 <p>
-                  {stripHtmlTags(project.description).substring(0, 150)}...
+                  {truncateText(stripHtmlTags(project.description), 165)}
                 </p>
                 <div className="project-tags">
                   {project.tags &&

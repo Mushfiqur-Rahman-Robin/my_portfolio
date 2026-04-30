@@ -11,7 +11,7 @@
 
 .project-detail-container .project-title {
   font-size: 3rem;
-  color: var(--color-green-accent);
+  color: var(--color-white-text);
   margin-bottom: 1.5rem;
   text-shadow: 0 0 10px rgba(110, 230, 78, 0.5);
 }
@@ -258,8 +258,8 @@
 .project-actions {
   display: flex;
   justify-content: center; /* Center buttons horizontally */
-  gap: 1.5rem;
-  margin-bottom: 3rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
   flex-wrap: wrap;
 }
 
@@ -267,10 +267,14 @@
   padding: 0.8rem 1.8rem;
   font-size: 1.05rem;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .back-link {
-  margin-top: 2rem;
+  margin-top: 0;
   text-align: center; /* Ensures content inside is text-aligned if not flex */
 }
 
@@ -279,6 +283,10 @@
   color: var(--color-green-accent);
   border: 2px solid var(--color-green-accent);
   padding: 0.7rem 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .back-link .btn:hover {
@@ -315,7 +323,9 @@
     gap: 1rem; /* Reduced gap */
   }
   .project-action-btn {
-    display: block; /* Make button block to use margin auto */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin: 0 auto; /* Center the button itself */
     width: 90%; /* Give it a substantial width */
     max-width: 250px; /* Constrain max width */
@@ -324,8 +334,10 @@
   }
   /* FIX: Back to All Projects button alignment */
   .back-link .btn {
-    display: block; /* Make button block to use margin auto */
-    margin: 1.5rem auto; /* Center the button itself with some top margin */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
     width: 90%;
     max-width: 250px;
     padding: 0.8rem 1.2rem;
