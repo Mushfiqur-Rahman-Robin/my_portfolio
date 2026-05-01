@@ -45,8 +45,8 @@ The repository is organized as a monorepo with the following main directories:
 
 1.  **Prerequisites**: Docker and Docker Compose must be installed.
 2.  **Environment**:
-    -   Copy `backend/.env.template` to `backend/.env` and fill in the necessary environment variables.
-    -   Copy `frontend/.env.local.template` to `frontend/.env.local` and fill in the necessary environment variables.
+    -   Create `backend/.env` and fill in the required backend variables.
+    -   Create `frontend/.env.local` with `VITE_API_URL=/api/v1/` for local/dev same-origin API routing.
 3.  **Build & Run**:
     ```bash
     docker compose up --build
@@ -63,9 +63,12 @@ The repository is organized as a monorepo with the following main directories:
 
 ## Deployment
 
--   **CI/CD**: The GitHub Actions pipeline in `.github/workflows/cicd.yml` runs tests and linters on every push.
--   **Backend**: Deployed as a Web Service on Render.
--   **Frontend**: Deployed as a static site on Vercel.
+-   **CI/CD**: The GitHub Actions pipeline in `.github/workflows/cicd.yml` runs backend checks, frontend checks, and production deploy on `main`.
+-   **Runtime**: Production deploy is Docker Compose based (`git pull` + `docker compose up --build -d` + migrations) via SSH action.
+
+## Changelog
+
+-   See [CHANGELOG.md](CHANGELOG.md) for recent updates and release notes.
 
 ## Contributing
 

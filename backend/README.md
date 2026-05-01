@@ -40,3 +40,4 @@ gzip -dc /home/mushfiq/portfolio_backups/YYYY-MM-DD_04-00-01/db_dump.sql.gz | do
 
 - API routes are versioned under `/api/v1/`.
 - Backend logic is intentionally separate from frontend styling work.
+- See [../CHANGELOG.md](../CHANGELOG.md) for tracked cross-project changes.

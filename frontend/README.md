@@ -40,13 +40,17 @@ docker compose up -d --build frontend backend db redis chromadb
 
 ## Environment
 
-`frontend/.env.local` contains:
+Create `frontend/.env.local` with:
 
 ```dotenv
 VITE_API_URL=/api/v1/
 ```
 
 This keeps API calls same-origin in both Docker and local dev proxy mode.
+
+## Changelog
+
+- See [../CHANGELOG.md](../CHANGELOG.md) for tracked UI and project updates.
 
 ## Key folders
 
