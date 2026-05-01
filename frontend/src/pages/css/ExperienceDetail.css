@@ -11,9 +11,9 @@
 
 .experience-detail-container .company-name {
   font-size: 3rem;
-  color: var(--color-green-accent);
+  color: var(--color-white-text);
   margin-bottom: 0.5rem;
-  text-shadow: 0 0 10px rgba(110, 230, 78, 0.5);
+  text-shadow: none;
 }
 
 .experience-detail-container .job-title {
