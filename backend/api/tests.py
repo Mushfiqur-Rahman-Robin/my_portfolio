@@ -115,6 +115,7 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
         self.assertEqual(Project.objects.count(), 2)
         self.assertEqual(response.data["title"], "New Project")
+        self.assertTrue(response.data["image"].endswith(".webp"))
 
     def test_update_project(self):
         url = reverse("project-detail", args=[self.project.id])
@@ -124,6 +125,19 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.project.refresh_from_db()
         self.assertEqual(self.project.title, "Updated Project")
+
+    def test_new_image_upload_is_stored_as_webp(self):
+        self.assertTrue(self.project.image.name.endswith(".webp"))
+
+    def test_legacy_non_webp_image_stays_unchanged_when_image_not_reuploaded(self):
+        Project.objects.filter(pk=self.project.pk).update(image="projects/banners/legacy-image.png")
+        self.project.refresh_from_db()
+
+        self.project.title = "Updated Title Only"
+        self.project.save(update_fields=["title"])
+        self.project.refresh_from_db()
+
+        self.assertTrue(self.project.image.name.endswith("legacy-image.png"))
 
     def test_delete_project(self):
         url = reverse("project-detail", args=[self.project.id])

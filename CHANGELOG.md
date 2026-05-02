@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented in this file.
 
+## 2026-05-03
+
+### Added
+- Added automatic conversion of newly uploaded image files to WebP for portfolio image models.
+- Added backend tests to verify new image uploads are saved as `.webp` and legacy non-WebP image paths remain unchanged unless re-uploaded.
+
+### Changed
+- Updated test settings to use PostgreSQL only when test DB environment variables are provided; otherwise fallback to local SQLite.
+- Disabled Chroma sync signal execution in test settings via `ENABLE_CHROMA_SYNC = False` to avoid external-service coupling in unit/API tests.
+
+### Fixed
+- Fixed local test failures caused by unresolved placeholder test DB credentials in `core.test_settings`.
+
 ## 2026-05-01
 
 ### Added

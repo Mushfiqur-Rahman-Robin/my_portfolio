@@ -1,7 +1,7 @@
 import os
 
 from .settings import *  # noqa: F403
-from .settings import MIDDLEWARE
+from .settings import BASE_DIR, MIDDLEWARE
 
 CACHES = {
     "default": {
@@ -13,6 +13,7 @@ CACHES = {
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 DEFAULT_FROM_EMAIL = "test@example.com"
 ADMIN_EMAIL = "admin@example.com"
+ENABLE_CHROMA_SYNC = False
 
 
 # Optionally disable caching middleware for tests
@@ -26,13 +27,21 @@ MIDDLEWARE = [
     ]
 ]
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("POSTGRES_DB", "${{ secrets.DB_TEST_NAME }}"),
-        "USER": os.environ.get("POSTGRES_USER", "${{ secrets.DB_TEST_USER }}"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "${{ secrets.DB_TEST_PASSWORD }}"),
-        "HOST": "localhost",
-        "PORT": "5432",
+if os.environ.get("POSTGRES_DB") and os.environ.get("POSTGRES_USER") and os.environ.get("POSTGRES_PASSWORD"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ["POSTGRES_DB"],
+            "USER": os.environ["POSTGRES_USER"],
+            "PASSWORD": os.environ["POSTGRES_PASSWORD"],
+            "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+            "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "test_db.sqlite3"),
+        }
+    }

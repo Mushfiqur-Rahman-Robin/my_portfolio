@@ -1,6 +1,7 @@
 # backend/api/signals.py
 
 import os
+from functools import wraps
 
 from django.conf import settings
 from django.db.models.signals import post_delete, post_save, pre_save
@@ -8,7 +9,17 @@ from django.dispatch import receiver
 
 from .chromadb_utils import add_or_update_node, delete_node
 from .models import Achievement, Certification, Experience, ExperiencePhoto, Project, ProjectImage, Publication, Resume
-from .utils import clean_html, extract_pdf_text  # ADDED clean_html import
+from .utils import clean_html, convert_image_to_webp, extract_pdf_text  # ADDED clean_html import
+
+
+def run_when_chroma_enabled(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if not getattr(settings, "ENABLE_CHROMA_SYNC", True):
+            return
+        return func(*args, **kwargs)
+
+    return wrapper
 
 
 def get_doc_id(instance):
@@ -31,6 +42,7 @@ def get_metadata(instance, title_field="title", url_path=None):
 
 
 @receiver(post_save, sender=Project)
+@run_when_chroma_enabled
 def sync_project_chroma(sender, instance, **kwargs):
     # Apply clean_html to project description (it's RichTextUploadingField, storing HTML)
     cleaned_description = clean_html(instance.description)  # ADDED clean_html
@@ -39,11 +51,13 @@ def sync_project_chroma(sender, instance, **kwargs):
 
 
 @receiver(post_delete, sender=Project)
+@run_when_chroma_enabled
 def delete_project_chroma(sender, instance, **kwargs):
     delete_node(get_doc_id(instance))
 
 
 @receiver(post_save, sender=Resume)
+@run_when_chroma_enabled
 def sync_resume_chroma(sender, instance, **kwargs):
     # Delete all other resume nodes to ensure only the latest one is indexed
     other_resumes = Resume.objects.exclude(pk=instance.pk)
@@ -59,44 +73,52 @@ def sync_resume_chroma(sender, instance, **kwargs):
 
 
 @receiver(post_delete, sender=Resume)
+@run_when_chroma_enabled
 def delete_resume_chroma(sender, instance, **kwargs):
     delete_node(get_doc_id(instance))
 
 
 @receiver(post_save, sender=Certification)
+@run_when_chroma_enabled
 def sync_certification_chroma(sender, instance, **kwargs):
     content = f"Certification: {instance.name}\nIssued by: {instance.issuing_organization}"
     add_or_update_node(get_doc_id(instance), content, get_metadata(instance, title_field="name", url_path="certifications"))
 
 
 @receiver(post_delete, sender=Certification)
+@run_when_chroma_enabled
 def delete_certification_chroma(sender, instance, **kwargs):
     delete_node(get_doc_id(instance))
 
 
 @receiver(post_save, sender=Publication)
+@run_when_chroma_enabled
 def sync_publication_chroma(sender, instance, **kwargs):
     content = f"Publication: {instance.title}\nAuthors: {instance.authors}\nConference: {instance.conference}"
     add_or_update_node(get_doc_id(instance), content, get_metadata(instance, url_path="publications"))
 
 
 @receiver(post_delete, sender=Publication)
+@run_when_chroma_enabled
 def delete_publication_chroma(sender, instance, **kwargs):
     delete_node(get_doc_id(instance))
 
 
 @receiver(post_save, sender=Achievement)
+@run_when_chroma_enabled
 def sync_achievement_chroma(sender, instance, **kwargs):
     content = f"Achievement: {instance.title}\nDescription: {instance.description}"
     add_or_update_node(get_doc_id(instance), content, get_metadata(instance, url_path="achievements"))
 
 
 @receiver(post_delete, sender=Achievement)
+@run_when_chroma_enabled
 def delete_achievement_chroma(sender, instance, **kwargs):
     delete_node(get_doc_id(instance))
 
 
 @receiver(post_save, sender=Experience)
+@run_when_chroma_enabled
 def sync_experience_chroma(sender, instance, **kwargs):
     # Apply clean_html to experience work_details (which now stores HTML from CKEditor)
     cleaned_work_details = clean_html(instance.work_details)  # ADDED clean_html
@@ -105,6 +127,7 @@ def sync_experience_chroma(sender, instance, **kwargs):
 
 
 @receiver(post_delete, sender=Experience)
+@run_when_chroma_enabled
 def delete_experience_chroma(sender, instance, **kwargs):
     delete_node(get_doc_id(instance))
 
@@ -132,6 +155,18 @@ def delete_file_if_exists(file_field):
             # ValueError can occur if the file field is empty/invalid before saving
             # OSError can occur if file doesn't exist or permission issues
             print(f"ERROR: Failed to delete file {file_field.name} from path {file_field.path if hasattr(file_field, 'path') else 'N/A'}: {e}")
+
+
+def convert_new_image_if_needed(instance, field_name="image"):
+    """Convert newly assigned image uploads to WebP while leaving existing stored files unchanged."""
+    image_field = getattr(instance, field_name, None)
+    if not image_field:
+        return
+
+    if getattr(image_field, "_committed", True):
+        return
+
+    setattr(instance, field_name, convert_image_to_webp(image_field))
 
 
 # --- Project File Deletion ---
@@ -178,6 +213,8 @@ def delete_resume_file(sender, instance, **kwargs):
 @receiver(pre_save, sender=Project)
 def delete_old_project_image_on_update(sender, instance, **kwargs):
     """Delete the old main image file when a new one is uploaded for Project."""
+    convert_new_image_if_needed(instance)
+
     if not instance.pk:  # Object is being created, not updated
         return
     try:
@@ -191,6 +228,8 @@ def delete_old_project_image_on_update(sender, instance, **kwargs):
 @receiver(pre_save, sender=ProjectImage)
 def delete_old_project_gallery_image_on_update(sender, instance, **kwargs):
     """Delete the old gallery image file when a new one is uploaded for ProjectImage."""
+    convert_new_image_if_needed(instance)
+
     if not instance.pk:
         return
     try:
@@ -204,6 +243,8 @@ def delete_old_project_gallery_image_on_update(sender, instance, **kwargs):
 @receiver(pre_save, sender=Certification)
 def delete_old_certification_image_on_update(sender, instance, **kwargs):
     """Delete the old image file when a new one is uploaded for Certification."""
+    convert_new_image_if_needed(instance)
+
     if not instance.pk:
         return
     try:
@@ -217,6 +258,8 @@ def delete_old_certification_image_on_update(sender, instance, **kwargs):
 @receiver(pre_save, sender=Achievement)
 def delete_old_achievement_image_on_update(sender, instance, **kwargs):
     """Delete the old image file when a new one is uploaded for Achievement."""
+    convert_new_image_if_needed(instance)
+
     if not instance.pk:
         return
     try:
@@ -230,6 +273,8 @@ def delete_old_achievement_image_on_update(sender, instance, **kwargs):
 @receiver(pre_save, sender=ExperiencePhoto)
 def delete_old_experience_photo_on_update(sender, instance, **kwargs):
     """Delete the old image file when a new one is uploaded for ExperiencePhoto."""
+    convert_new_image_if_needed(instance)
+
     if not instance.pk:
         return
     try:
