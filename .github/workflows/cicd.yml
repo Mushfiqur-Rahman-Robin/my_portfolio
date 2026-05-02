@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
@@ -190,4 +190,14 @@ jobs:
             docker compose exec -T backend python manage.py migrate --noinput
             docker compose exec -T backend python manage.py check
             docker compose ps
-            docker image prune -af --filter "until=24h" || true
+            dangling_ids=$(docker image ls \
+              --filter "dangling=true" \
+              --filter "label=com.docker.compose.project=my_portfolio" \
+              -q | sort -u)
+            if [ -n "$dangling_ids" ]; then
+              echo "Removing project-scoped dangling images:"
+              echo "$dangling_ids"
+              echo "$dangling_ids" | xargs -r docker rmi
+            else
+              echo "No project-scoped dangling images to remove."
+            fi
