@@ -186,7 +186,7 @@ jobs:
             git fetch --all --prune
             git checkout main
             git pull origin main
-            docker compose up --build -d
+            docker compose up --build -d --no-deps --force-recreate backend frontend
             docker compose exec -T backend python manage.py migrate --noinput
             docker compose exec -T backend python manage.py check
             docker compose ps
