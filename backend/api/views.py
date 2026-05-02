@@ -269,21 +269,12 @@ class VisitorCountView(APIView):
             try:
                 ip_address = get_client_ip(request)
                 user_agent = request.META.get("HTTP_USER_AGENT", "")
-                today = timezone.now().date()
-
-                already_logged_today = VisitorAnalytics.objects.filter(
+                VisitorAnalytics.objects.create(
                     ip_address=ip_address,
+                    country=get_country_for_ip(ip_address),
+                    device_type=get_device_type(request),
                     user_agent=user_agent,
-                    visited_at__date=today,
-                ).exists()
-
-                if not already_logged_today:
-                    VisitorAnalytics.objects.create(
-                        ip_address=ip_address,
-                        country=get_country_for_ip(ip_address),
-                        device_type=get_device_type(request),
-                        user_agent=user_agent,
-                    )
+                )
             except Exception as analytics_error:
                 logger.error(f"Error storing visitor analytics: {analytics_error}", exc_info=True)
 

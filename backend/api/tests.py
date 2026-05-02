@@ -210,7 +210,11 @@ class APITests(TestCase):
 
     @patch("api.views.get_country_for_ip")
     @patch("api.throttles.VisitorCountRateThrottle.allow_request", return_value=True)
-    def test_visitor_count_deduplicates_same_ip_and_user_agent_per_day(self, _mock_allow_request, mock_country_lookup):
+    def test_visitor_count_tracks_multiple_entries_for_repeated_same_day_visits(
+        self,
+        _mock_allow_request,
+        mock_country_lookup,
+    ):
         mock_country_lookup.return_value = "Bangladesh"
 
         headers = {
@@ -223,7 +227,7 @@ class APITests(TestCase):
 
         self.assertEqual(first.status_code, status.HTTP_200_OK)
         self.assertEqual(second.status_code, status.HTTP_200_OK)
-        self.assertEqual(VisitorAnalytics.objects.count(), 1)
+        self.assertEqual(VisitorAnalytics.objects.count(), 2)
 
     def test_chatbot_conversation_context_uses_last_20_interactions(self):
         session = ChatSession.objects.create()
