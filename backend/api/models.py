@@ -172,6 +172,32 @@ class DailyVisitorCount(models.Model):
         return f"{self.date.strftime('%Y-%m-%d')}: {self.count} visitors"
 
 
+class VisitorAnalytics(models.Model):
+    """Stores per-visit metadata for traffic analysis in admin."""
+
+    DEVICE_TYPE_CHOICES = (
+        ("mobile", "Mobile"),
+        ("tablet", "Tablet"),
+        ("desktop", "Desktop/Laptop"),
+        ("unknown", "Unknown"),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    ip_address = models.GenericIPAddressField(blank=True, null=True, db_index=True)
+    country = models.CharField(max_length=120, default="Unknown", blank=True, db_index=True)
+    device_type = models.CharField(max_length=20, choices=DEVICE_TYPE_CHOICES, default="unknown", db_index=True)
+    user_agent = models.TextField(blank=True, default="")
+    visited_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["-visited_at"]
+        verbose_name = "Visitor Analytics"
+        verbose_name_plural = "Visitor Analytics"
+
+    def __str__(self):
+        return f"{self.ip_address or 'Unknown IP'} from {self.country} ({self.get_device_type_display()})"
+
+
 class Experience(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     company_name = models.CharField(max_length=200)

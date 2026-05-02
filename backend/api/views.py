@@ -1,4 +1,7 @@
+import ipaddress
+import json
 import logging
+from http import client as http_client
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -26,6 +29,7 @@ from .models import (
     Resume,
     Tag,
     TotalVisitorCount,
+    VisitorAnalytics,
 )
 from .serializers import (
     AchievementSerializer,
@@ -45,6 +49,69 @@ from .throttles import ChatbotRateThrottle, ContactFormRateThrottle, VisitorCoun
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 email_logger = logging.getLogger("email_sending")
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        return x_forwarded_for.split(",")[0].strip()
+
+    x_real_ip = request.META.get("HTTP_X_REAL_IP")
+    if x_real_ip:
+        return x_real_ip.strip()
+
+    remote_addr = request.META.get("REMOTE_ADDR")
+    if remote_addr:
+        return remote_addr.strip()
+
+    return None
+
+
+def get_country_for_ip(ip_address):
+    if not ip_address:
+        return "Unknown"
+
+    try:
+        parsed_ip = ipaddress.ip_address(ip_address)
+        if not parsed_ip.is_global:
+            return "Private/Local"
+    except ValueError:
+        return "Unknown"
+
+    try:
+        connection = http_client.HTTPSConnection("ipapi.co", timeout=1.5)
+        connection.request(
+            "GET",
+            f"/{ip_address}/json/",
+            headers={"User-Agent": "portfolio-visitor-analytics/1.0"},
+        )
+        response = connection.getresponse()
+        if response.status >= 400:
+            return "Unknown"
+
+        payload = json.loads(response.read().decode("utf-8"))
+
+        country_name = payload.get("country_name") or payload.get("country")
+        return country_name.strip() if isinstance(country_name, str) and country_name.strip() else "Unknown"
+    except (OSError, TimeoutError, json.JSONDecodeError, ValueError):
+        return "Unknown"
+    finally:
+        if "connection" in locals():
+            connection.close()
+
+
+def get_device_type(request):
+    user_agent = (request.META.get("HTTP_USER_AGENT") or "").lower()
+    if not user_agent:
+        return "unknown"
+
+    if "ipad" in user_agent or "tablet" in user_agent:
+        return "tablet"
+
+    if "mobile" in user_agent or ("android" in user_agent and "tablet" not in user_agent):
+        return "mobile"
+
+    return "desktop"
 
 
 class StandardResultsPagination(PageNumberPagination):
@@ -197,6 +264,20 @@ class VisitorCountView(APIView):
                 daily_count.count = F("count") + 1
                 daily_count.save()
 
+            # 3. Track visitor metadata for admin analytics (best effort)
+            try:
+                ip_address = get_client_ip(request)
+                user_agent = request.META.get("HTTP_USER_AGENT", "")
+
+                VisitorAnalytics.objects.create(
+                    ip_address=ip_address,
+                    country=get_country_for_ip(ip_address),
+                    device_type=get_device_type(request),
+                    user_agent=user_agent,
+                )
+            except Exception as analytics_error:
+                logger.error(f"Error storing visitor analytics: {analytics_error}", exc_info=True)
+
             return Response(
                 {"message": "Visitor count incremented", "count": total_count.count},
                 status=status.HTTP_200_OK,
@@ -218,9 +299,10 @@ class ChatbotView(APIView):
     throttle_classes = [ChatbotRateThrottle]
 
     @staticmethod
-    def build_conversation_context(session, limit=12):
-        """Build a compact conversation transcript from recent session messages."""
-        messages = list(session.messages.order_by("-created_at")[:limit])
+    def build_conversation_context(session, interaction_limit=20):
+        """Build transcript from last N interactions (user+assistant pairs) in this session."""
+        message_limit = interaction_limit * 2
+        messages = list(session.messages.order_by("-created_at")[:message_limit])
         messages.reverse()
 
         lines = []
@@ -228,11 +310,7 @@ class ChatbotView(APIView):
             role = "User" if message.sender == "user" else "Assistant"
             lines.append(f"{role}: {message.message}")
 
-        transcript = "\n".join(lines).strip()
-        max_chars = 8192
-        if len(transcript) > max_chars:
-            transcript = transcript[-max_chars:]
-        return transcript
+        return "\n".join(lines).strip()
 
     def post(self, request, *args, **kwargs):
         query = request.data.get("query")

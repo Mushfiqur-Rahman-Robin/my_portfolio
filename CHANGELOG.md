@@ -8,10 +8,14 @@ All notable changes to this project are documented in this file.
 - Added automatic conversion of newly uploaded image files to WebP for portfolio image models.
 - Added backend tests to verify new image uploads are saved as `.webp` and legacy non-WebP image paths remain unchanged unless re-uploaded.
 - Added one-time management command `backfill_images_to_webp` for safely converting existing `.jpg/.jpeg/.png` ImageField files to `.webp` with dry-run/apply modes.
+- Added `VisitorAnalytics` tracking for visitor count events, capturing IP, country, device type, user-agent, and visit timestamp for admin-only visibility.
+- Added read-only Django admin view for visitor analytics with filter/search support.
+- Added backend tests for visitor metadata capture and chatbot memory-window behavior.
 
 ### Changed
 - Updated test settings to use PostgreSQL only when test DB environment variables are provided; otherwise fallback to local SQLite.
 - Disabled Chroma sync signal execution in test settings via `ENABLE_CHROMA_SYNC = False` to avoid external-service coupling in unit/API tests.
+- Updated chatbot session memory policy to use the most recent 20 interactions (40 messages) instead of character-cap truncation.
 
 ### Fixed
 - Fixed local test failures caused by unresolved placeholder test DB credentials in `core.test_settings`.

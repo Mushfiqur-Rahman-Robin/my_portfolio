@@ -41,6 +41,8 @@ gzip -dc /home/mushfiq/portfolio_backups/YYYY-MM-DD_04-00-01/db_dump.sql.gz | do
 - API routes are versioned under `/api/v1/`.
 - Backend logic is intentionally separate from frontend styling work.
 - New image uploads for portfolio models are converted to WebP at save time in backend signals. Existing stored `.png/.jpg` paths are kept as-is unless a new image is uploaded.
+- Visitor count endpoint now logs admin-only visitor analytics metadata (`ip_address`, country, device type, user-agent, timestamp) in `VisitorAnalytics`.
+- Chatbot memory now uses the most recent 20 interactions per session (user+assistant pairs) for follow-up continuity.
 - Test settings (`core.test_settings`) now use PostgreSQL when `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` are provided (CI behavior), otherwise fallback to local SQLite for safer local test runs.
 - See [../CHANGELOG.md](../CHANGELOG.md) for tracked cross-project changes.
 

@@ -14,7 +14,8 @@ from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from .models import Achievement, Certification, ChatSession, Experience, Project, Publication, Tag
+from .models import Achievement, Certification, ChatSession, Experience, Project, Publication, Tag, VisitorAnalytics
+from .views import ChatbotView
 
 # Define the temporary media root path
 # This should be outside the TestCase class definition but can use settings.BASE_DIR
@@ -183,6 +184,42 @@ class APITests(TestCase):
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["company_name"], "Test Company")
+
+    @patch("api.views.get_country_for_ip")
+    def test_visitor_count_tracks_ip_country_and_device_type(self, mock_country_lookup):
+        mock_country_lookup.return_value = "Bangladesh"
+
+        response = self.client.post(
+            reverse("visitor-count"),
+            {},
+            format="json",
+            HTTP_X_FORWARDED_FOR="103.21.244.1, 127.0.0.1",
+            HTTP_USER_AGENT="Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(VisitorAnalytics.objects.count(), 1)
+
+        analytics = VisitorAnalytics.objects.first()
+        self.assertEqual(str(analytics.ip_address), "103.21.244.1")
+        self.assertEqual(analytics.country, "Bangladesh")
+        self.assertEqual(analytics.device_type, "mobile")
+
+    def test_chatbot_conversation_context_uses_last_20_interactions(self):
+        session = ChatSession.objects.create()
+
+        for index in range(1, 26):
+            session.messages.create(sender="user", message=f"question-{index}")
+            session.messages.create(sender="bot", message=f"answer-{index}")
+
+        context = ChatbotView.build_conversation_context(session)
+
+        self.assertNotIn("User: question-5\n", context)
+        self.assertNotIn("Assistant: answer-5\n", context)
+        self.assertIn("User: question-6\n", context)
+        self.assertIn("Assistant: answer-6\n", context)
+        self.assertIn("User: question-25", context)
+        self.assertIn("Assistant: answer-25", context)
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_contact_message_sends_email(self):

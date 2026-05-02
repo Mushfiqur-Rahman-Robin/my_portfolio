@@ -20,6 +20,7 @@ from .models import (
     Resume,
     Tag,
     TotalVisitorCount,
+    VisitorAnalytics,
 )
 
 
@@ -212,3 +213,22 @@ class DailyVisitorCountAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False  # Prevent deletion from the admin
+
+
+@admin.register(VisitorAnalytics)
+class VisitorAnalyticsAdmin(admin.ModelAdmin):
+    """Read-only admin view for visitor metadata analytics."""
+
+    list_display = ("visited_at", "ip_address", "country", "device_type")
+    list_filter = ("country", "device_type", "visited_at")
+    search_fields = ("ip_address", "country", "user_agent")
+    readonly_fields = ("id", "ip_address", "country", "device_type", "user_agent", "visited_at")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
