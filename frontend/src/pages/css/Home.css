@@ -266,8 +266,8 @@
   margin-top: 0.5rem;
   justify-content: center; /* IMPORTANT: Center tag badges */
   margin-bottom: 1rem;
-  min-height: 3.9rem;
-  max-height: 3.9rem;
+  min-height: 4.1rem;
+  max-height: 4.1rem;
   overflow: hidden;
   align-content: flex-start;
 }
