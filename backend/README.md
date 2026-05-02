@@ -43,3 +43,30 @@ gzip -dc /home/mushfiq/portfolio_backups/YYYY-MM-DD_04-00-01/db_dump.sql.gz | do
 - New image uploads for portfolio models are converted to WebP at save time in backend signals. Existing stored `.png/.jpg` paths are kept as-is unless a new image is uploaded.
 - Test settings (`core.test_settings`) now use PostgreSQL when `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` are provided (CI behavior), otherwise fallback to local SQLite for safer local test runs.
 - See [../CHANGELOG.md](../CHANGELOG.md) for tracked cross-project changes.
+
+## One-time backfill: convert existing images to WebP
+
+For existing DB records pointing to `.jpg/.jpeg/.png`, use the management command below.
+
+1. Dry run (no write):
+
+```bash
+docker compose exec backend python manage.py backfill_images_to_webp
+```
+
+2. Apply conversion (write DB + media):
+
+```bash
+docker compose exec backend python manage.py backfill_images_to_webp --apply
+```
+
+3. Optional cleanup of original files after successful conversion:
+
+```bash
+docker compose exec backend python manage.py backfill_images_to_webp --apply --delete-old
+```
+
+Recommendations:
+- Always take DB + media backup before running `--apply` in production.
+- Validate pages and admin after conversion.
+- Keep `--delete-old` for the final pass after verification.

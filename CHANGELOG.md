@@ -7,6 +7,7 @@ All notable changes to this project are documented in this file.
 ### Added
 - Added automatic conversion of newly uploaded image files to WebP for portfolio image models.
 - Added backend tests to verify new image uploads are saved as `.webp` and legacy non-WebP image paths remain unchanged unless re-uploaded.
+- Added one-time management command `backfill_images_to_webp` for safely converting existing `.jpg/.jpeg/.png` ImageField files to `.webp` with dry-run/apply modes.
 
 ### Changed
 - Updated test settings to use PostgreSQL only when test DB environment variables are provided; otherwise fallback to local SQLite.
