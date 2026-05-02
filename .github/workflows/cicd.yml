@@ -190,14 +190,8 @@ jobs:
             docker compose exec -T backend python manage.py migrate --noinput
             docker compose exec -T backend python manage.py check
             docker compose ps
-            dangling_ids=$(docker image ls \
-              --filter "dangling=true" \
-              --filter "label=com.docker.compose.project=my_portfolio" \
-              -q | sort -u)
-            if [ -n "$dangling_ids" ]; then
-              echo "Removing project-scoped dangling images:"
-              echo "$dangling_ids"
-              echo "$dangling_ids" | xargs -r docker rmi
-            else
-              echo "No project-scoped dangling images to remove."
-            fi
+            before_count=$(docker image ls --filter "dangling=true" -q | wc -l)
+            echo "Dangling image count before cleanup: $before_count"
+            docker image prune -f || true
+            after_count=$(docker image ls --filter "dangling=true" -q | wc -l)
+            echo "Dangling image count after cleanup: $after_count"

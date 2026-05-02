@@ -188,7 +188,8 @@ class APITests(TestCase):
         self.assertEqual(response.data["results"][0]["company_name"], "Test Company")
 
     @patch("api.views.get_country_for_ip")
-    def test_visitor_count_tracks_ip_country_and_device_type(self, mock_country_lookup):
+    @patch("api.throttles.VisitorCountRateThrottle.allow_request", return_value=True)
+    def test_visitor_count_tracks_ip_country_and_device_type(self, _mock_allow_request, mock_country_lookup):
         mock_country_lookup.return_value = "Bangladesh"
 
         response = self.client.post(
@@ -206,6 +207,23 @@ class APITests(TestCase):
         self.assertEqual(str(analytics.ip_address), "103.21.244.1")
         self.assertEqual(analytics.country, "Bangladesh")
         self.assertEqual(analytics.device_type, "mobile")
+
+    @patch("api.views.get_country_for_ip")
+    @patch("api.throttles.VisitorCountRateThrottle.allow_request", return_value=True)
+    def test_visitor_count_deduplicates_same_ip_and_user_agent_per_day(self, _mock_allow_request, mock_country_lookup):
+        mock_country_lookup.return_value = "Bangladesh"
+
+        headers = {
+            "HTTP_X_FORWARDED_FOR": "103.21.244.1, 127.0.0.1",
+            "HTTP_USER_AGENT": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148",
+        }
+
+        first = self.client.post(reverse("visitor-count"), {}, format="json", **headers)
+        second = self.client.post(reverse("visitor-count"), {}, format="json", **headers)
+
+        self.assertEqual(first.status_code, status.HTTP_200_OK)
+        self.assertEqual(second.status_code, status.HTTP_200_OK)
+        self.assertEqual(VisitorAnalytics.objects.count(), 1)
 
     def test_chatbot_conversation_context_uses_last_20_interactions(self):
         session = ChatSession.objects.create()
