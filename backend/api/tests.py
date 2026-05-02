@@ -2,6 +2,8 @@
 import os
 import shutil
 from io import BytesIO
+from types import SimpleNamespace
+from unittest.mock import patch
 
 from django.conf import settings
 from django.core import mail
@@ -12,7 +14,7 @@ from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from .models import Achievement, Certification, Experience, Project, Publication, Tag
+from .models import Achievement, Certification, ChatSession, Experience, Project, Publication, Tag
 
 # Define the temporary media root path
 # This should be outside the TestCase class definition but can use settings.BASE_DIR
@@ -207,3 +209,34 @@ class APITests(TestCase):
         self.assertEqual(sent_email.from_email, settings.DEFAULT_FROM_EMAIL)
 
         self.assertIn(settings.ADMIN_EMAIL, sent_email.to)
+
+    @override_settings(OPENAI_API_KEY="test-key")  # pragma: allowlist secret
+    @patch("api.views.query_nodes")
+    @patch("api.views.OpenAI")
+    def test_chatbot_uses_session_history_for_follow_up(self, mock_openai, mock_query_nodes):
+        mock_query_nodes.return_value = {"documents": [["portfolio context"]]}
+
+        completion_response = SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content="Test bot answer"))])
+        mock_openai.return_value.chat.completions.create.return_value = completion_response
+
+        first = self.client.post(reverse("chatbot"), {"query": "what is mushfiq's motto?"}, format="json")
+        self.assertEqual(first.status_code, status.HTTP_200_OK)
+        session_id = first.data["session_id"]
+
+        second = self.client.post(
+            reverse("chatbot"),
+            {"query": "what was my first question?", "session_id": session_id},
+            format="json",
+        )
+        self.assertEqual(second.status_code, status.HTTP_200_OK)
+
+        create_calls = mock_openai.return_value.chat.completions.create.call_args_list
+        self.assertEqual(len(create_calls), 2)
+        second_prompt = create_calls[1].kwargs["messages"][0]["content"]
+
+        self.assertIn("---RECENT CONVERSATION HISTORY---", second_prompt)
+        self.assertIn("User: what is mushfiq's motto?", second_prompt)
+        self.assertIn("User: what was my first question?", second_prompt)
+
+        session = ChatSession.objects.get(id=session_id)
+        self.assertEqual(session.messages.count(), 4)

@@ -217,6 +217,23 @@ class ChatbotView(APIView):
     schema_tags = ["Chatbot"]
     throttle_classes = [ChatbotRateThrottle]
 
+    @staticmethod
+    def build_conversation_context(session, limit=12):
+        """Build a compact conversation transcript from recent session messages."""
+        messages = list(session.messages.order_by("-created_at")[:limit])
+        messages.reverse()
+
+        lines = []
+        for message in messages:
+            role = "User" if message.sender == "user" else "Assistant"
+            lines.append(f"{role}: {message.message}")
+
+        transcript = "\n".join(lines).strip()
+        max_chars = 8192
+        if len(transcript) > max_chars:
+            transcript = transcript[-max_chars:]
+        return transcript
+
     def post(self, request, *args, **kwargs):
         query = request.data.get("query")
         session_id = request.data.get("session_id")
@@ -237,6 +254,9 @@ class ChatbotView(APIView):
 
             # Save the user's message
             ChatMessage.objects.create(session=session, sender="user", message=query)
+
+            # Build conversation memory from recent messages in this session
+            conversation_context = self.build_conversation_context(session)
 
             # --- Smart Context Injection ---
             special_context = []
@@ -270,7 +290,8 @@ class ChatbotView(APIView):
             prompt = (
                 f"You are a helpful AI assistant for Md Mushfiqur Rahman's personal portfolio website. "
                 f"Your tone should be professional, friendly, and concise. "
-                f"Answer the user's question based ONLY on the following context. "
+                f"Use the recent conversation history to answer follow-up or memory-based questions (e.g., references to earlier messages). "
+                f"Answer the user's question based ONLY on the following context and history. "
                 f"If you are asked for a personal phone number, physical address, \
                 or any other private contact detail not explicitly listed in the context, \
                 you MUST politely refuse and state that the best way to connect is via the professional links like email or LinkedIn."
@@ -278,6 +299,7 @@ class ChatbotView(APIView):
                 state that you don't have that specific information and suggest they ask about his skills, projects, or experience.\n\n"
                 f"Do NOT answer anything that is not related to Md Mushfiqur Rahman's personal portfolio website and personal information.\n\n"
                 f"Use bullet points to answer the question when possible.\n\n"
+                f"---RECENT CONVERSATION HISTORY---\n{conversation_context or 'No prior messages in this session.'}\n\n"
                 f"---CONTEXT---\n{final_context}\n\n"
                 f"---QUESTION---\n{query}\n\n"
                 f"---ANSWER---\n"
