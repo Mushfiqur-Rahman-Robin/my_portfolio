@@ -26,6 +26,7 @@ Backend URLs:
 ## Environment
 
 Backend reads environment values from `backend/.env` (loaded by `docker-compose.yml`).
+Use `backend/.env.template` as the source of truth for required variables.
 
 ## Database backup restore (Docker Postgres)
 
@@ -43,8 +44,15 @@ gzip -dc /home/mushfiq/portfolio_backups/YYYY-MM-DD_04-00-01/db_dump.sql.gz | do
 - New image uploads for portfolio models are converted to WebP at save time in backend signals. Existing stored `.png/.jpg` paths are kept as-is unless a new image is uploaded.
 - Visitor count endpoint now logs admin-only visitor analytics metadata (`ip_address`, country, device type, user-agent, timestamp) in `VisitorAnalytics`.
 - Chatbot memory now uses the most recent 20 interactions per session (user+assistant pairs) for follow-up continuity.
+- Chatbot prompt assembly is centralized in `api/prompt.py` (`build_chatbot_prompt`) so placeholder-like values (e.g. `{x}`, `${NAME}`) are passed safely without formatting errors.
 - Test settings (`core.test_settings`) now use PostgreSQL when `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` are provided (CI behavior), otherwise fallback to local SQLite for safer local test runs.
 - See [../CHANGELOG.md](../CHANGELOG.md) for tracked cross-project changes.
+
+## Deployment safety checklist
+
+- Keep migrations in CI and deploy (already configured in `.github/workflows/cicd.yml`).
+- Use non-interactive exec (`docker compose exec -T ...`) in automation.
+- Rotate credentials immediately if any secret was exposed outside secure secret stores.
 
 ## One-time backfill: convert existing images to WebP
 

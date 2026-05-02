@@ -12,10 +12,11 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from PIL import Image
 from rest_framework import status
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APIRequestFactory
 
 from .models import Achievement, Certification, ChatSession, Experience, Project, Publication, Tag, VisitorAnalytics
-from .views import ChatbotView
+from .prompt import build_chatbot_prompt
+from .views import ChatbotView, get_country_for_ip, get_device_type
 
 # Define the temporary media root path
 # This should be outside the TestCase class definition but can use settings.BASE_DIR
@@ -49,6 +50,7 @@ class APITests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
+        self.request_factory = APIRequestFactory()
         self.tag = Tag.objects.create(name="Test Tag")
 
         # This setup is for objects that already exist before each test runs.
@@ -220,6 +222,33 @@ class APITests(TestCase):
         self.assertIn("Assistant: answer-6\n", context)
         self.assertIn("User: question-25", context)
         self.assertIn("Assistant: answer-25", context)
+
+    def test_prompt_builder_keeps_placeholder_like_text_intact(self):
+        query = "Can you explain value {x} and config ${NAME}?"
+        history = "User: hello {user}"
+        context = "Project token: {{abc}}"
+
+        prompt = build_chatbot_prompt(query=query, conversation_context=history, final_context=context)
+
+        self.assertIn(query, prompt)
+        self.assertIn(history, prompt)
+        self.assertIn(context, prompt)
+
+    def test_prompt_builder_uses_safe_defaults_for_missing_inputs(self):
+        prompt = build_chatbot_prompt(query=None, conversation_context=None, final_context=None)
+
+        self.assertIn("No prior messages in this session.", prompt)
+        self.assertIn("No relevant information found in the knowledge base.", prompt)
+
+    def test_country_lookup_returns_private_local_for_private_ip(self):
+        country = get_country_for_ip("127.0.0.1")
+        self.assertEqual(country, "Private/Local")
+
+    def test_device_type_detects_unknown_when_no_user_agent(self):
+        request = self.request_factory.post(reverse("visitor-count"), {}, format="json")
+        request.META.pop("HTTP_USER_AGENT", None)
+
+        self.assertEqual(get_device_type(request), "unknown")
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_contact_message_sends_email(self):

@@ -31,6 +31,7 @@ from .models import (
     TotalVisitorCount,
     VisitorAnalytics,
 )
+from .prompt import build_chatbot_prompt
 from .serializers import (
     AchievementSerializer,
     CertificationSerializer,
@@ -364,23 +365,10 @@ class ChatbotView(APIView):
             if not final_context:
                 final_context = "No relevant information found in the knowledge base."
 
-            # --- Updated Prompt with Privacy Guardrails ---
-            prompt = (
-                f"You are a helpful AI assistant for Md Mushfiqur Rahman's personal portfolio website. "
-                f"Your tone should be professional, friendly, and concise. "
-                f"Use the recent conversation history to answer follow-up or memory-based questions (e.g., references to earlier messages). "
-                f"Answer the user's question based ONLY on the following context and history. "
-                f"If you are asked for a personal phone number, physical address, \
-                or any other private contact detail not explicitly listed in the context, \
-                you MUST politely refuse and state that the best way to connect is via the professional links like email or LinkedIn."
-                f"If the context doesn't contain the answer to a general question, \
-                state that you don't have that specific information and suggest they ask about his skills, projects, or experience.\n\n"
-                f"Do NOT answer anything that is not related to Md Mushfiqur Rahman's personal portfolio website and personal information.\n\n"
-                f"Use bullet points to answer the question when possible.\n\n"
-                f"---RECENT CONVERSATION HISTORY---\n{conversation_context or 'No prior messages in this session.'}\n\n"
-                f"---CONTEXT---\n{final_context}\n\n"
-                f"---QUESTION---\n{query}\n\n"
-                f"---ANSWER---\n"
+            prompt = build_chatbot_prompt(
+                query=query,
+                conversation_context=conversation_context,
+                final_context=final_context,
             )
 
             # 4. Call OpenAI API
@@ -400,5 +388,5 @@ class ChatbotView(APIView):
             return Response({"answer": answer, "session_id": str(session.id)}, status=status.HTTP_200_OK)
 
         except Exception as e:
-            print(f"Chatbot error: {e}")
+            logger.error(f"Chatbot error: {e}", exc_info=True)
             return Response({"error": "An internal error occurred while processing your request."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

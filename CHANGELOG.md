@@ -11,11 +11,14 @@ All notable changes to this project are documented in this file.
 - Added `VisitorAnalytics` tracking for visitor count events, capturing IP, country, device type, user-agent, and visit timestamp for admin-only visibility.
 - Added read-only Django admin view for visitor analytics with filter/search support.
 - Added backend tests for visitor metadata capture and chatbot memory-window behavior.
+- Added `api/prompt.py` to centralize chatbot prompt generation with safe placeholder handling.
+- Added extra backend tests for prompt defaults/placeholders and visitor helper behavior.
 
 ### Changed
 - Updated test settings to use PostgreSQL only when test DB environment variables are provided; otherwise fallback to local SQLite.
 - Disabled Chroma sync signal execution in test settings via `ENABLE_CHROMA_SYNC = False` to avoid external-service coupling in unit/API tests.
 - Updated chatbot session memory policy to use the most recent 20 interactions (40 messages) instead of character-cap truncation.
+- Updated GitHub Actions workflow to newer action versions and removed Node 20 deprecation warning path.
 
 ### Fixed
 - Fixed local test failures caused by unresolved placeholder test DB credentials in `core.test_settings`.
