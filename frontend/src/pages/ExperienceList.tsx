@@ -45,7 +45,7 @@ const ExperienceList: React.FC = () => {
         if (currentPage !== pageFromUrl) {
             setCurrentPage(pageFromUrl);
         }
-    }, [searchParams]);
+    }, [searchParams, currentPage]);
 
     useEffect(() => {
         const fetchExperiences = async () => {

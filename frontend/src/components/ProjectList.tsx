@@ -68,7 +68,7 @@ const ProjectList: React.FC = () => {
     if (selectedTag !== tagFromUrl) {
       setSelectedTag(tagFromUrl);
     }
-  }, [searchParams]);
+  }, [searchParams, currentPage, selectedTag]);
 
   // Effect to fetch all tags (runs once on mount)
   useEffect(() => {
