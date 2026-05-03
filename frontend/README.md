@@ -50,7 +50,7 @@ This keeps API calls same-origin in both Docker and local dev proxy mode.
 
 ## Changelog
 
-- See [../CHANGELOG.md](../CHANGELOG.md) for tracked UI and project updates.
+- See [../docs/CHANGELOG.md](../docs/CHANGELOG.md) for tracked UI and project updates.
 
 ## Key folders
 

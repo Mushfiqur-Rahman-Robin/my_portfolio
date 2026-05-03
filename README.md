@@ -68,7 +68,12 @@ The repository is organized as a monorepo with the following main directories:
 
 ## Changelog
 
--   See [CHANGELOG.md](CHANGELOG.md) for recent updates and release notes.
+-   See [CHANGELOG.md](docs/CHANGELOG.md) for recent updates and release notes.
+
+## Development Guide
+
+-   For detailed environment setup, testing procedures, and deployment workflows, see [AI_AGENT_DEVELOPMENT_GUIDE.md](docs/AI_AGENT_DEVELOPMENT_GUIDE.md).
+-   This guide covers complete procedures for AI agents and developers to setup, test, and deploy the project safely.
 
 ## Contributing
 

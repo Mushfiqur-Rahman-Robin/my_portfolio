@@ -57,7 +57,7 @@ gzip -dc /home/mushfiq/portfolio_backups/YYYY-MM-DD_04-00-01/db_dump.sql.gz | do
 - Chatbot memory now uses the most recent 20 interactions per session (user+assistant pairs) for follow-up continuity.
 - Chatbot prompt assembly is centralized in `api/prompt.py` (`build_chatbot_prompt`) so placeholder-like values (e.g. `{x}`, `${NAME}`) are passed safely without formatting errors.
 - Test settings (`core.test_settings`) now use PostgreSQL when `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` are provided (CI behavior), otherwise fallback to local SQLite for safer local test runs.
-- See [../CHANGELOG.md](../CHANGELOG.md) for tracked cross-project changes.
+- See [../docs/CHANGELOG.md](../docs/CHANGELOG.md) for tracked cross-project changes.
 
 ## Deployment safety checklist
 
