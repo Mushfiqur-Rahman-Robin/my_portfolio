@@ -34,6 +34,7 @@ All notable changes to this project are documented in this file.
 
 ### Fixed
 - Fixed local test failures caused by unresolved placeholder test DB credentials in `core.test_settings`.
+- Fixed CI test failures returning `301` by disabling `SECURE_SSL_REDIRECT` and secure cookie/HSTS enforcement inside `core.test_settings` (tests now behave consistently when `DEBUG=False`).
 
 ## 2026-05-01
 

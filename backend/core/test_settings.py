@@ -15,6 +15,15 @@ DEFAULT_FROM_EMAIL = "test@example.com"
 ADMIN_EMAIL = "admin@example.com"
 ENABLE_CHROMA_SYNC = False
 
+# Disable HTTPS/security-cookie enforcement in tests to avoid HTTP->HTTPS redirects
+# when CI sets DEBUG=False.
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+SECURE_HSTS_SECONDS = 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+
 
 # Optionally disable caching middleware for tests
 MIDDLEWARE = [
