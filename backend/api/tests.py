@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
@@ -50,7 +51,14 @@ class APITests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
+        self.admin_client = APIClient()
         self.request_factory = APIRequestFactory()
+        self.admin_user = get_user_model().objects.create_superuser(
+            username="admin",  # pragma: allowlist secret # nosec: B106
+            email="admin@example.com",  # pragma: allowlist secret # nosec: B106
+            password="testpass123",  # pragma: allowlist secret # nosec: B106
+        )
+        self.admin_client.force_authenticate(user=self.admin_user)
         self.tag = Tag.objects.create(name="Test Tag")
 
         # This setup is for objects that already exist before each test runs.
@@ -114,7 +122,7 @@ class APITests(TestCase):
             "tags": [self.tag.name],
         }
         # CRITICAL FIX: Use format='multipart' for file uploads
-        response = self.client.post(reverse("project-list"), new_project_data, format="multipart")
+        response = self.admin_client.post(reverse("project-list"), new_project_data, format="multipart")
 
         # Check the response
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
@@ -126,10 +134,21 @@ class APITests(TestCase):
         url = reverse("project-detail", args=[self.project.id])
         updated_data = {"title": "Updated Project"}
         # PATCHing a simple field can still use 'json' format
-        response = self.client.patch(url, updated_data, format="json")
+        response = self.admin_client.patch(url, updated_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.project.refresh_from_db()
         self.assertEqual(self.project.title, "Updated Project")
+
+    def test_create_project_requires_admin(self):
+        new_project_data = {
+            "title": "Unauthorized Project",
+            "description": "Another test project",
+            "image": generate_photo_file(),
+            "display_order": 2,
+            "tags": [self.tag.name],
+        }
+        response = self.client.post(reverse("project-list"), new_project_data, format="multipart")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_new_image_upload_is_stored_as_webp(self):
         self.assertTrue(self.project.image.name.endswith(".webp"))
@@ -146,7 +165,7 @@ class APITests(TestCase):
 
     def test_delete_project(self):
         url = reverse("project-detail", args=[self.project.id])
-        response = self.client.delete(url)
+        response = self.admin_client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Project.objects.count(), 0)
 

@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file.
 
 ## 2026-05-03
 
+### Security
+- Restricted write operations on portfolio content APIs to admin users while preserving public read access.
+- Kept contact, visitor count, and chatbot endpoints publicly accessible with existing throttling.
+- Replaced raw internal exception string in visitor count API responses with a generic error message.
+- Added production-focused Django security settings (`SECURE_SSL_REDIRECT`, secure cookies, HSTS, content type nosniff) configurable via environment variables.
+
+### CI/CD
+- Added push-trigger coverage for `fix/issues-and-vulnerabilites` and `fix/issues-and-vulnerablities` branches in GitHub Actions.
+
+### Tests
+- Updated API tests to authenticate admin users for write operations and added a regression test confirming unauthenticated write requests are rejected.
+
 ### Added
 - Added automatic conversion of newly uploaded image files to WebP for portfolio image models.
 - Added backend tests to verify new image uploads are saved as `.webp` and legacy non-WebP image paths remain unchanged unless re-uploaded.
@@ -22,6 +34,7 @@ All notable changes to this project are documented in this file.
 
 ### Fixed
 - Fixed local test failures caused by unresolved placeholder test DB credentials in `core.test_settings`.
+- Fixed CI test failures returning `301` by disabling `SECURE_SSL_REDIRECT` and secure cookie/HSTS enforcement inside `core.test_settings` (tests now behave consistently when `DEBUG=False`).
 
 ## 2026-05-01
 

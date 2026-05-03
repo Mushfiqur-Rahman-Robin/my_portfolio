@@ -11,6 +11,7 @@ from drf_spectacular.utils import extend_schema
 from openai import OpenAI
 from rest_framework import status, viewsets
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -127,13 +128,24 @@ class ExperienceResultsPagination(PageNumberPagination):
     max_page_size = 100
 
 
+class PublicReadAdminWriteMixin:
+    """Allow public read access while restricting write access to admin users."""
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
+
+
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     schema_tags = ["Portfolio Management - Tags"]
 
 
-class ProjectViewSet(viewsets.ModelViewSet):
+class ProjectViewSet(PublicReadAdminWriteMixin, viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     pagination_class = StandardResultsPagination
@@ -182,6 +194,7 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
     http_method_names = ["post", "head", "options"]
     schema_tags = ["Contact & Admin"]
     throttle_classes = [ContactFormRateThrottle]
+    permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -216,14 +229,14 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class ResumeViewSet(viewsets.ModelViewSet):
+class ResumeViewSet(PublicReadAdminWriteMixin, viewsets.ModelViewSet):
     queryset = Resume.objects.all()
     serializer_class = ResumeSerializer
     http_method_names = ["get", "post", "head", "options", "delete"]
     schema_tags = ["Contact & Admin"]
 
 
-class ExperienceViewSet(viewsets.ModelViewSet):
+class ExperienceViewSet(PublicReadAdminWriteMixin, viewsets.ModelViewSet):
     queryset = Experience.objects.all()
     serializer_class = ExperienceSerializer
     pagination_class = ExperienceResultsPagination
@@ -231,7 +244,7 @@ class ExperienceViewSet(viewsets.ModelViewSet):
     schema_tags = ["Portfolio Management - Experiences"]
 
 
-class ExperiencePhotoViewSet(viewsets.ModelViewSet):
+class ExperiencePhotoViewSet(PublicReadAdminWriteMixin, viewsets.ModelViewSet):
     queryset = ExperiencePhoto.objects.all()
     serializer_class = ExperiencePhotoSerializer
     http_method_names = ["get", "post", "head", "options", "delete"]
@@ -240,7 +253,7 @@ class ExperiencePhotoViewSet(viewsets.ModelViewSet):
 
 class VisitorCountView(APIView):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
     schema_tags = ["Contact & Admin"]
     throttle_classes = [VisitorCountRateThrottle]
 
@@ -284,7 +297,10 @@ class VisitorCountView(APIView):
             )
         except Exception as e:
             logger.error(f"Error incrementing visitor count: {e}", exc_info=True)
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": "An internal error occurred while updating visitor count."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class ChatbotView(APIView):
@@ -294,7 +310,7 @@ class ChatbotView(APIView):
     """
 
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [AllowAny]
     schema_tags = ["Chatbot"]
     throttle_classes = [ChatbotRateThrottle]
 

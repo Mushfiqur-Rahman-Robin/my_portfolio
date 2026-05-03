@@ -28,6 +28,16 @@ Backend URLs:
 Backend reads environment values from `backend/.env` (loaded by `docker-compose.yml`).
 Use `backend/.env.template` as the source of truth for required variables.
 
+Security-related environment variables (recommended for production):
+
+- `SECURE_SSL_REDIRECT=True`
+- `SESSION_COOKIE_SECURE=True`
+- `CSRF_COOKIE_SECURE=True`
+- `SECURE_HSTS_SECONDS=31536000`
+- `SECURE_HSTS_INCLUDE_SUBDOMAINS=True`
+- `SECURE_HSTS_PRELOAD=True`
+- `SECURE_CONTENT_TYPE_NOSNIFF=True`
+
 ## Database backup restore (Docker Postgres)
 
 Latest backups are in `/home/mushfiq/portfolio_backups`. To restore safely without editing backup files:
@@ -40,6 +50,7 @@ gzip -dc /home/mushfiq/portfolio_backups/YYYY-MM-DD_04-00-01/db_dump.sql.gz | do
 ## Notes
 
 - API routes are versioned under `/api/v1/`.
+- Public read endpoints remain open for portfolio content (`GET`/safe methods), while write actions on content endpoints are now admin-only.
 - Backend logic is intentionally separate from frontend styling work.
 - New image uploads for portfolio models are converted to WebP at save time in backend signals. Existing stored `.png/.jpg` paths are kept as-is unless a new image is uploaded.
 - Visitor count endpoint now logs admin-only visitor analytics metadata (`ip_address`, country, device type, user-agent, timestamp) in `VisitorAnalytics`.
