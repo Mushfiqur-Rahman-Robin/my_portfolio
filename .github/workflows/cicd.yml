@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - migration/django-react-stack
+      - fix/issues-and-vulnerabilites
   pull_request:
     branches:
       - main
