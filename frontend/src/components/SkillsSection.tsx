@@ -23,6 +23,7 @@ const skills: Skill[] = [
   { name: 'NLP', level: 85 },
   { name: 'Computer Vision', level: 85 },
   { name: 'Generative AI', level: 85 },
+  { name: 'Agentic AI', level: 90 },
   { name: 'LangChain', level: 85 },
   { name: 'Unsupervised ML', level: 85 },
   { name: 'Statistics', level: 85 },
@@ -34,6 +35,7 @@ const skills: Skill[] = [
   { name: 'DVC', level: 70 },
   { name: 'Airflow', level: 70 },
   { name: 'AWS', level: 70 },
+  { name: 'AWS SageMaker', level: 70 },
   { name: 'Git & GitHub', level: 90 },
   { name: 'Docker', level: 85 },
   { name: 'CI/CD (GitHub Actions, CircleCI)', level: 75 },
@@ -42,6 +44,7 @@ const skills: Skill[] = [
   { name: 'Monitoring (Prometheus, Grafana)', level: 60 },
   { name: 'Web Scraping (BS4, Selenium)', level: 85 },
   { name: 'n8n', level: 75 },
+  { name: 'Claude Code', level: 70 },
 ];
 
 const SkillsSection: React.FC = () => {
