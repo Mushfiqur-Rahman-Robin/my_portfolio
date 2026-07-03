@@ -14,6 +14,7 @@ from .models import (
     DailyVisitorCount,
     Experience,
     ExperiencePhoto,
+    LLMCostTracking,
     Project,
     ProjectImage,
     Publication,
@@ -223,6 +224,54 @@ class VisitorAnalyticsAdmin(admin.ModelAdmin):
     list_filter = ("country", "device_type", "visited_at")
     search_fields = ("ip_address", "country", "user_agent")
     readonly_fields = ("id", "ip_address", "country", "device_type", "user_agent", "visited_at")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(LLMCostTracking)
+class LLMCostTrackingAdmin(admin.ModelAdmin):
+    list_display = (
+        "created_at",
+        "operation_type",
+        "model_name",
+        "tokens_used",
+        "cost",
+        "total_cost",
+        "total_tokens",
+        "session_link",
+    )
+    list_filter = ("operation_type", "model_name", "created_at")
+    search_fields = ("model_name",)
+    readonly_fields = (
+        "id",
+        "session",
+        "operation_type",
+        "model_name",
+        "tokens_used",
+        "cost",
+        "total_chat_cost",
+        "total_embedding_cost",
+        "total_cost",
+        "total_chat_tokens",
+        "total_embedding_tokens",
+        "total_tokens",
+        "created_at",
+    )
+    ordering = ["-created_at"]
+
+    def session_link(self, obj):
+        if obj.session:
+            return str(obj.session.id)[:8]
+        return "-"
+
+    session_link.short_description = "Session"
 
     def has_add_permission(self, request):
         return False

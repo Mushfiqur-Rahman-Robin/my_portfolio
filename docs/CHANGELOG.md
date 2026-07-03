@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented in this file.
 
+## 2026-07-03
+
+### Added
+- Added `LLMCostTracking` model and migrations (`0003_llmcosttracking`, `0004_alter_llmcosttracking_decimal_places`) for per-transaction cost ledger, tracking chat and embedding API costs with running totals stored at 4 decimal places (e.g., `0.2099`).
+- Added `api/pricing.py` with model-specific pricing constants (Gemini 2.5 Flash, GPT-4.1-mini, gemini-embedding-2, text-embedding-3-small, etc.) and cost calculation helpers using `Decimal` arithmetic for exact monetary precision.
+- Integrated cost tracking into `generate_chat_completion` (records chat cost per session using real API token counts) and `generate_embedding` (records embedding cost per call).
+- Registered read-only `LLMCostTracking` admin view with operation type, model, tokens, cost, running totals, and session link.
+- Added comprehensive test suite (`LLMCostTrackingTests`) for cost tracking: record creation, running totals accumulation, chat+embedding mixed tracking, pricing calculations, token estimation, query count verification, and concurrent write safety.
+- Added `select_for_update()` row locking in `record_llm_cost` to prevent race conditions when multiple concurrent writes update running totals.
+
+### Fixed
+- Fixed `int()` conversion in token extraction from Gemini `usage_metadata` and OpenAI `usage` to handle Mock objects in tests.
+- Fixed chat completion cost recording to only trigger when a session is provided.
+- Fixed pre-existing test assertions for Gemini embedding model name (`gemini-embedding-2`) and embedding dimension (`1536`).
+- Switched cost arithmetic from `float` to `Decimal` throughout the pipeline to avoid floating-point precision loss.
+
 ## 2026-05-03
 
 ### Security

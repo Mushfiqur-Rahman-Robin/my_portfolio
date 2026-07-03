@@ -1,7 +1,7 @@
 # AI Agent Development Guide
 
-**Last Updated:** May 3, 2026  
-**Version:** 1.0  
+**Last Updated:** July 3, 2026
+**Version:** 1.0
 **Purpose:** Comprehensive reference for AI agents to manage portfolio project development, testing, and deployment.
 
 ---
@@ -31,6 +31,7 @@
 - **Database:** PostgreSQL 15 (production), SQLite (local/test)
 - **Cache:** Redis 7
 - **Vector Store:** ChromaDB 0.4.14
+- **LLM Providers:** OpenAI GPT / Google Gemini Flash 2.5 (configurable)
 - **Containerization:** Docker Compose
 
 ### Key Features
@@ -111,7 +112,10 @@ Create `.env` file in `backend/` directory based on `.env.template`:
 - `CSRF_TRUSTED_ORIGINS` - CORS/CSRF allowed origins
 - `DATABASE_URL` - PostgreSQL connection string
 - `REDIS_URL` - Redis connection string (default: redis://localhost:6379/1)
-- `OPENAI_API_KEY` - OpenAI API key for chatbot
+- `OPENAI_API_KEY` - OpenAI API key for chatbot (required when LLM_PROVIDER=openai)
+- `GEMINI_API_KEY` - Google Gemini API key for chatbot (required when LLM_PROVIDER=gemini)
+- `LLM_PROVIDER` - Which LLM provider to use: `openai` or `gemini` (default: `gemini`)
+- `LLM_CHAT_MODEL` - Optional: override the default chat model for the selected provider
 
 **Security Settings (auto-enabled when DEBUG=False):**
 - `SECURE_SSL_REDIRECT` - Redirect HTTP to HTTPS
@@ -476,8 +480,8 @@ curl -I http://localhost:8000/api/v1/projects/
 ### Common Issues
 
 #### Tests Failing with 301 Status
-**Problem:** Tests return HTTP 301 (redirect) when DEBUG=False  
-**Cause:** Production security settings enabled in test environment  
+**Problem:** Tests return HTTP 301 (redirect) when DEBUG=False
+**Cause:** Production security settings enabled in test environment
 **Solution:**
 ```bash
 # Verify core/test_settings.py has these lines:
@@ -488,21 +492,21 @@ curl -I http://localhost:8000/api/v1/projects/
 ```
 
 #### PostgreSQL Connection Failed
-**Problem:** `psycopg2.OperationalError: connection refused`  
+**Problem:** `psycopg2.OperationalError: connection refused`
 **Solution:**
 ```bash
 # Check if PostgreSQL service is running
 docker compose ps db
 
 # Ensure DATABASE_URL is correct format:
-# postgresql://user:password@localhost:5432/database_name
+# postgresql://user:password@localhost:5432/database_name  # pragma: allowlist secret
 
 # Or use SQLite for local testing
 export DATABASE_URL=sqlite:///./db.sqlite3
 ```
 
 #### Redis Connection Failed
-**Problem:** `ConnectionError: connection refused`  
+**Problem:** `ConnectionError: connection refused`
 **Solution:**
 ```bash
 # Start Redis
@@ -516,7 +520,7 @@ redis-cli ping  # Should return PONG
 ```
 
 #### Frontend Build Errors
-**Problem:** `npm run build` fails  
+**Problem:** `npm run build` fails
 **Solution:**
 ```bash
 # Clear cache and reinstall
@@ -531,7 +535,7 @@ npm run lint
 ```
 
 #### Docker Build Timeout
-**Problem:** `docker compose build` takes too long or times out  
+**Problem:** `docker compose build` takes too long or times out
 **Solution:**
 ```bash
 # Increase Docker buildkit timeout
@@ -546,7 +550,7 @@ docker image prune -f
 ```
 
 #### Admin Login Not Working
-**Problem:** Admin credentials rejected  
+**Problem:** Admin credentials rejected
 **Solution:**
 ```bash
 # Reset admin user
@@ -699,6 +703,6 @@ docker compose exec -T db psql -U portfolio -d portfolio_db
 
 ---
 
-**Last Updated:** May 3, 2026  
-**Maintained by:** AI Development Team  
+**Last Updated:** July 3, 2026
+**Maintained by:** AI Development Team
 **Questions?** Refer to specific service README.md files in respective directories.
