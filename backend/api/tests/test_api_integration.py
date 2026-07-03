@@ -14,10 +14,10 @@ from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory
 
-from .llm_client import generate_chat_completion, generate_embedding
-from .models import Achievement, Certification, ChatSession, Experience, LLMCostTracking, Project, Publication, Tag, VisitorAnalytics
-from .prompt import build_chatbot_prompt
-from .views import ChatbotView, get_country_for_ip, get_device_type
+from ..llm_client import generate_chat_completion, generate_embedding
+from ..models import Achievement, Certification, ChatSession, Experience, LLMCostTracking, Project, Publication, Tag, VisitorAnalytics
+from ..prompt import build_chatbot_prompt
+from ..views import ChatbotView, get_country_for_ip, get_device_type
 
 # Define the temporary media root path
 # This should be outside the TestCase class definition but can use settings.BASE_DIR
@@ -362,43 +362,43 @@ class LLMClientTests(TestCase):
 
     @override_settings(LLM_PROVIDER="gemini", LLM_CHAT_MODEL="")
     def test_get_chat_model_gemini_default(self):
-        from .llm_client import get_chat_model
+        from ..llm_client import get_chat_model
 
         self.assertEqual(get_chat_model(), "gemini-2.5-flash")
 
     @override_settings(LLM_PROVIDER="openai", LLM_CHAT_MODEL="")
     def test_get_chat_model_openai_default(self):
-        from .llm_client import get_chat_model
+        from ..llm_client import get_chat_model
 
         self.assertEqual(get_chat_model(), "gpt-4.1-mini")
 
     @override_settings(LLM_PROVIDER="gemini", LLM_CHAT_MODEL="gemini-2.0-flash")
     def test_get_chat_model_custom_override(self):
-        from .llm_client import get_chat_model
+        from ..llm_client import get_chat_model
 
         self.assertEqual(get_chat_model(), "gemini-2.0-flash")
 
     @override_settings(LLM_PROVIDER="gemini")
     def test_get_embedding_model_gemini(self):
-        from .llm_client import get_embedding_model
+        from ..llm_client import get_embedding_model
 
         self.assertEqual(get_embedding_model(), "gemini-embedding-2")
 
     @override_settings(LLM_PROVIDER="openai")
     def test_get_embedding_model_openai(self):
-        from .llm_client import get_embedding_model
+        from ..llm_client import get_embedding_model
 
         self.assertEqual(get_embedding_model(), "text-embedding-3-small")
 
     @override_settings(LLM_PROVIDER="gemini")
     def test_get_embedding_dimension_gemini(self):
-        from .llm_client import get_embedding_dimension
+        from ..llm_client import get_embedding_dimension
 
         self.assertEqual(get_embedding_dimension(), 1536)
 
     @override_settings(LLM_PROVIDER="openai")
     def test_get_embedding_dimension_openai(self):
-        from .llm_client import get_embedding_dimension
+        from ..llm_client import get_embedding_dimension
 
         self.assertEqual(get_embedding_dimension(), 1536)
 
@@ -410,7 +410,7 @@ class LLMClientTests(TestCase):
     @patch("api.llm_client.genai")
     def test_generate_chat_completion_gemini(self, mock_genai):
         """Gemini provider routes correctly and returns the model's text."""
-        from .llm_client import generate_chat_completion
+        from ..llm_client import generate_chat_completion
 
         mock_response = mock_genai.Client.return_value.models.generate_content.return_value
         mock_response.text = "Hello from Gemini!"
@@ -428,7 +428,7 @@ class LLMClientTests(TestCase):
     @override_settings(LLM_PROVIDER="gemini", LLM_CHAT_MODEL="", GEMINI_API_KEY="")
     def test_generate_chat_completion_gemini_missing_key_raises(self):
         """Missing GEMINI_API_KEY with gemini provider raises ValueError."""
-        from .llm_client import generate_chat_completion
+        from ..llm_client import generate_chat_completion
 
         with self.assertRaises(ValueError, msg="GEMINI_API_KEY is not set"):
             generate_chat_completion(messages=[{"role": "user", "content": "Hi"}])
@@ -441,7 +441,7 @@ class LLMClientTests(TestCase):
     @patch("api.llm_client.OpenAI")
     def test_generate_chat_completion_openai(self, mock_openai_cls):
         """OpenAI provider routes correctly and returns the model's text."""
-        from .llm_client import generate_chat_completion
+        from ..llm_client import generate_chat_completion
 
         mock_choice = mock_openai_cls.return_value.chat.completions.create.return_value.choices[0]
         mock_choice.message.content = "Hello from OpenAI!"
@@ -458,7 +458,7 @@ class LLMClientTests(TestCase):
     @override_settings(LLM_PROVIDER="openai", LLM_CHAT_MODEL="", OPENAI_API_KEY="")
     def test_generate_chat_completion_openai_missing_key_raises(self):
         """Missing OPENAI_API_KEY with openai provider raises ValueError."""
-        from .llm_client import generate_chat_completion
+        from ..llm_client import generate_chat_completion
 
         with self.assertRaises(ValueError, msg="OPENAI_API_KEY is not set"):
             generate_chat_completion(messages=[{"role": "user", "content": "Hi"}])
@@ -471,7 +471,7 @@ class LLMClientTests(TestCase):
     @patch("api.llm_client.genai")
     def test_generate_embedding_gemini(self, mock_genai):
         """Gemini embedding path returns a list of floats."""
-        from .llm_client import generate_embedding
+        from ..llm_client import generate_embedding
 
         mock_embedding = mock_genai.Client.return_value.models.embed_content.return_value
         mock_embedding.embeddings = [type("Emb", (), {"values": [0.1, 0.2, 0.3]})()]
@@ -484,7 +484,7 @@ class LLMClientTests(TestCase):
     @override_settings(LLM_PROVIDER="gemini", LLM_CHAT_MODEL="", GEMINI_API_KEY="")
     def test_generate_embedding_gemini_missing_key_raises(self):
         """Missing GEMINI_API_KEY with gemini provider raises ValueError for embedding."""
-        from .llm_client import generate_embedding
+        from ..llm_client import generate_embedding
 
         with self.assertRaises(ValueError, msg="GEMINI_API_KEY is not set"):
             generate_embedding("test text")
@@ -497,7 +497,7 @@ class LLMClientTests(TestCase):
     @patch("api.llm_client.OpenAI")
     def test_generate_embedding_openai(self, mock_openai_cls):
         """OpenAI embedding path returns a list of floats."""
-        from .llm_client import generate_embedding
+        from ..llm_client import generate_embedding
 
         mock_data = mock_openai_cls.return_value.embeddings.create.return_value.data[0]
         mock_data.embedding = [0.4, 0.5, 0.6]
@@ -510,10 +510,100 @@ class LLMClientTests(TestCase):
     @override_settings(LLM_PROVIDER="openai", LLM_CHAT_MODEL="", OPENAI_API_KEY="")
     def test_generate_embedding_openai_missing_key_raises(self):
         """Missing OPENAI_API_KEY with openai provider raises ValueError for embedding."""
-        from .llm_client import generate_embedding
+        from ..llm_client import generate_embedding
 
         with self.assertRaises(ValueError, msg="OPENAI_API_KEY is not set"):
             generate_embedding("test text")
+
+    # ------------------------------------------------------------------
+    # Fallback token estimation paths
+    # ------------------------------------------------------------------
+
+    @override_settings(LLM_PROVIDER="gemini", LLM_CHAT_MODEL="", GEMINI_API_KEY="fake-key")  # pragma: allowlist secret
+    @patch("api.llm_client.genai")
+    @patch("api.llm_client.record_llm_cost")
+    def test_chat_completion_gemini_without_usage_metadata(self, mock_record, mock_genai):
+        from ..llm_client import generate_chat_completion
+
+        mock_response = mock_genai.Client.return_value.models.generate_content.return_value
+        mock_response.text = "Fallback response"
+        del mock_response.usage_metadata
+
+        session = ChatSession.objects.create()
+        result = generate_chat_completion(
+            messages=[{"role": "user", "content": "Hello"}],
+            session=session,
+        )
+        self.assertEqual(result, "Fallback response")
+        mock_record.assert_called_once()
+
+    @override_settings(LLM_PROVIDER="openai", LLM_CHAT_MODEL="", OPENAI_API_KEY="fake-key")  # pragma: allowlist secret
+    @patch("api.llm_client.OpenAI")
+    @patch("api.llm_client.record_llm_cost")
+    def test_chat_completion_openai_without_usage(self, mock_record, mock_openai_cls):
+        from ..llm_client import generate_chat_completion
+
+        mock_completion = mock_openai_cls.return_value.chat.completions.create.return_value
+        del mock_completion.usage
+        mock_completion.choices[0].message.content = "No usage data"
+
+        session = ChatSession.objects.create()
+        result = generate_chat_completion(
+            messages=[{"role": "user", "content": "Hi"}],
+            session=session,
+        )
+        self.assertEqual(result, "No usage data")
+        mock_record.assert_called_once()
+
+    @override_settings(LLM_PROVIDER="openai", LLM_CHAT_MODEL="", OPENAI_API_KEY="fake-key")  # pragma: allowlist secret
+    @patch("api.llm_client.OpenAI")
+    @patch("api.llm_client.record_llm_cost")
+    def test_embedding_openai_without_usage(self, mock_record, mock_openai_cls):
+        from ..llm_client import generate_embedding
+
+        mock_resp = mock_openai_cls.return_value.embeddings.create.return_value
+        mock_resp.data[0].embedding = [0.1, 0.2]
+        del mock_resp.usage
+
+        result = generate_embedding("test")
+        self.assertEqual(result, [0.1, 0.2])
+        mock_record.assert_called_once()
+
+    @override_settings(LLM_PROVIDER="openai", LLM_CHAT_MODEL="", OPENAI_API_KEY="fake-key")  # pragma: allowlist secret
+    @patch("api.llm_client.OpenAI")
+    @patch("api.llm_client.record_llm_cost")
+    def test_embedding_openai_non_int_prompt_tokens(self, mock_record, mock_openai_cls):
+        from ..llm_client import generate_embedding
+
+        mock_resp = mock_openai_cls.return_value.embeddings.create.return_value
+        mock_resp.data[0].embedding = [0.7, 0.8]
+        type(mock_resp).usage = property(lambda self: type("Usage", (), {"prompt_tokens": "not_an_int"})())
+
+        result = generate_embedding("test text")
+        self.assertEqual(result, [0.7, 0.8])
+        mock_record.assert_called_once()
+
+    @override_settings(LLM_PROVIDER="gemini", LLM_CHAT_MODEL="", GEMINI_API_KEY="fake-key")  # pragma: allowlist secret
+    @patch("api.llm_client.genai")
+    @patch("api.llm_client.record_llm_cost")
+    def test_chat_completion_gemini_broken_usage_metadata(self, mock_record, mock_genai):
+        from ..llm_client import generate_chat_completion
+
+        mock_response = mock_genai.Client.return_value.models.generate_content.return_value
+        mock_response.text = "Response"
+
+        broken_usage = type("Usage", (), {})()
+        object.__setattr__(broken_usage, "prompt_token_count", "invalid")
+        object.__setattr__(broken_usage, "candidates_token_count", 5)
+        mock_response.usage_metadata = broken_usage
+
+        session = ChatSession.objects.create()
+        result = generate_chat_completion(
+            messages=[{"role": "user", "content": "Hi"}],
+            session=session,
+        )
+        self.assertEqual(result, "Response")
+        mock_record.assert_called_once()
 
 
 class LLMCostTrackingTests(TestCase):
@@ -526,7 +616,7 @@ class LLMCostTrackingTests(TestCase):
     def test_chat_cost_tracking_creates_record_with_session(self):
         session = ChatSession.objects.create()
 
-        from .llm_client import record_llm_cost
+        from ..llm_client import record_llm_cost
 
         record_llm_cost("chat", "gemini-2.5-flash", 1000, 200, session=session)
 
@@ -538,7 +628,7 @@ class LLMCostTrackingTests(TestCase):
         self.assertEqual(record.session, session)
 
     def test_chat_cost_tracking_without_session(self):
-        from .llm_client import record_llm_cost
+        from ..llm_client import record_llm_cost
 
         record_llm_cost("chat", "gpt-4.1-mini", 500, 150, session=None)
 
@@ -547,7 +637,7 @@ class LLMCostTrackingTests(TestCase):
         self.assertIsNone(record.session)
 
     def test_embedding_cost_tracking_creates_record(self):
-        from .llm_client import record_llm_cost
+        from ..llm_client import record_llm_cost
 
         record_llm_cost("embedding", "text-embedding-3-small", 300, 0)
 
@@ -563,7 +653,7 @@ class LLMCostTrackingTests(TestCase):
     # ------------------------------------------------------------------
 
     def test_running_totals_accumulate_for_chat(self):
-        from .llm_client import record_llm_cost
+        from ..llm_client import record_llm_cost
 
         session = ChatSession.objects.create()
 
@@ -591,7 +681,7 @@ class LLMCostTrackingTests(TestCase):
     # ------------------------------------------------------------------
 
     def test_running_totals_accumulate_for_embedding(self):
-        from .llm_client import record_llm_cost
+        from ..llm_client import record_llm_cost
 
         record_llm_cost("embedding", "gemini-embedding-2", 500, 0)
         record_llm_cost("embedding", "gemini-embedding-2", 300, 0)
@@ -614,7 +704,7 @@ class LLMCostTrackingTests(TestCase):
     # ------------------------------------------------------------------
 
     def test_mixed_chat_and_embedding_running_totals(self):
-        from .llm_client import record_llm_cost
+        from ..llm_client import record_llm_cost
 
         session = ChatSession.objects.create()
 
@@ -663,52 +753,52 @@ class LLMCostTrackingTests(TestCase):
     # ------------------------------------------------------------------
 
     def test_chat_cost_calculation_gemini_flash(self):
-        from .pricing import calculate_chat_cost
+        from ..pricing import calculate_chat_cost
 
         cost = calculate_chat_cost("gemini-2.5-flash", 1000000, 1000000)
         expected = 0.30 + 2.50
         self.assertAlmostEqual(float(cost), expected)
 
     def test_chat_cost_calculation_openai(self):
-        from .pricing import calculate_chat_cost
+        from ..pricing import calculate_chat_cost
 
         cost = calculate_chat_cost("gpt-4.1-mini", 1000000, 1000000)
         expected = 0.40 + 1.60
         self.assertAlmostEqual(float(cost), expected)
 
     def test_embedding_cost_calculation_openai(self):
-        from .pricing import calculate_embedding_cost
+        from ..pricing import calculate_embedding_cost
 
         cost = calculate_embedding_cost("text-embedding-3-small", 1000000)
         self.assertAlmostEqual(float(cost), 0.02)
 
     def test_embedding_cost_calculation_gemini(self):
-        from .pricing import calculate_embedding_cost
+        from ..pricing import calculate_embedding_cost
 
         cost = calculate_embedding_cost("gemini-embedding-2", 1000000)
         self.assertAlmostEqual(float(cost), 0.20)
 
     def test_chat_cost_zero_tokens(self):
-        from .pricing import calculate_chat_cost
+        from ..pricing import calculate_chat_cost
 
         cost = calculate_chat_cost("gemini-2.5-flash", 0, 0)
         self.assertEqual(cost, 0.0)
 
     def test_embedding_cost_zero_tokens(self):
-        from .pricing import calculate_embedding_cost
+        from ..pricing import calculate_embedding_cost
 
         cost = calculate_embedding_cost("gemini-embedding-2", 0)
         self.assertEqual(cost, 0.0)
 
     def test_chat_cost_unknown_model_falls_back_to_defaults(self):
-        from .pricing import DEFAULT_CHAT_INPUT_PRICE, DEFAULT_CHAT_OUTPUT_PRICE, calculate_chat_cost
+        from ..pricing import DEFAULT_CHAT_INPUT_PRICE, DEFAULT_CHAT_OUTPUT_PRICE, calculate_chat_cost
 
         cost = calculate_chat_cost("nonexistent-model", 1000000, 1000000)
         expected = DEFAULT_CHAT_INPUT_PRICE + DEFAULT_CHAT_OUTPUT_PRICE
         self.assertAlmostEqual(float(cost), expected)
 
     def test_embedding_cost_unknown_model_falls_back_to_default(self):
-        from .pricing import DEFAULT_EMBEDDING_PRICE, calculate_embedding_cost
+        from ..pricing import DEFAULT_EMBEDDING_PRICE, calculate_embedding_cost
 
         cost = calculate_embedding_cost("nonexistent-model", 1000000)
         self.assertAlmostEqual(float(cost), DEFAULT_EMBEDDING_PRICE)
@@ -718,20 +808,20 @@ class LLMCostTrackingTests(TestCase):
     # ------------------------------------------------------------------
 
     def test_estimate_token_count_positive(self):
-        from .pricing import estimate_token_count
+        from ..pricing import estimate_token_count
 
         tokens = estimate_token_count("Hello world, this is a test sentence.")
         self.assertGreater(tokens, 0)
         self.assertIsInstance(tokens, int)
 
     def test_estimate_token_count_empty_string(self):
-        from .pricing import estimate_token_count
+        from ..pricing import estimate_token_count
 
         tokens = estimate_token_count("")
         self.assertEqual(tokens, 0)
 
     def test_estimate_token_count_none(self):
-        from .pricing import estimate_token_count
+        from ..pricing import estimate_token_count
 
         tokens = estimate_token_count(None)
         self.assertEqual(tokens, 0)
@@ -852,13 +942,13 @@ class LLMCostTrackingTests(TestCase):
         self.assertIn("0.00042", str(record))
 
     def test_cost_tracking_uses_minimal_queries_per_insert(self):
-        from .llm_client import record_llm_cost
+        from ..llm_client import record_llm_cost
 
         with self.assertNumQueries(4):
             record_llm_cost("chat", "gemini-2.5-flash", 100, 50)
 
     def test_cost_tracking_uses_minimal_queries_for_embedding(self):
-        from .llm_client import record_llm_cost
+        from ..llm_client import record_llm_cost
 
         with self.assertNumQueries(4):
             record_llm_cost("embedding", "text-embedding-3-small", 200, 0)
@@ -868,7 +958,7 @@ class LLMCostTrackingTests(TestCase):
     # ------------------------------------------------------------------
 
     def test_concurrent_write_safety_via_select_for_update(self):
-        from .llm_client import record_llm_cost
+        from ..llm_client import record_llm_cost
 
         record_llm_cost("chat", "gemini-2.5-flash", 100, 50)
         record_llm_cost("chat", "gemini-2.5-flash", 200, 100)

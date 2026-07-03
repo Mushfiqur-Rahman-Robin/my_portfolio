@@ -248,13 +248,13 @@ cd backend
 source .venv/bin/activate
 
 # Quick test run
-pytest api/tests.py -q
+pytest api/tests/ -q
 
 # Verbose output
-pytest api/tests.py -v
+pytest api/tests/ -v
 
 # With coverage report
-pytest api/tests.py --cov=api --cov-report=html
+pytest api/tests/ --cov=api --cov-report=html
 ```
 
 #### Run Tests in CI-like Environment (DEBUG=False)
@@ -270,18 +270,18 @@ PYTHONPATH=. \
 EMAIL_BACKEND=django.core.mail.backends.locmem.EmailBackend \
 DEFAULT_FROM_EMAIL=test@example.com \
 ADMIN_EMAIL=admin@example.com \
-pytest api/tests.py -v
+pytest api/tests/ -v
 ```
 
 #### Run Specific Test
 ```bash
-pytest api/tests.py::APITests::test_create_project_requires_admin -v
+pytest api/tests/test_api_integration.py::APITests::test_create_project_requires_admin -v
 ```
 
 #### Test Results Expected
-- **Total Tests:** 21
+- **Total Tests:** 264+
 - **Pass Rate:** 100%
-- **Duration:** ~18-20 seconds
+- **Duration:** ~25-30 seconds
 - **Key Test:** `test_create_project_requires_admin` (validates admin-only write access)
 
 ### Frontend Testing
@@ -373,14 +373,14 @@ npm run preview
 #### Full Deployment Flow
 ```bash
 # 1. Ensure all tests pass locally
-cd backend && pytest api/tests.py -q
+cd backend && pytest api/tests/ -q
 cd frontend && npm run lint && npm run build
 
 # 2. Push to GitHub
 git push origin main
 
 # 3. GitHub Actions automatically:
-#    a. Runs backend tests (21/21 must pass)
+#    a. Runs backend tests (all must pass)
 #    b. Runs frontend linting & build
 #    c. Deploys to production server (if on main branch)
 #    d. Runs migrations on production DB
@@ -680,7 +680,7 @@ source backend/.venv/bin/activate
 cd frontend && npm ci
 
 # Testing
-pytest api/tests.py -v                 # Backend tests
+pytest api/tests/ -v                   # Backend tests
 npm run lint                           # Frontend linting
 npm run build                          # Frontend build
 npm audit --omit=dev                   # Security audit
