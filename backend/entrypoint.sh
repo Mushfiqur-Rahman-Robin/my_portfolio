@@ -13,8 +13,15 @@ python manage.py migrate --noinput
 # Optionally collect static files if they need runtime updates
 python manage.py collectstatic --noinput
 
-# Index content on chromadb
-python manage.py index_content --reindex
+# Wait for ChromaDB to be ready
+echo "Waiting for ChromaDB to be ready..."
+until curl -s -o /dev/null -w "%{http_code}" http://chromadb:8000/api/v1/heartbeat | grep -q 200; do
+  echo "Waiting for ChromaDB..."
+  sleep 2
+done
+
+# Index content on chromadb (non-fatal)
+python manage.py index_content --reindex || echo "Warning: Content indexing failed, continuing..."
 
 # Start Gunicorn (CMD arguments are passed via exec)
 exec "$@"

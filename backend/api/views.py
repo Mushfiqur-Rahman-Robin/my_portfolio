@@ -8,7 +8,6 @@ from django.core.mail import send_mail
 from django.db.models import F
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
-from openai import OpenAI
 from rest_framework import status, viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAdminUser
@@ -16,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .chromadb_utils import query_nodes
+from .llm_client import generate_chat_completion
 from .models import (
     Achievement,
     Certification,
@@ -306,7 +306,8 @@ class VisitorCountView(APIView):
 class ChatbotView(APIView):
     """
     Handles chatbot queries by retrieving context from ChromaDB
-    and generating a response using OpenAI's GPT model.
+    and generating a response using the configured LLM provider
+    (Gemini Flash 2.5 by default; OpenAI is also supported via LLM_PROVIDER env var).
     """
 
     authentication_classes = []
@@ -386,15 +387,13 @@ class ChatbotView(APIView):
                 final_context=final_context,
             )
 
-            # 4. Call OpenAI API
-            client = OpenAI(api_key=settings.OPENAI_API_KEY)
-            completion = client.chat.completions.create(
-                model="gpt-4.1-mini",
+            # 4. Call LLM API
+            answer = generate_chat_completion(
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=512,
                 temperature=0.2,
+                session=session,
             )
-            answer = completion.choices[0].message.content
 
             # Save the bot's response
             ChatMessage.objects.create(session=session, sender="bot", message=answer)

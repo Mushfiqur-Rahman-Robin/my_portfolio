@@ -269,3 +269,48 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f"{self.get_sender_display()} message at {self.created_at.strftime('%H:%M')}"
+
+
+class LLMCostTracking(models.Model):
+    """
+    A single table to track LLM costs.
+    It acts as a ledger. Each row is a transaction (chat session or embedding),
+    and we also store the running totals in each row so the latest row has the grand total.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    session = models.ForeignKey(
+        ChatSession,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="costs",
+        help_text="Null for embedding costs, or linked for chat session costs",
+    )
+
+    # Operation details
+    operation_type = models.CharField(max_length=20, choices=(("chat", "Chat"), ("embedding", "Embedding")), default="chat")
+    model_name = models.CharField(max_length=255, default="unknown")
+
+    # Usage for this record
+    tokens_used = models.PositiveIntegerField(default=0)
+    cost = models.DecimalField(max_digits=10, decimal_places=4, default=0.0)
+
+    # Running Totals at the time of this record
+    total_chat_cost = models.DecimalField(max_digits=10, decimal_places=4, default=0.0)
+    total_embedding_cost = models.DecimalField(max_digits=10, decimal_places=4, default=0.0)
+    total_cost = models.DecimalField(max_digits=10, decimal_places=4, default=0.0)
+
+    total_chat_tokens = models.PositiveIntegerField(default=0)
+    total_embedding_tokens = models.PositiveIntegerField(default=0)
+    total_tokens = models.PositiveIntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "LLM Cost Tracking"
+        verbose_name_plural = "LLM Cost Tracking"
+
+    def __str__(self):
+        return f"{self.get_operation_type_display()} | Cost: ${self.cost} | Total: ${self.total_cost}"

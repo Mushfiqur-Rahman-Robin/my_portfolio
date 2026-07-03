@@ -12,6 +12,15 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 # Load the OpenAI API Key from the .env file
 OPENAI_API_KEY = config("OPENAI_API_KEY", default="")
 
+# Load the Gemini API Key from the .env file
+GEMINI_API_KEY = config("GEMINI_API_KEY", default="")
+
+# LLM provider configuration: "openai" or "gemini"
+LLM_PROVIDER = config("LLM_PROVIDER", default="gemini")
+
+# Optional: override the default chat model for the selected provider
+LLM_CHAT_MODEL = config("LLM_CHAT_MODEL", default="")
+
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS",
     default="127.0.0.1,localhost,0.0.0.0",
