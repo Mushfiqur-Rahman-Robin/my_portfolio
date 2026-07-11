@@ -3,7 +3,7 @@ import axios from "axios";
 import "./css/ChatbotWidget.css";
 
 const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
-const LOCAL_STORAGE_KEY = 'chatbotSessionId';
+const SESSION_STORAGE_KEY = 'chatbotSessionId';
 
 const ChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,9 +14,10 @@ const ChatbotWidget = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inactivityTimer = useRef<number | null>(null);
 
-  // Load session ID from local storage on initial component mount
+  // Load session ID from session storage on initial component mount
+  // sessionStorage persists across page reloads but clears when the tab/browser closes
   useEffect(() => {
-    const storedSessionId = localStorage.getItem(LOCAL_STORAGE_KEY);
+    const storedSessionId = sessionStorage.getItem(SESSION_STORAGE_KEY);
     if (storedSessionId) {
       setSessionId(storedSessionId);
     }
@@ -29,7 +30,7 @@ const ChatbotWidget = () => {
     inactivityTimer.current = window.setTimeout(() => {
       setMessages([]);
       setSessionId(null); // Clear session ID
-      localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear from storage
+      sessionStorage.removeItem(SESSION_STORAGE_KEY); // Clear from storage
       setIsOpen(false);
     }, INACTIVITY_TIMEOUT);
   };
@@ -75,7 +76,7 @@ const ChatbotWidget = () => {
       if (sessionId !== res.data.session_id) {
         const newSessionId = res.data.session_id;
         setSessionId(newSessionId);
-        localStorage.setItem(LOCAL_STORAGE_KEY, newSessionId);
+        sessionStorage.setItem(SESSION_STORAGE_KEY, newSessionId);
       }
     } catch (error) {
       console.error("Chatbot API error:", error);
@@ -99,7 +100,16 @@ const ChatbotWidget = () => {
         <div className="chatbot-box">
           <div className="chatbot-header">
             <span>AI Assistant</span>
-            <button onClick={() => setIsOpen(false)}>×</button>
+            <button
+              onClick={() => {
+                setSessionId(null);
+                sessionStorage.removeItem(SESSION_STORAGE_KEY);
+                setMessages([]);
+                setIsOpen(false);
+              }}
+            >
+              ×
+            </button>
           </div>
           <div className="chatbot-messages">
             {messages.length === 0 && (
