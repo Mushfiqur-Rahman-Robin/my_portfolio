@@ -4,6 +4,17 @@ All notable changes to this project are documented in this file.
 
 ## 2026-07-11
 
+### Added
+- Calendly "Book a Session" integration with backend `CALENDLY_URL`/`CALENDLY_USERNAME` environment variables and `/api/v1/site-config/` endpoint.
+- "Book a Session" button on the homepage hero banner (next to "Buy Me a Coffee") with Calendly blue styling and full mobile responsiveness.
+- `SiteConfigView` API endpoint returning public site configuration.
+
+### Changed
+- Backend Dockerfile now runs as non-root `appuser` with appropriate file ownership.
+- Frontend Dockerfile now runs as non-root `nginx` user on port 8080 instead of 80.
+- `entrypoint.sh` now uses `pg_isready -U postgres` (PostgreSQL superuser) for database readiness check.
+- Frontend nginx config listens on port 8080 to support non-root operation.
+
 ### Fixed
 - Added `unique=True` constraint to `LLMCostTracking.job_name` field to enforce database-level uniqueness and prevent accidental cost-row merging from duplicate job names.
 

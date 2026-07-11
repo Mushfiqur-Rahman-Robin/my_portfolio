@@ -42,9 +42,15 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 COPY --from=builder /opt/venv /opt/venv
 COPY --from=builder /app /app
 
+# Create non-root user and set ownership
+RUN groupadd -r appuser && useradd -r -g appuser appuser \
+    && chown -R appuser:appuser /app
+
 # Entrypoint
 COPY entrypoint.sh .
 RUN chmod +x /app/entrypoint.sh
+
+USER appuser
 
 EXPOSE 8000
 ENTRYPOINT ["/app/entrypoint.sh"]

@@ -291,6 +291,24 @@ class APITests(TestCase):
 
         self.assertEqual(get_device_type(request), "unknown")
 
+    # ------------------------------------------------------------------
+    # BookingConfigView
+    # ------------------------------------------------------------------
+
+    @override_settings(CALENDLY_URL="https://calendly.com/test-user/30min", CALENDLY_USERNAME="test-user")
+    def test_booking_config_returns_calendly_settings(self):
+        response = self.client.get(reverse("booking-config"))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["calendly_url"], "https://calendly.com/test-user/30min")
+        self.assertEqual(response.data["calendly_username"], "test-user")
+
+    @override_settings(CALENDLY_URL="", CALENDLY_USERNAME="")
+    def test_booking_config_returns_empty_strings_when_not_configured(self):
+        response = self.client.get(reverse("booking-config"))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["calendly_url"], "")
+        self.assertEqual(response.data["calendly_username"], "")
+
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_contact_message_sends_email(self):
         """

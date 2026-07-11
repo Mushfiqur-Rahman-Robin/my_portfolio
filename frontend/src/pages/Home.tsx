@@ -34,11 +34,21 @@ const Home: React.FC = () => {
   const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loadingFeaturedProjects, setLoadingFeaturedProjects] = useState<boolean>(true);
+  const [calendlyUrl, setCalendlyUrl] = useState<string>("");
 
   useEffect(() => {
     // Increment visitor count on page load (backend-only)
     axios.post(`${import.meta.env.VITE_API_URL}visitor-count/`)
       .catch(err => console.error('Failed to increment visitor count:', err));
+
+    // Fetch booking configuration for Calendly
+    axios.get(`${import.meta.env.VITE_API_URL}booking-config/`)
+      .then(response => {
+        if (response.data.calendly_url) {
+          setCalendlyUrl(response.data.calendly_url);
+        }
+      })
+      .catch(err => console.error('Failed to fetch site config:', err));
 
     // Fetch up to 3 featured projects
     const fetchFeaturedProjects = async () => {
@@ -90,6 +100,17 @@ const Home: React.FC = () => {
             >
               Buy Me A Coffee
             </span>
+            {calendlyUrl && (
+              <a
+                href={calendlyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn calendly-btn"
+                title="Book a session with me on Calendly"
+              >
+                Book a Session
+              </a>
+            )}
           </div>
         </div>
       </section>

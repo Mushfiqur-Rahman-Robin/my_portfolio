@@ -11,7 +11,7 @@ This app renders the portfolio UI and consumes the Django API.
 ## Current UI conventions
 
 - Navbar desktop alignment: logo left, nav links right-aligned to match main content boundaries.
-- Hero CTA buttons: equal-height button styling for consistent vertical alignment.
+- Hero CTA buttons: equal-height button styling for consistent vertical alignment. Includes "Book a Session" (Calendly) and "Buy Me a Coffee" buttons.
 - Skills section: unified, compact skill grid (no category headers) with responsive columns.
 - Project images (home featured + all projects): fixed-size framed image area with contained fit for consistent card alignment across mixed image sizes.
 
