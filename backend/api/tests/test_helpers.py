@@ -9,7 +9,15 @@ from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory
 
 from ..models import ChatSession, Project, Tag
-from ..views import ChatbotView, get_client_ip, get_country_for_ip, get_device_type
+from ..views import (
+    ChatbotView,
+    ExperienceResultsPagination,
+    PublicReadAdminWriteMixin,
+    StandardResultsPagination,
+    get_client_ip,
+    get_country_for_ip,
+    get_device_type,
+)
 
 
 def _make_image_file():
@@ -321,3 +329,74 @@ class VisitorCountErrorTests(TestCase):
         response = self.client.post(reverse("visitor-count"), {}, format="json")
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertIn("error", response.data)
+
+
+class PaginationClassTests(TestCase):
+    def test_standard_pagination_default_page_size(self):
+        paginator = StandardResultsPagination()
+        self.assertEqual(paginator.page_size, 3)
+        self.assertEqual(paginator.page_size_query_param, "page_size")
+        self.assertEqual(paginator.max_page_size, 100)
+
+    def test_experience_pagination_default_page_size(self):
+        paginator = ExperienceResultsPagination()
+        self.assertEqual(paginator.page_size, 2)
+        self.assertEqual(paginator.page_size_query_param, "page_size")
+        self.assertEqual(paginator.max_page_size, 100)
+
+
+class PublicReadAdminWriteMixinTests(TestCase):
+    def setUp(self):
+        self.mixin = PublicReadAdminWriteMixin()
+
+    def test_get_permissions_safe_methods_allow_any(self):
+        from rest_framework.permissions import AllowAny
+
+        request = type("Request", (), {"method": "GET"})()
+        self.mixin.request = request
+        permissions = self.mixin.get_permissions()
+        self.assertEqual(len(permissions), 1)
+        self.assertIsInstance(permissions[0], AllowAny)
+
+    def test_get_permissions_unsafe_methods_is_admin(self):
+        from rest_framework.permissions import IsAdminUser
+
+        request = type("Request", (), {"method": "POST"})()
+        self.mixin.request = request
+        permissions = self.mixin.get_permissions()
+        self.assertEqual(len(permissions), 1)
+        self.assertIsInstance(permissions[0], IsAdminUser)
+
+    def test_get_permissions_patch_is_admin(self):
+        from rest_framework.permissions import IsAdminUser
+
+        request = type("Request", (), {"method": "PATCH"})()
+        self.mixin.request = request
+        permissions = self.mixin.get_permissions()
+        self.assertEqual(len(permissions), 1)
+        self.assertIsInstance(permissions[0], IsAdminUser)
+
+    def test_get_permissions_delete_is_admin(self):
+        from rest_framework.permissions import IsAdminUser
+
+        request = type("Request", (), {"method": "DELETE"})()
+        self.mixin.request = request
+        permissions = self.mixin.get_permissions()
+        self.assertEqual(len(permissions), 1)
+        self.assertIsInstance(permissions[0], IsAdminUser)
+
+    def test_get_permissions_options_is_safe(self):
+        from rest_framework.permissions import AllowAny
+
+        request = type("Request", (), {"method": "OPTIONS"})()
+        self.mixin.request = request
+        permissions = self.mixin.get_permissions()
+        self.assertIsInstance(permissions[0], AllowAny)
+
+    def test_get_permissions_head_is_safe(self):
+        from rest_framework.permissions import AllowAny
+
+        request = type("Request", (), {"method": "HEAD"})()
+        self.mixin.request = request
+        permissions = self.mixin.get_permissions()
+        self.assertIsInstance(permissions[0], AllowAny)
