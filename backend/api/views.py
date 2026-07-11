@@ -35,6 +35,7 @@ from .models import (
 from .prompt import build_chatbot_prompt
 from .serializers import (
     AchievementSerializer,
+    BookingConfigResponseSerializer,
     CertificationSerializer,
     ContactMessageSerializer,
     ExperiencePhotoSerializer,
@@ -301,6 +302,27 @@ class VisitorCountView(APIView):
                 {"error": "An internal error occurred while updating visitor count."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+class BookingConfigView(APIView):
+    """Returns booking/session configuration including Calendly integration details."""
+
+    authentication_classes = []
+    permission_classes = [AllowAny]
+    schema_tags = ["Contact & Admin"]
+
+    @extend_schema(
+        responses={200: BookingConfigResponseSerializer},
+        summary="Get booking/session configuration",
+    )
+    def get(self, request, format=None):
+        return Response(
+            {
+                "calendly_url": settings.CALENDLY_URL,
+                "calendly_username": settings.CALENDLY_USERNAME,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class ChatbotView(APIView):

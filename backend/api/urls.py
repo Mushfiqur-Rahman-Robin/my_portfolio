@@ -6,6 +6,7 @@ from rest_framework.routers import DefaultRouter
 # Import all viewsets
 from .views import (
     AchievementViewSet,
+    BookingConfigView,
     CertificationViewSet,
     ChatbotView,
     ContactMessageViewSet,
@@ -32,4 +33,5 @@ urlpatterns = [
     path("v1/", include(router.urls)),
     path("v1/visitor-count/", VisitorCountView.as_view(), name="visitor-count"),
     path("v1/chatbot/", ChatbotView.as_view(), name="chatbot"),
+    path("v1/booking-config/", BookingConfigView.as_view(), name="booking-config"),
 ]

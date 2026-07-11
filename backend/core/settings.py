@@ -193,6 +193,10 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="noreply@yourdomain.com")
 
+# Calendly integration for Book a Session feature
+CALENDLY_URL = config("CALENDLY_URL", default="")
+CALENDLY_USERNAME = config("CALENDLY_USERNAME", default="")
+
 # LOGGING configuration for CRITICAL level only and a specific email logger
 LOGGING = {
     "version": 1,

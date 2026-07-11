@@ -2,16 +2,13 @@
 set -e
 
 # Wait for the database to be ready
-until pg_isready -h db -p 5432 -U portfolio; do
+until pg_isready -h db -p 5432 -U postgres; do
   echo "Waiting for PostgreSQL to be ready..."
   sleep 2
 done
 
 # Apply migrations
 python manage.py migrate --noinput
-
-# Optionally collect static files if they need runtime updates
-python manage.py collectstatic --noinput
 
 # Wait for ChromaDB to be ready
 echo "Waiting for ChromaDB to be ready..."

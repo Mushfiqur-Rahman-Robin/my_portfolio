@@ -39,7 +39,9 @@
 - Public API with role-based access control
 - Chatbot with ChromaDB knowledge base integration
 - Visitor analytics tracking
+- Calendly "Book a Session" integration with configurable scheduling link
 - Admin dashboard with CKEditor4 rich text editing
+- Non-root container execution (backend: `appuser`, frontend: `nginx`, PostgreSQL: `postgres`)
 
 ### Repository Structure
 ```

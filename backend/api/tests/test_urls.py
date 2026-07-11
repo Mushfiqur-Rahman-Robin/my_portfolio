@@ -73,6 +73,10 @@ class APIURLTests(TestCase):
         url = reverse("chatbot")
         self.assertEqual(url, "/api/v1/chatbot/")
 
+    def test_booking_config_url(self):
+        url = reverse("booking-config")
+        self.assertEqual(url, "/api/v1/booking-config/")
+
 
 class SchemaURLTests(TestCase):
     def test_swagger_ui_url_resolves(self):

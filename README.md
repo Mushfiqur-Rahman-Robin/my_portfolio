@@ -12,6 +12,7 @@ This is the source code for my personal portfolio, built with a modern, scalable
 -   **Resume Access:** Provide an easy way to view or download the latest resume.
 -   **Visitor Counter:** Track website engagement with a simple visitor counter.
 -   **AI Chatbot:** Intelligent Q&A powered by LLMs (Gemini/OpenAI) with RAG context retrieval via ChromaDB.
+-   **Book a Session:** Calendly integration for scheduling meetings directly from the homepage.
 -   **LLM Cost Tracking:** Ledger-based tracking of chat and embedding API costs, token usage, and running totals per session.
 -   **Admin Interface:** Django admin for easy content management.
 -   **Responsive Design:** Ensures a good viewing experience across various devices.

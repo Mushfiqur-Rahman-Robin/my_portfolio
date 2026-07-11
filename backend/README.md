@@ -52,6 +52,7 @@ gzip -dc /home/mushfiq/portfolio_backups/YYYY-MM-DD_04-00-01/db_dump.sql.gz | do
 - API routes are versioned under `/api/v1/`.
 - Public read endpoints remain open for portfolio content (`GET`/safe methods), while write actions on content endpoints are now admin-only.
 - Backend logic is intentionally separate from frontend styling work.
+- Calendly integration is configured via `CALENDLY_URL` and `CALENDLY_USERNAME` environment variables. The `/api/v1/booking-config/` endpoint exposes these to the frontend for the "Book a Session" button.
 - New image uploads for portfolio models are converted to WebP at save time in backend signals. Existing stored `.png/.jpg` paths are kept as-is unless a new image is uploaded.
 - Visitor count endpoint now logs admin-only visitor analytics metadata (`ip_address`, country, device type, user-agent, timestamp) in `VisitorAnalytics`.
 - Chatbot memory now uses the most recent 20 interactions per session (user+assistant pairs) for follow-up continuity.
