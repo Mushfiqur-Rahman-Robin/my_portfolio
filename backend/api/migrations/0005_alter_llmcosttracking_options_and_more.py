@@ -4,6 +4,22 @@ import django.db.models.deletion
 from django.db import migrations, models
 
 
+def remove_duplicate_sessions(apps, schema_editor):
+    LLMCostTracking = apps.get_model("api", "LLMCostTracking")
+    from django.db.models import Count
+
+    # Find duplicate session_ids, ignoring null sessions
+    duplicates = LLMCostTracking.objects.values("session").annotate(session_count=Count("session")).filter(session_count__gt=1, session__isnull=False)
+
+    for duplicate in duplicates:
+        session_id = duplicate["session"]
+        # Get all records for this session, ordered by newest first
+        duplicate_records = LLMCostTracking.objects.filter(session_id=session_id).order_by("-created_at")
+        # Keep the first (newest), delete the rest
+        ids_to_delete = [record.id for record in list(duplicate_records)[1:]]
+        LLMCostTracking.objects.filter(id__in=ids_to_delete).delete()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -11,6 +27,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(remove_duplicate_sessions, reverse_code=migrations.RunPython.noop),
         migrations.AlterModelOptions(
             name="llmcosttracking",
             options={"ordering": ["-updated_at"], "verbose_name": "LLM Cost Tracking", "verbose_name_plural": "LLM Cost Tracking"},
