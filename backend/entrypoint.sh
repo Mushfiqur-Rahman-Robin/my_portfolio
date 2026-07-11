@@ -10,9 +10,6 @@ done
 # Apply migrations
 python manage.py migrate --noinput
 
-# Optionally collect static files if they need runtime updates
-python manage.py collectstatic --noinput
-
 # Wait for ChromaDB to be ready
 echo "Waiting for ChromaDB to be ready..."
 until curl -s -o /dev/null -w "%{http_code}" http://chromadb:8000/api/v1/heartbeat | grep -q 200; do
