@@ -8,11 +8,9 @@
 
 /* Eye-soothing Banner Section */
 .hero-banner {
-  background: linear-gradient(
-    140deg,
-    rgba(3, 16, 24, 0.9),
-    rgba(6, 32, 42, 0.92)
-  );
+  background: linear-gradient(140deg,
+      rgba(3, 16, 24, 0.9),
+      rgba(6, 32, 42, 0.92));
   padding: 4.6rem 1.6rem;
   border-radius: 18px;
   margin-bottom: 2.4rem;
@@ -39,11 +37,9 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(
-    circle at center,
-    rgba(8, 145, 178, 0.2) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(circle at center,
+      rgba(8, 145, 178, 0.2) 0%,
+      transparent 70%);
   animation: pulse-glow 15s infinite ease-in-out alternate;
   z-index: 1;
 }
@@ -53,10 +49,12 @@
     transform: scale(1) rotate(0deg);
     opacity: 0.3;
   }
+
   50% {
     transform: scale(1.2) rotate(180deg);
     opacity: 0.6;
   }
+
   100% {
     transform: scale(1) rotate(360deg);
     opacity: 0.3;
@@ -162,6 +160,23 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
+/* Calendly Book a Session Button */
+.calendly-btn {
+  background-color: #0ea5e9;
+  color: #fff;
+  border: 2px solid #0ea5e9;
+  padding: 0.75rem 1.3rem;
+  font-size: 0.95rem;
+}
+
+.calendly-btn:hover {
+  background-color: #0284c7;
+  border-color: #0284c7;
+  color: #fff;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
 /* Featured Projects Section */
 .featured-projects-section {
   margin-top: 2.3rem;
@@ -191,7 +206,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center; /* Ensure overall card content is centered */
+  text-align: center;
+  /* Ensure overall card content is centered */
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
@@ -249,7 +265,8 @@
   line-height: 1.5;
   margin-bottom: 1rem;
   flex-grow: 1;
-  text-align: center; /* IMPORTANT: Center paragraph text here */
+  text-align: center;
+  /* IMPORTANT: Center paragraph text here */
   font-size: 0.95rem;
   min-height: 4.5em;
   max-height: 4.5em;
@@ -264,7 +281,8 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.5rem;
-  justify-content: center; /* IMPORTANT: Center tag badges */
+  justify-content: center;
+  /* IMPORTANT: Center tag badges */
   margin-bottom: 1rem;
   min-height: 4.1rem;
   max-height: 4.1rem;
@@ -405,6 +423,7 @@
   .project-preview-image-frame {
     height: 155px;
   }
+
   .project-preview-description {
     font-size: 0.88rem;
     min-height: 4.5em;
@@ -420,6 +439,7 @@
     gap: 0.6rem;
     align-items: center;
   }
+
   .project-preview-actions .btn {
     width: 88%;
     max-width: 220px;

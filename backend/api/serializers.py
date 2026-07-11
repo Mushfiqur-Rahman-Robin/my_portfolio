@@ -112,3 +112,8 @@ class VisitorCountPostSerializer(serializers.Serializer):
 class VisitorCountResponseSerializer(serializers.Serializer):
     message = serializers.CharField(read_only=True)
     count = serializers.IntegerField(read_only=True)
+
+
+class BookingConfigResponseSerializer(serializers.Serializer):
+    calendly_url = serializers.CharField(read_only=True)
+    calendly_username = serializers.CharField(read_only=True)
