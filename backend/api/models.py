@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.db import models
@@ -274,43 +275,50 @@ class ChatMessage(models.Model):
 class LLMCostTracking(models.Model):
     """
     A single table to track LLM costs.
-    It acts as a ledger. Each row is a transaction (chat session or embedding),
-    and we also store the running totals in each row so the latest row has the grand total.
+    It tracks the costs per chat session or background job (like index_content).
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    session = models.ForeignKey(
+    session = models.OneToOneField(
         ChatSession,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name="costs",
-        help_text="Null for embedding costs, or linked for chat session costs",
+        related_name="cost_tracking",
+        help_text="Linked for chat session costs",
     )
+    job_name = models.CharField(max_length=255, null=True, blank=True, unique=True, help_text="Identifier for background jobs like index_content")
 
     # Operation details
-    operation_type = models.CharField(max_length=20, choices=(("chat", "Chat"), ("embedding", "Embedding")), default="chat")
+    operation_type = models.CharField(max_length=50, choices=(("chat", "Chat Session"), ("embedding", "Embedding Job")), default="chat")
     model_name = models.CharField(max_length=255, default="unknown")
 
-    # Usage for this record
-    tokens_used = models.PositiveIntegerField(default=0)
-    cost = models.DecimalField(max_digits=10, decimal_places=4, default=0.0)
+    # Usage for THIS session/job
+    session_chat_tokens = models.PositiveIntegerField(default=0)
+    session_embedding_tokens = models.PositiveIntegerField(default=0)
+    session_total_tokens = models.PositiveIntegerField(default=0)
+
+    session_chat_cost = models.DecimalField(max_digits=18, decimal_places=8, default=Decimal("0.0"))
+    session_embedding_cost = models.DecimalField(max_digits=18, decimal_places=8, default=Decimal("0.0"))
+    session_cost = models.DecimalField(max_digits=18, decimal_places=8, default=Decimal("0.0"))
 
     # Running Totals at the time of this record
-    total_chat_cost = models.DecimalField(max_digits=10, decimal_places=4, default=0.0)
-    total_embedding_cost = models.DecimalField(max_digits=10, decimal_places=4, default=0.0)
-    total_cost = models.DecimalField(max_digits=10, decimal_places=4, default=0.0)
+    total_chat_cost = models.DecimalField(max_digits=18, decimal_places=8, default=Decimal("0.0"))
+    total_embedding_cost = models.DecimalField(max_digits=18, decimal_places=8, default=Decimal("0.0"))
+    total_cost = models.DecimalField(max_digits=18, decimal_places=8, default=Decimal("0.0"))
 
     total_chat_tokens = models.PositiveIntegerField(default=0)
     total_embedding_tokens = models.PositiveIntegerField(default=0)
     total_tokens = models.PositiveIntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["-updated_at"]
         verbose_name = "LLM Cost Tracking"
         verbose_name_plural = "LLM Cost Tracking"
 
     def __str__(self):
-        return f"{self.get_operation_type_display()} | Cost: ${self.cost} | Total: ${self.total_cost}"
+        job_or_session = f"Session: {self.session.id}" if self.session else f"Job: {self.job_name}"
+        return f"{self.get_operation_type_display()} | {job_or_session} | Cost: ${self.session_cost:.8f} | Total: ${self.total_cost:.8f}"

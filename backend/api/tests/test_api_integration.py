@@ -624,7 +624,7 @@ class LLMCostTrackingTests(TestCase):
         self.assertIsNotNone(record)
         self.assertEqual(record.operation_type, "chat")
         self.assertEqual(record.model_name, "gemini-2.5-flash")
-        self.assertEqual(record.tokens_used, 1200)
+        self.assertEqual(record.session_total_tokens, 1200)
         self.assertEqual(record.session, session)
 
     def test_chat_cost_tracking_without_session(self):
@@ -645,7 +645,7 @@ class LLMCostTrackingTests(TestCase):
         self.assertIsNotNone(record)
         self.assertEqual(record.operation_type, "embedding")
         self.assertEqual(record.model_name, "text-embedding-3-small")
-        self.assertEqual(record.tokens_used, 300)
+        self.assertEqual(record.session_total_tokens, 300)
         self.assertIsNone(record.session)
 
     # ------------------------------------------------------------------
@@ -662,19 +662,12 @@ class LLMCostTrackingTests(TestCase):
         record_llm_cost("chat", "gemini-2.5-flash", 300, 50, session=session)
 
         records = list(LLMCostTracking.objects.order_by("created_at"))
-        self.assertEqual(len(records), 3)
+        self.assertEqual(len(records), 1)
 
-        self.assertEqual(records[0].total_chat_tokens, 1200)
+        self.assertEqual(records[0].session_total_tokens, 2150)
+        self.assertEqual(records[0].total_chat_tokens, 2150)
         self.assertEqual(records[0].total_embedding_tokens, 0)
-        self.assertEqual(records[0].total_tokens, 1200)
-
-        self.assertEqual(records[1].total_chat_tokens, 1800)
-        self.assertEqual(records[1].total_embedding_tokens, 0)
-        self.assertEqual(records[1].total_tokens, 1800)
-
-        self.assertEqual(records[2].total_chat_tokens, 2150)
-        self.assertEqual(records[2].total_embedding_tokens, 0)
-        self.assertEqual(records[2].total_tokens, 2150)
+        self.assertEqual(records[0].total_tokens, 2150)
 
     # ------------------------------------------------------------------
     # Running totals — sequential embedding accumulation
@@ -688,7 +681,7 @@ class LLMCostTrackingTests(TestCase):
         record_llm_cost("embedding", "gemini-embedding-2", 200, 0)
 
         records = list(LLMCostTracking.objects.order_by("created_at"))
-        self.assertEqual(len(records), 3)
+        self.assertEqual(len(records), 3)  # Without job_name, it creates 3 distinct records.
 
         self.assertEqual(records[0].total_chat_tokens, 0)
         self.assertEqual(records[0].total_embedding_tokens, 500)
@@ -714,39 +707,29 @@ class LLMCostTrackingTests(TestCase):
         record_llm_cost("embedding", "gemini-embedding-2", 200, 0)
 
         records = list(LLMCostTracking.objects.order_by("created_at"))
-        self.assertEqual(len(records), 4)
+        self.assertEqual(len(records), 3)  # 1 for session, 2 without job_name
 
-        # Record 1: chat 1200 tokens
-        self.assertEqual(records[0].tokens_used, 1200)
-        self.assertEqual(records[0].total_chat_tokens, 1200)
-        self.assertEqual(records[0].total_embedding_tokens, 0)
-        self.assertEqual(records[0].total_tokens, 1200)
-        self.assertGreater(float(records[0].total_chat_cost), 0)
-        self.assertEqual(float(records[0].total_embedding_cost), 0)
+        # Record 1: chat 1200 + 400 = 1600 tokens (this is the session record)
+        self.assertEqual(records[0].session_total_tokens, 1600)
+        self.assertEqual(records[0].total_chat_tokens, 1600)
+        self.assertEqual(records[0].total_embedding_tokens, 400)
+        self.assertEqual(records[0].total_tokens, 2000)
 
-        # Record 2: embedding 400 tokens
-        self.assertEqual(records[1].tokens_used, 400)
+        # Record 2: embedding 400 tokens (no session)
+        self.assertEqual(records[1].session_total_tokens, 400)
         self.assertEqual(records[1].total_chat_tokens, 1200)
         self.assertEqual(records[1].total_embedding_tokens, 400)
         self.assertEqual(records[1].total_tokens, 1600)
-        self.assertEqual(float(records[1].total_chat_cost), float(records[0].total_chat_cost))
-        self.assertGreater(float(records[1].total_embedding_cost), 0)
 
-        # Record 3: chat 400 tokens
-        self.assertEqual(records[2].tokens_used, 400)
+        # Record 3: embedding 200 tokens (no session)
+        self.assertEqual(records[2].session_total_tokens, 200)
         self.assertEqual(records[2].total_chat_tokens, 1600)
-        self.assertEqual(records[2].total_embedding_tokens, 400)
-        self.assertEqual(records[2].total_tokens, 2000)
-
-        # Record 4: embedding 200 tokens
-        self.assertEqual(records[3].tokens_used, 200)
-        self.assertEqual(records[3].total_chat_tokens, 1600)
-        self.assertEqual(records[3].total_embedding_tokens, 600)
-        self.assertEqual(records[3].total_tokens, 2200)
+        self.assertEqual(records[2].total_embedding_tokens, 600)
+        self.assertEqual(records[2].total_tokens, 2200)
 
         # Total cost should equal sum of individual costs
-        expected_total = sum(float(r.cost) for r in records)
-        self.assertAlmostEqual(float(records[3].total_cost), expected_total)
+        expected_total = sum(float(r.session_cost) for r in records)
+        self.assertAlmostEqual(float(records[2].total_cost), expected_total)
 
     # ------------------------------------------------------------------
     # Cost calculations — specific model prices
@@ -873,7 +856,7 @@ class LLMCostTrackingTests(TestCase):
         generate_chat_completion(messages=[{"role": "user", "content": "Hi"}], session=session)
 
         record = LLMCostTracking.objects.first()
-        self.assertEqual(record.tokens_used, 49)
+        self.assertEqual(record.session_total_tokens, 49)
 
     @override_settings(LLM_PROVIDER="openai", LLM_CHAT_MODEL="", OPENAI_API_KEY="fake-key")  # pragma: allowlist secret
     @patch("api.llm_client.OpenAI")
@@ -888,7 +871,7 @@ class LLMCostTrackingTests(TestCase):
         generate_chat_completion(messages=[{"role": "user", "content": "Hi"}], session=session)
 
         record = LLMCostTracking.objects.first()
-        self.assertEqual(record.tokens_used, 23)
+        self.assertEqual(record.session_total_tokens, 23)
         self.assertEqual(record.operation_type, "chat")
 
     # ------------------------------------------------------------------
@@ -908,7 +891,7 @@ class LLMCostTrackingTests(TestCase):
 
         record = LLMCostTracking.objects.first()
         self.assertEqual(record.operation_type, "embedding")
-        self.assertGreater(record.tokens_used, 0)
+        self.assertGreater(record.session_total_tokens, 0)
         self.assertIsNone(record.session)
 
     @override_settings(LLM_PROVIDER="openai", LLM_CHAT_MODEL="", OPENAI_API_KEY="fake-key")  # pragma: allowlist secret
@@ -924,7 +907,7 @@ class LLMCostTrackingTests(TestCase):
         self.assertEqual(result, [0.5, 0.6])
         record = LLMCostTracking.objects.first()
         self.assertEqual(record.operation_type, "embedding")
-        self.assertEqual(record.tokens_used, 10)
+        self.assertEqual(record.session_total_tokens, 10)
 
     # ------------------------------------------------------------------
     # Model __str__ and admin query count
@@ -934,8 +917,8 @@ class LLMCostTrackingTests(TestCase):
         record = LLMCostTracking.objects.create(
             operation_type="chat",
             model_name="gemini-2.5-flash",
-            tokens_used=100,
-            cost=0.00042,
+            session_total_tokens=100,
+            session_cost=0.00042,
             total_cost=0.00042,
         )
         self.assertIn("Chat", str(record))
@@ -944,13 +927,13 @@ class LLMCostTrackingTests(TestCase):
     def test_cost_tracking_uses_minimal_queries_per_insert(self):
         from ..llm_client import record_llm_cost
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(6):
             record_llm_cost("chat", "gemini-2.5-flash", 100, 50)
 
     def test_cost_tracking_uses_minimal_queries_for_embedding(self):
         from ..llm_client import record_llm_cost
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(6):
             record_llm_cost("embedding", "text-embedding-3-small", 200, 0)
 
     # ------------------------------------------------------------------
@@ -963,5 +946,8 @@ class LLMCostTrackingTests(TestCase):
         record_llm_cost("chat", "gemini-2.5-flash", 100, 50)
         record_llm_cost("chat", "gemini-2.5-flash", 200, 100)
 
-        second = LLMCostTracking.objects.order_by("-created_at").first()
+        # Use updated_at ordering (matches Meta.ordering) — the second record
+        # will always have the most recent updated_at because record_llm_cost
+        # performs two save() calls (once for the record, once for totals).
+        second = LLMCostTracking.objects.order_by("-updated_at").first()
         self.assertEqual(second.total_tokens, 450)

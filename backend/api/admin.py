@@ -238,24 +238,29 @@ class VisitorAnalyticsAdmin(admin.ModelAdmin):
 @admin.register(LLMCostTracking)
 class LLMCostTrackingAdmin(admin.ModelAdmin):
     list_display = (
-        "created_at",
+        "updated_at",
         "operation_type",
         "model_name",
-        "tokens_used",
-        "cost",
+        "session_total_tokens",
+        "session_cost",
         "total_cost",
         "total_tokens",
-        "session_link",
+        "job_or_session",
     )
-    list_filter = ("operation_type", "model_name", "created_at")
-    search_fields = ("model_name",)
+    list_filter = ("operation_type", "model_name", "updated_at")
+    search_fields = ("model_name", "job_name")
     readonly_fields = (
         "id",
         "session",
+        "job_name",
         "operation_type",
         "model_name",
-        "tokens_used",
-        "cost",
+        "session_chat_tokens",
+        "session_embedding_tokens",
+        "session_total_tokens",
+        "session_chat_cost",
+        "session_embedding_cost",
+        "session_cost",
         "total_chat_cost",
         "total_embedding_cost",
         "total_cost",
@@ -263,15 +268,18 @@ class LLMCostTrackingAdmin(admin.ModelAdmin):
         "total_embedding_tokens",
         "total_tokens",
         "created_at",
+        "updated_at",
     )
-    ordering = ["-created_at"]
+    ordering = ["-updated_at"]
 
-    def session_link(self, obj):
+    def job_or_session(self, obj):
         if obj.session:
-            return str(obj.session.id)[:8]
+            return f"Session: {str(obj.session.id)[:8]}"
+        elif obj.job_name:
+            return f"Job: {obj.job_name}"
         return "-"
 
-    session_link.short_description = "Session"
+    job_or_session.short_description = "Job/Session"
 
     def has_add_permission(self, request):
         return False

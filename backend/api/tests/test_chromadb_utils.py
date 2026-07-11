@@ -46,7 +46,7 @@ class ChromaDBUtilsTests(TestCase):
 
         add_or_update_node("doc-1", "sample content", {"type": "test"})
 
-        mock_generate_embedding.assert_called_once_with("sample content")
+        mock_generate_embedding.assert_called_once_with("sample content", job_name=None)
         mock_collection.upsert.assert_called_once_with(
             ids=["doc-1"],
             embeddings=[[0.1, 0.2, 0.3]],
@@ -95,6 +95,7 @@ class ChromaDBUtilsTests(TestCase):
     def test_query_nodes_success(self, mock_get_collection, mock_generate_embedding):
         mock_generate_embedding.return_value = [0.1, 0.2]
         mock_collection = MagicMock()
+        mock_collection.count.return_value = 10  # collection has enough docs
         mock_collection.query.return_value = {"documents": [["result1", "result2"]]}
         mock_get_collection.return_value = mock_collection
 
@@ -107,6 +108,7 @@ class ChromaDBUtilsTests(TestCase):
     def test_query_nodes_embedding_failure(self, mock_get_collection, mock_generate_embedding):
         mock_generate_embedding.side_effect = Exception("Failed")
         mock_collection = MagicMock()
+        mock_collection.count.return_value = 10
         mock_get_collection.return_value = mock_collection
 
         result = query_nodes("test query")
@@ -117,6 +119,7 @@ class ChromaDBUtilsTests(TestCase):
     def test_query_nodes_empty_embedding(self, mock_get_collection, mock_generate_embedding):
         mock_generate_embedding.return_value = None
         mock_collection = MagicMock()
+        mock_collection.count.return_value = 10
         mock_get_collection.return_value = mock_collection
 
         result = query_nodes("test query")
@@ -127,8 +130,39 @@ class ChromaDBUtilsTests(TestCase):
     def test_query_nodes_custom_n_results(self, mock_get_collection, mock_generate_embedding):
         mock_generate_embedding.return_value = [0.1, 0.2]
         mock_collection = MagicMock()
+        mock_collection.count.return_value = 10  # collection large enough
         mock_collection.query.return_value = {"documents": [["a", "b", "c", "d", "e"]]}
         mock_get_collection.return_value = mock_collection
 
         result = query_nodes("test", n_results=5)
         self.assertEqual(len(result["documents"][0]), 5)
+
+    @patch("api.chromadb_utils.generate_embedding")
+    @patch("api.chromadb_utils.get_collection")
+    def test_query_nodes_caps_n_results_to_collection_size(self, mock_get_collection, mock_generate_embedding):
+        """When the collection has fewer docs than n_results, n_results is capped."""
+        mock_generate_embedding.return_value = [0.1, 0.2]
+        mock_collection = MagicMock()
+        mock_collection.count.return_value = 3  # only 3 docs in collection
+        mock_collection.query.return_value = {"documents": [["a", "b", "c"]]}
+        mock_get_collection.return_value = mock_collection
+
+        result = query_nodes("test", n_results=4)
+
+        # query should have been called with n_results=3, not 4
+        call_kwargs = mock_collection.query.call_args[1]
+        self.assertEqual(call_kwargs["n_results"], 3)
+        self.assertEqual(result["documents"], [["a", "b", "c"]])
+
+    @patch("api.chromadb_utils.generate_embedding")
+    @patch("api.chromadb_utils.get_collection")
+    def test_query_nodes_returns_empty_when_collection_is_empty(self, mock_get_collection, mock_generate_embedding):
+        """When the collection is completely empty, return early without querying."""
+        mock_generate_embedding.return_value = [0.1, 0.2]
+        mock_collection = MagicMock()
+        mock_collection.count.return_value = 0
+        mock_get_collection.return_value = mock_collection
+
+        result = query_nodes("test query")
+        self.assertEqual(result["documents"], [[""]])
+        mock_collection.query.assert_not_called()

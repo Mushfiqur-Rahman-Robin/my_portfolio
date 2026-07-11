@@ -1,7 +1,7 @@
 # AI Agent Development Guide
 
-**Last Updated:** July 3, 2026
-**Version:** 1.0
+**Last Updated:** July 11, 2026
+**Version:** 1.1
 **Purpose:** Comprehensive reference for AI agents to manage portfolio project development, testing, and deployment.
 
 ---
@@ -279,7 +279,7 @@ pytest api/tests/test_api_integration.py::APITests::test_create_project_requires
 ```
 
 #### Test Results Expected
-- **Total Tests:** 264+
+- **Total Tests:** 266
 - **Pass Rate:** 100%
 - **Duration:** ~25-30 seconds
 - **Key Test:** `test_create_project_requires_admin` (validates admin-only write access)
@@ -703,6 +703,6 @@ docker compose exec -T db psql -U portfolio -d portfolio_db
 
 ---
 
-**Last Updated:** July 3, 2026
+**Last Updated:** July 11, 2026
 **Maintained by:** AI Development Team
 **Questions?** Refer to specific service README.md files in respective directories.

@@ -62,10 +62,11 @@ def get_chroma_collection_name():
     return f"portfolio_knowledge_{safe_name}"
 
 
-def record_llm_cost(operation_type, model_name, input_tokens, output_tokens, session=None):
+def record_llm_cost(operation_type, model_name, input_tokens, output_tokens, session=None, job_name=None):
     from decimal import Decimal
 
     from django.db import transaction
+    from django.db.models import Sum
 
     from .models import LLMCostTracking
     from .pricing import calculate_chat_cost, calculate_embedding_cost
@@ -77,39 +78,52 @@ def record_llm_cost(operation_type, model_name, input_tokens, output_tokens, ses
     else:
         total_transaction_cost = calculate_embedding_cost(model_name, input_tokens)
 
+    total_transaction_cost = Decimal(str(total_transaction_cost))
+
     try:
         with transaction.atomic():
-            last_record = LLMCostTracking.objects.select_for_update().order_by("-created_at").first()
+            if session:
+                record, _ = LLMCostTracking.objects.select_for_update().get_or_create(session=session, defaults={"operation_type": "chat"})
+            elif job_name:
+                record, _ = LLMCostTracking.objects.select_for_update().get_or_create(job_name=job_name, defaults={"operation_type": "embedding"})
+            else:
+                record = LLMCostTracking.objects.create(operation_type=operation_type)
 
-            new_record = LLMCostTracking(
-                session=session,
-                operation_type=operation_type,
-                model_name=model_name,
-                tokens_used=total_tx_tokens,
-                cost=total_transaction_cost,
-            )
-
-            if last_record:
-                new_record.total_chat_cost = last_record.total_chat_cost
-                new_record.total_embedding_cost = last_record.total_embedding_cost
-                new_record.total_cost = last_record.total_cost
-                new_record.total_chat_tokens = last_record.total_chat_tokens
-                new_record.total_embedding_tokens = last_record.total_embedding_tokens
-                new_record.total_tokens = last_record.total_tokens
+            record.model_name = model_name
 
             if operation_type == "chat":
-                new_record.total_chat_cost = Decimal(str(new_record.total_chat_cost)) + total_transaction_cost
-                new_record.total_chat_tokens += total_tx_tokens
+                record.session_chat_tokens += total_tx_tokens
+                record.session_chat_cost += total_transaction_cost
             else:
-                new_record.total_embedding_cost = Decimal(str(new_record.total_embedding_cost)) + total_transaction_cost
-                new_record.total_embedding_tokens += total_tx_tokens
+                record.session_embedding_tokens += total_tx_tokens
+                record.session_embedding_cost += total_transaction_cost
 
-            new_record.total_cost = Decimal(str(new_record.total_cost)) + total_transaction_cost
-            new_record.total_tokens += total_tx_tokens
+            record.session_total_tokens += total_tx_tokens
+            record.session_cost += total_transaction_cost
+            record.save()
 
-            new_record.save()
+            # Re-calculate global running totals from all records
+            totals = LLMCostTracking.objects.aggregate(
+                sum_chat_cost=Sum("session_chat_cost"),
+                sum_embedding_cost=Sum("session_embedding_cost"),
+                sum_cost=Sum("session_cost"),
+                sum_chat_tokens=Sum("session_chat_tokens"),
+                sum_embedding_tokens=Sum("session_embedding_tokens"),
+                sum_tokens=Sum("session_total_tokens"),
+            )
+
+            record.total_chat_cost = totals["sum_chat_cost"] or Decimal("0.0")
+            record.total_embedding_cost = totals["sum_embedding_cost"] or Decimal("0.0")
+            record.total_cost = totals["sum_cost"] or Decimal("0.0")
+            record.total_chat_tokens = totals["sum_chat_tokens"] or 0
+            record.total_embedding_tokens = totals["sum_embedding_tokens"] or 0
+            record.total_tokens = totals["sum_tokens"] or 0
+
+            # Save the updated running totals on this record
+            record.save()
     except Exception as e:
         logger.error(f"Failed to record LLM cost: {e}", exc_info=True)
+        raise e
 
 
 def generate_chat_completion(messages, max_tokens=512, temperature=0.2, session=None):
@@ -180,7 +194,7 @@ def generate_chat_completion(messages, max_tokens=512, temperature=0.2, session=
         return completion.choices[0].message.content
 
 
-def generate_embedding(text):
+def generate_embedding(text, session=None, job_name=None):
     from .pricing import estimate_token_count
 
     provider = _get_provider()
@@ -198,7 +212,7 @@ def generate_embedding(text):
         )
 
         in_tokens = estimate_token_count(text)
-        record_llm_cost("embedding", model, in_tokens, 0)
+        record_llm_cost("embedding", model, in_tokens, 0, session=session, job_name=job_name)
 
         return result.embeddings[0].values
 
@@ -215,6 +229,6 @@ def generate_embedding(text):
             in_tokens = int(in_tokens)
         except (TypeError, ValueError):
             in_tokens = estimate_token_count(text)
-        record_llm_cost("embedding", model, in_tokens, 0)
+        record_llm_cost("embedding", model, in_tokens, 0, session=session, job_name=job_name)
 
         return resp.data[0].embedding

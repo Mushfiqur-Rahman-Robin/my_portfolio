@@ -20,10 +20,10 @@ def get_collection():
     return client.get_or_create_collection(collection_name)
 
 
-def add_or_update_node(doc_id, content, metadata):
+def add_or_update_node(doc_id, content, metadata, job_name=None):
     """Adds a new node or updates an existing one in ChromaDB."""
     try:
-        embedding = generate_embedding(content)
+        embedding = generate_embedding(content, job_name=job_name)
     except Exception as e:
         print(f"Error generating embedding for node {doc_id}: {e}")
         return
@@ -44,10 +44,14 @@ def delete_node(doc_id):
         print(f"Could not delete node {doc_id} (it may not exist): {e}")
 
 
-def query_nodes(query, n_results=4):
-    """Queries the collection for the most relevant nodes."""
+def query_nodes(query, n_results=4, session=None):
+    """Queries the collection for the most relevant nodes.
+
+    Automatically caps n_results to the number of documents in the collection
+    to avoid ChromaDB warnings when the collection is smaller than n_results.
+    """
     try:
-        embedding = generate_embedding(query)
+        embedding = generate_embedding(query, session=session)
     except Exception as e:
         print(f"Error generating embedding for query: {e}")
         return {"documents": [[""]]}
@@ -56,5 +60,14 @@ def query_nodes(query, n_results=4):
         return {"documents": [[""]]}
 
     collection = get_collection()
+
+    # Cap n_results to avoid querying more than what exists in the collection.
+    # ChromaDB emits a WARNING (and silently adjusts anyway) when n_results
+    # exceeds the document count; we handle it explicitly here.
+    actual_count = collection.count()
+    if actual_count == 0:
+        return {"documents": [[""]]}
+    n_results = min(n_results, actual_count)
+
     results = collection.query(query_embeddings=[embedding], n_results=n_results)
     return results

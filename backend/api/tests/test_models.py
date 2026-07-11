@@ -67,8 +67,8 @@ class ModelStrTests(TestCase):
         cls.llm_cost = LLMCostTracking.objects.create(
             operation_type="chat",
             model_name="gemini-2.5-flash",
-            tokens_used=200,
-            cost=0.0010,
+            session_total_tokens=200,
+            session_cost=0.0010,
             total_cost=0.0050,
         )
 
@@ -159,8 +159,8 @@ class ModelStrTests(TestCase):
         record = LLMCostTracking.objects.create(
             operation_type="embedding",
             model_name="text-embedding-3-small",
-            tokens_used=100,
-            cost=0.0002,
+            session_total_tokens=100,
+            session_cost=0.0002,
             total_cost=0.0008,
         )
         s = str(record)
@@ -206,7 +206,7 @@ class ModelMetaTests(TestCase):
         self.assertEqual(ChatMessage._meta.ordering, ["created_at"])
 
     def test_llm_cost_tracking_ordering(self):
-        self.assertEqual(LLMCostTracking._meta.ordering, ["-created_at"])
+        self.assertEqual(LLMCostTracking._meta.ordering, ["-updated_at"])
 
     def test_verbose_names(self):
         self.assertEqual(Project._meta.verbose_name, "Project")
@@ -312,11 +312,11 @@ class ModelFieldDefaultsTests(TestCase):
         self.assertEqual(va.user_agent, "")
 
     def test_llm_cost_tracking_defaults(self):
-        record = LLMCostTracking.objects.create(tokens_used=10)
+        record = LLMCostTracking.objects.create(session_total_tokens=10)
         self.assertEqual(record.operation_type, "chat")
         self.assertEqual(record.model_name, "unknown")
-        self.assertEqual(record.tokens_used, 10)
-        self.assertEqual(float(record.cost), 0.0)
+        self.assertEqual(record.session_total_tokens, 10)
+        self.assertEqual(float(record.session_cost), 0.0)
 
     def test_experience_end_date_nullable(self):
         exp = Experience.objects.create(

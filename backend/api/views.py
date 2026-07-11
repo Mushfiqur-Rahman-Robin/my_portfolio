@@ -371,7 +371,7 @@ class ChatbotView(APIView):
                 special_context.append(f"He has the following publications: {pub_titles}.")
 
             # 3. Retrieve general context from ChromaDB
-            results = query_nodes(query, n_results=4)
+            results = query_nodes(query, n_results=4, session=session)
             retrieved_context = "\n\n".join(results["documents"][0]) if results.get("documents") and results["documents"][0] else ""
 
             # Combine all context

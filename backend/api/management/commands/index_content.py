@@ -21,6 +21,12 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        from django.utils.timezone import now
+
+        # Include microseconds so two simultaneous runs never share a job_name
+        # and accidentally merge their cost rows in LLMCostTracking.
+        job_name = f"index_content_{now().strftime('%Y%m%d_%H%M%S_%f')}"
+
         self.stdout.write(self.style.SUCCESS("Starting content indexing..."))
         collection = get_collection()
 
@@ -61,6 +67,7 @@ class Command(BaseCommand):
             doc_id="static-about-me",
             content=f"About Md Mushfiqur Rahman: {about_me_text}",
             metadata={"type": "about", "title": "About Md Mushfiqur Rahman"},
+            job_name=job_name,
         )
         self.stdout.write(self.style.SUCCESS("Indexed 'About Me' content."))
 
@@ -104,7 +111,7 @@ class Command(BaseCommand):
             "Web-scrapping (BeautifulSoup, Selenium)",
         ]
         skills_text = f"Md Mushfiqur Rahman's skills include: {', '.join(skills_list)}."
-        add_or_update_node(doc_id="static-skills", content=skills_text, metadata={"type": "skills", "title": "Skills"})
+        add_or_update_node(doc_id="static-skills", content=skills_text, metadata={"type": "skills", "title": "Skills"}, job_name=job_name)
         self.stdout.write(self.style.SUCCESS("Indexed 'Skills' content."))
 
         # NEW: Index Contact Information
@@ -115,7 +122,9 @@ class Command(BaseCommand):
         - GitHub: https://github.com/Mushfiqur-Rahman-Robin
         He can be reached for collaborations, inquiries, or general contact through these professional channels.
         """
-        add_or_update_node(doc_id="static-contact-info", content=contact_info_text, metadata={"type": "contact", "title": "Contact Information"})
+        add_or_update_node(
+            doc_id="static-contact-info", content=contact_info_text, metadata={"type": "contact", "title": "Contact Information"}, job_name=job_name
+        )
         self.stdout.write(self.style.SUCCESS("Indexed 'Contact' content."))
 
         # --- 2. Index Dynamic Content from Database ---
@@ -125,32 +134,34 @@ class Command(BaseCommand):
         for project in Project.objects.all():
             cleaned_description = clean_html(project.description)
             content = f"Project Title: {project.title}\nDescription: {cleaned_description}"
-            add_or_update_node(f"project-{project.id}", content, {"type": "project", "title": project.title})
+            add_or_update_node(f"project-{project.id}", content, {"type": "project", "title": project.title}, job_name=job_name)
         self.stdout.write(self.style.SUCCESS(f"Indexed {Project.objects.count()} projects."))
 
         # Index Experiences (work_details now stores HTML, so clean it)
         for exp in Experience.objects.all():
             cleaned_work_details = clean_html(exp.work_details)
             content = f"Experience at {exp.company_name} as {exp.job_title}\nDetails: {cleaned_work_details}"
-            add_or_update_node(f"experience-{exp.id}", content, {"type": "experience", "title": f"{exp.job_title} at {exp.company_name}"})
+            add_or_update_node(
+                f"experience-{exp.id}", content, {"type": "experience", "title": f"{exp.job_title} at {exp.company_name}"}, job_name=job_name
+            )
         self.stdout.write(self.style.SUCCESS(f"Indexed {Experience.objects.count()} experiences."))
 
         # Index Certifications
         for cert in Certification.objects.all():
             content = f"Certification: {cert.name}\nIssued by: {cert.issuing_organization}"
-            add_or_update_node(f"certification-{cert.id}", content, {"type": "certification", "title": cert.name})
+            add_or_update_node(f"certification-{cert.id}", content, {"type": "certification", "title": cert.name}, job_name=job_name)
         self.stdout.write(self.style.SUCCESS(f"Indexed {Certification.objects.count()} certifications."))
 
         # Index Publications
         for pub in Publication.objects.all():
             content = f"Publication: {pub.title}\nAuthors: {pub.authors}\nConference: {pub.conference}"
-            add_or_update_node(f"publication-{pub.id}", content, {"type": "publication", "title": pub.title})
+            add_or_update_node(f"publication-{pub.id}", content, {"type": "publication", "title": pub.title}, job_name=job_name)
         self.stdout.write(self.style.SUCCESS(f"Indexed {Publication.objects.count()} publications."))
 
         # Index Achievements
         for ach in Achievement.objects.all():
             content = f"Achievement: {ach.title}\nDescription: {ach.description}"
-            add_or_update_node(f"achievement-{ach.id}", content, {"type": "achievement", "title": ach.title})
+            add_or_update_node(f"achievement-{ach.id}", content, {"type": "achievement", "title": ach.title}, job_name=job_name)
         self.stdout.write(self.style.SUCCESS(f"Indexed {Achievement.objects.count()} achievements."))
 
         # Index latest Resume
@@ -160,7 +171,7 @@ class Command(BaseCommand):
             if os.path.exists(pdf_path):
                 content = extract_pdf_text(pdf_path)
                 if content:
-                    add_or_update_node(f"resume-{latest_resume.id}", content, {"type": "resume", "title": latest_resume.title})
+                    add_or_update_node(f"resume-{latest_resume.id}", content, {"type": "resume", "title": latest_resume.title}, job_name=job_name)
                     self.stdout.write(self.style.SUCCESS("Indexed latest resume."))
             else:
                 self.stdout.write(self.style.WARNING(f"Resume PDF not found at path: {pdf_path}"))

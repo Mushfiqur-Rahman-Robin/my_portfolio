@@ -2,15 +2,30 @@
 
 All notable changes to this project are documented in this file.
 
+## 2026-07-11
+
+### Fixed
+- Added `unique=True` constraint to `LLMCostTracking.job_name` field to enforce database-level uniqueness and prevent accidental cost-row merging from duplicate job names.
+
+## 2026-07-04
+
+### Fixed
+- Fixed ChromaDB `WARNING: Number of requested results N is greater than number of elements in index` by capping `n_results` in `query_nodes()` to the actual collection document count before querying. Returns an empty result immediately if the collection contains zero documents.
+- Fixed `job_name` collision risk in `index_content` command: timestamp now includes microseconds (`%Y%m%d_%H%M%S_%f`) so two simultaneous runs can never share a name and accidentally merge their cost rows into one `LLMCostTracking` record.
+- Fixed `test_concurrent_write_safety_via_select_for_update` test using `order_by("-updated_at")` instead of `order_by("-created_at")` to match `LLMCostTracking.Meta.ordering` and eliminate a sub-millisecond timing fragility.
+- Added two new tests for the ChromaDB capping behaviour: `test_query_nodes_caps_n_results_to_collection_size` and `test_query_nodes_returns_empty_when_collection_is_empty`.
+
 ## 2026-07-03
 
 ### Added
-- Added `LLMCostTracking` model and migrations (`0003_llmcosttracking`, `0004_alter_llmcosttracking_decimal_places`) for per-transaction cost ledger, tracking chat and embedding API costs with running totals stored at 4 decimal places (e.g., `0.2099`).
+- Refactored `LLMCostTracking` model to consolidate token usage and costs into a single database row per chat session or background indexing job, moving away from per-transaction ledgers.
+- Increased financial tracking precision from 4 to 8 decimal places (e.g., `0.00002100`) for precise accounting of small micro-transactions.
+- Added `job_name` field to identify background indexing jobs (e.g., `index_content`).
 - Added `api/pricing.py` with model-specific pricing constants (Gemini 2.5 Flash, GPT-4.1-mini, gemini-embedding-2, text-embedding-3-small, etc.) and cost calculation helpers using `Decimal` arithmetic for exact monetary precision.
-- Integrated cost tracking into `generate_chat_completion` (records chat cost per session using real API token counts) and `generate_embedding` (records embedding cost per call).
-- Registered read-only `LLMCostTracking` admin view with operation type, model, tokens, cost, running totals, and session link.
-- Added comprehensive test suite (`LLMCostTrackingTests`) for cost tracking: record creation, running totals accumulation, chat+embedding mixed tracking, pricing calculations, token estimation, query count verification, and concurrent write safety.
-- Added `select_for_update()` row locking in `record_llm_cost` to prevent race conditions when multiple concurrent writes update running totals.
+- Integrated cost tracking into `generate_chat_completion` (records chat cost per session) and `generate_embedding` (records embedding cost per job/session).
+- Registered read-only `LLMCostTracking` admin view with operation type, model, session total tokens, session cost, running totals, and session/job link.
+- Added comprehensive test suite (`LLMCostTrackingTests`) for cost tracking: record creation, session consolidation, chat+embedding mixed tracking, pricing calculations, token estimation, and query count verification.
+- Implemented `select_for_update()` row locking with `get_or_create()` in `record_llm_cost` to prevent race conditions when updating session-level totals and recalculating global totals.
 
 ### Fixed
 - Fixed `int()` conversion in token extraction from Gemini `usage_metadata` and OpenAI `usage` to handle Mock objects in tests.
