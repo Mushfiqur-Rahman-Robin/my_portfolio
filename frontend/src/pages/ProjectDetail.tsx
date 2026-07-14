@@ -82,7 +82,7 @@ const ProjectDetail: React.FC = () => {
       <h1 className="project-title">{project.title}</h1>
 
       {project.image && (
-        <img src={project.image} alt={project.title} className="project-main-image" />
+        <img src={project.image} alt={project.title} className="project-main-image" decoding="async" />
       )}
 
       {project.gallery_images && project.gallery_images.length > 0 && (
@@ -96,6 +96,8 @@ const ProjectDetail: React.FC = () => {
                 key={img.id}
                 src={img.image}
                 alt={img.caption}
+                loading="lazy"
+                decoding="async"
                 className={`thumbnail-image ${selectedGalleryImage === img.image ? 'active' : ''}`}
                 onClick={() => setSelectedGalleryImage(img.image)}
               />

@@ -191,7 +191,7 @@ const ProjectList: React.FC = () => {
                 <h2>{truncateText(project.title, 74)}</h2>
                 {project.image && (
                   <div className="project-card-image-frame">
-                    <img src={project.image} alt={project.title} />
+                    <img src={project.image} alt={project.title} loading="lazy" decoding="async" />
                   </div>
                 )}
                 <p>

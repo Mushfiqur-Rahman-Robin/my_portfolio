@@ -1,20 +1,28 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar.tsx';
 import Footer from './components/Footer.tsx';
 import Home from './pages/Home.tsx';
-import About from './pages/About.tsx';
-import Contact from './pages/Contact.tsx';
-import ProjectList from './components/ProjectList.tsx';
-import ProjectDetail from './pages/ProjectDetail.tsx';
-import Resume from './pages/Resume.tsx';
-import ExperienceList from './pages/ExperienceList.tsx';
-import ExperienceDetail from './pages/ExperienceDetail.tsx';
-import CertificationList from './pages/CertificationList.tsx';
-import AchievementList from './pages/AchievementList.tsx';
-import PublicationList from './pages/PublicationList.tsx';
-import ChatbotWidget from './components/ChatbotWidget.tsx';
+
+const About = lazy(() => import('./pages/About.tsx'));
+const Contact = lazy(() => import('./pages/Contact.tsx'));
+const ProjectList = lazy(() => import('./components/ProjectList.tsx'));
+const ProjectDetail = lazy(() => import('./pages/ProjectDetail.tsx'));
+const Resume = lazy(() => import('./pages/Resume.tsx'));
+const ExperienceList = lazy(() => import('./pages/ExperienceList.tsx'));
+const ExperienceDetail = lazy(() => import('./pages/ExperienceDetail.tsx'));
+const CertificationList = lazy(() => import('./pages/CertificationList.tsx'));
+const AchievementList = lazy(() => import('./pages/AchievementList.tsx'));
+const PublicationList = lazy(() => import('./pages/PublicationList.tsx'));
+const ChatbotWidget = lazy(() => import('./components/ChatbotWidget.tsx'));
 
 import './App.css';
+
+const PageLoader = () => (
+  <div className="loading-message" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
+    Loading...
+  </div>
+);
 
 function App() {
   return (
@@ -22,23 +30,27 @@ function App() {
       <div className="app-container">
         <Navbar />
         <main className="content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/projects" element={<ProjectList />} />
-            <Route path="/projects/:id" element={<ProjectDetail />} />
-            <Route path="/resume" element={<Resume />} />
-            <Route path="/experience" element={<ExperienceList />} />
-            <Route path="/experience/:id" element={<ExperienceDetail />} />
-            <Route path="/certifications" element={<CertificationList />} />
-            <Route path="/achievements" element={<AchievementList />} />
-            <Route path="/publications" element={<PublicationList />} />
-            <Route path="/contact" element={<Contact />} />
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/projects" element={<ProjectList />} />
+              <Route path="/projects/:id" element={<ProjectDetail />} />
+              <Route path="/resume" element={<Resume />} />
+              <Route path="/experience" element={<ExperienceList />} />
+              <Route path="/experience/:id" element={<ExperienceDetail />} />
+              <Route path="/certifications" element={<CertificationList />} />
+              <Route path="/achievements" element={<AchievementList />} />
+              <Route path="/publications" element={<PublicationList />} />
+              <Route path="/contact" element={<Contact />} />
+            </Routes>
+          </Suspense>
         </main>
         <Footer />
       </div>
-      <ChatbotWidget />
+      <Suspense fallback={null}>
+        <ChatbotWidget />
+      </Suspense>
     </Router>
   );
 }

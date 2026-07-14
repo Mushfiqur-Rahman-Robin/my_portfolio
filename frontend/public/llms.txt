@@ -1,0 +1,15 @@
+# Portfolio of Md Mushfiqur Rahman
+
+## About
+Md Mushfiqur Rahman is an AI/ML Engineer, Strategist, and Problem Solver specializing in ML, Generative AI, and agentic solutions.
+
+## Key Pages
+- [Home](https://mushfiqurrahmanrobin.com): Overview and featured projects
+- [About](https://mushfiqurrahmanrobin.com/about): Professional background and skills
+- [Projects](https://mushfiqurrahmanrobin.com/projects): Portfolio of AI/ML projects
+- [Experience](https://mushfiqurrahmanrobin.com/experience): Professional work history
+- [Publications](https://mushfiqurrahmanrobin.com/publications): Research publications
+- [Certifications](https://mushfiqurrahmanrobin.com/certifications): Professional certifications
+- [Achievements](https://mushfiqurrahmanrobin.com/achievements): Notable achievements
+- [Resume](https://mushfiqurrahmanrobin.com/resume): Downloadable resume
+- [Contact](https://mushfiqurrahmanrobin.com/contact): Get in touch

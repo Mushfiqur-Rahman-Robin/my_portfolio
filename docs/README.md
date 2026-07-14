@@ -61,5 +61,5 @@ Comprehensive reference guide for AI agents and developers to manage the project
 
 ---
 
-**Last Updated:** May 3, 2026
+**Last Updated:** July 15, 2026
 **Note:** All documentation excludes sensitive secrets (API keys, passwords, database credentials). Use `.env` files and environment variables for sensitive configuration.

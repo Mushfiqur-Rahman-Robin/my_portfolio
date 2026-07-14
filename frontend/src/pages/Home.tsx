@@ -129,7 +129,7 @@ const Home: React.FC = () => {
                     <h3>{truncateText(project.title, 74)}</h3>
                     {project.image && (
                       <div className="project-preview-image-frame">
-                        <img src={project.image} alt={project.title} className="project-preview-image" />
+                        <img src={project.image} alt={project.title} className="project-preview-image" loading="lazy" decoding="async" />
                       </div>
                     )}
                     <p className="project-preview-description">

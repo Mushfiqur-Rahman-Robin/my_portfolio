@@ -2,6 +2,27 @@
 
 All notable changes to this project are documented in this file.
 
+## 2026-07-15
+
+### Performance & SEO
+- Created proper `robots.txt` (plain text) to fix invalid robots.txt error reported by PageSpeed Insights.
+- Created `llms.txt` with H1 header and links for AI/LLM crawler discoverability.
+- Added SEO meta tags: `<meta name="description">`, Open Graph (`og:title`, `og:description`, `og:type`, `og:url`, `og:site_name`), Twitter Card (`twitter:card`, `twitter:title`, `twitter:description`), and canonical URL.
+- Added `<link rel="preconnect">` for `fonts.googleapis.com`, `fonts.gstatic.com`, and `api.mushfiqurrahmanrobin.com` to reduce connection latency.
+- Replaced render-blocking Google Fonts CSS `@import` with non-blocking `<link>` pattern (`media="print" onload="this.media='all'"` + `<noscript>` fallback).
+- Added `<link rel="preload">` for Google Fonts stylesheet to prioritize critical font loading.
+- Added `Cache-Control` headers to nginx config: static assets (1-year immutable cache), robots.txt/llms.txt (1-day cache), HTML (no-cache).
+- Added `loading="lazy"` and `decoding="async"` attributes to below-the-fold images for improved LCP.
+- Added `decoding="async"` to main project image in ProjectDetail for faster decoding.
+- Implemented Vite code splitting: vendor chunk (React/ReactDOM/ReactRouter), axios chunk, and lazy-loaded route chunks.
+- Used `React.lazy()` + `Suspense` for all non-Home routes and ChatbotWidget to reduce initial bundle size and unused JavaScript.
+
+### Changed
+- Vite build now generates separate chunks: vendor (~34 KiB), axios (~42 KiB), app core (~188 KiB), plus per-route lazy chunks (~2-3 KiB each).
+- Google Fonts loading moved from CSS `@import` to HTML `<link>` with non-blocking pattern.
+- CSS bundle split: critical base styles (~14 KiB) loaded eagerly; component/page CSS loaded on demand via lazy routes.
+- nginx now serves `robots.txt` and `llms.txt` from root with explicit location blocks.
+
 ## 2026-07-11
 
 ### Added
