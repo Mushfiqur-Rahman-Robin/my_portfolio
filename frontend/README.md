@@ -64,3 +64,25 @@ This keeps API calls same-origin in both Docker and local dev proxy mode.
 cd frontend
 npm run build
 ```
+
+## Tests
+
+The frontend uses [Vitest](https://vitest.dev) with [jsdom](https://github.com/jsdom/jsdom) and
+[@testing-library/react](https://testing-library.com/docs/react-testing-library/intro/).
+
+```bash
+cd frontend
+npm test          # watch mode
+npm run test:run  # one-shot (used in CI)
+npm run coverage  # one-shot with v8 coverage report
+```
+
+Conventions:
+
+- Test files live next to the code they cover (or under `src/test/`) and match
+  `*.{test,spec}.{ts,tsx}`.
+- Global matchers (`toBeInTheDocument`, …) and the Vitest globals (`describe`,
+  `it`, `expect`, `vi`) are configured in `src/test/setup.ts` and
+  `src/test/vitest-env.d.ts`; no per-file imports of those globals are needed.
+- Configuration lives in `vitest.config.ts`; the Vite config in `vite.config.ts`
+  is untouched so the production build is unaffected.

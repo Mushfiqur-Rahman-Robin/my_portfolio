@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file.
 
 ## 2026-07-15
 
+### Testing (frontend)
+- Introduced a frontend test harness: Vitest 3 + jsdom 24 + @testing-library/react 16 + @testing-library/jest-dom + @testing-library/user-event, pinned to versions that support the project's Node 18 toolchain.
+- Added `vitest.config.ts` (jsdom environment, global matchers, v8 coverage) without touching the production `vite.config.ts`, so the build pipeline is unchanged.
+- Added `src/test/setup.ts` (jest-dom matchers, `matchMedia`/`IntersectionObserver` jsdom stubs, per-test cleanup) and `src/test/vitest-env.d.ts` for Vitest global types.
+- Added `npm test` / `npm run test:run` / `npm run coverage` scripts to `frontend/package.json`.
+- Added foundational tests that lock in the critical `index.html` shell contract (lang/viewport, meta/canonical/OG, API preconnect, inline hero, deferred entry script) plus RTL smoke tests for `<Footer />` and `<Navbar />` (router, mobile-menu toggle, cleanup). These guard the PageSpeed-critical markup against silent regressions in later performance PRs.
+- Updated `frontend/README.md` and root `README.md` to document the frontend test workflow.
+
 ### Performance & SEO
 - Created proper `robots.txt` (plain text) to fix invalid robots.txt error reported by PageSpeed Insights.
 - Created `llms.txt` with H1 header and links for AI/LLM crawler discoverability.

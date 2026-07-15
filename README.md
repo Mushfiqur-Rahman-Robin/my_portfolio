@@ -24,7 +24,7 @@ This is the source code for my personal portfolio, built with a modern, scalable
     -   API Documentation: `drf-spectacular`
 -   **Frontend**: React (Vite + TypeScript)
 -   **DevOps**: Docker, Docker Compose, GitHub Actions
--   **Tooling**: `uv` (Python package manager), `ruff` (linter), `pytest` (testing), `npm` (Node package manager), `pre-commit`
+-   **Tooling**: `uv` (Python package manager), `ruff` (linter), `pytest` (backend testing), `npm` (Node package manager), `vitest` (frontend testing), `pre-commit`
 
 ## Project Structure
 
@@ -85,7 +85,7 @@ Contributions are welcome! If you'd like to contribute to this project, please f
 1.  **Fork the repository.**
 2.  **Create a new branch** for your feature or bug fix: `git checkout -b feature-name` or `git checkout -b fix-name`.
 3.  **Make your changes** and commit them with clear, descriptive messages.
-4.  **Ensure your code adheres to the project's linting standards** (run `pre-commit run --all-files` if configured).
+4.  **Ensure your code adheres to the project's linting standards** (run `pre-commit run --all-files` if configured, and run the test suites: `pytest` in `backend/`, `npm run test:run` in `frontend/`).
 5.  **Push your changes** to your forked repository.
 6.  **Open a pull request** to the main repository, detailing the changes you've made.
 
