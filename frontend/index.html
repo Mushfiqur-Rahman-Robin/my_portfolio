@@ -2,34 +2,77 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/react.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Portfolio of Md Mushfiqur Rahman - AI/ML Engineer and Strategist specializing in Machine Learning, Generative AI, and agentic solutions." />
+    <title>Portfolio of Mushfiq</title>
+    <meta name="description" content="Portfolio of Md Mushfiqur Rahman — AI/ML Engineer and Strategist specializing in Machine Learning, Generative AI, and agentic solutions." />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#031018" />
 
     <meta property="og:title" content="Portfolio of Md Mushfiqur Rahman" />
     <meta property="og:description" content="AI/ML Engineer | Strategist | Problem Solver. Empowering systems with intelligence through ML, Generative AI, and agentic solutions." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://mushfiqurrahmanrobin.com" />
     <meta property="og:site_name" content="Mushfiqur Rahman Portfolio" />
+    <meta property="og:image" content="https://mushfiqurrahmanrobin.com/website_about.webp" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Portfolio of Md Mushfiqur Rahman" />
     <meta name="twitter:description" content="AI/ML Engineer | Strategist | Problem Solver. Empowering systems with intelligence." />
+    <meta name="twitter:image" content="https://mushfiqurrahmanrobin.com/website_about.webp" />
 
     <link rel="canonical" href="https://mushfiqurrahmanrobin.com" />
+    <link rel="icon" type="image/svg+xml" href="/react.svg" />
+    <link rel="apple-touch-icon" href="/react.svg" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://api.mushfiqurrahmanrobin.com" />
 
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" />
     <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" />
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" /></noscript>
 
-    <title>Portfolio of Mushfiq</title>
+    <style>
+      :root{--color-black-background:#031018;--color-green-accent:#0891b2;--color-green-accent-hover:#0e7490;--color-green-accent-light:#22b4d2;--color-white-text:#f0f9ff;--color-light-gray-text:rgba(240,249,255,0.82);--color-darker-gray-elements:#06202a;--color-border-subtle:rgba(8,145,178,0.4);color-scheme:dark;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.5;color:rgba(240,249,255,0.82);background-color:#031018;font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+      *,*::before,*::after{box-sizing:border-box}
+      body,html{margin:0;min-height:100vh;overflow-x:hidden;background:radial-gradient(circle at top,rgba(8,145,178,.12),transparent 45%),#031018}
+      body{display:flex;flex-direction:column}
+      h1{color:#f0f9ff;font-size:clamp(2.4rem,5vw,4rem);line-height:1.1;font-weight:700;margin:0 0 .5em}
+      h1,h2{text-shadow:0 0 22px rgba(8,145,178,.45)}
+      .navbar{position:sticky;top:0;z-index:100;background-color:#06202a;border-bottom:1px solid rgba(8,145,178,.4);padding:.85rem 1rem}
+      .hero-banner{background:linear-gradient(140deg,rgba(3,16,24,.9),rgba(6,32,42,.92));padding:4.6rem 1.6rem;border-radius:18px;margin-bottom:2.4rem;border:1px solid rgba(8,145,178,.4);box-shadow:0 14px 30px rgba(0,0,0,.35);position:relative;overflow:hidden;min-height:290px;display:flex;align-items:center;justify-content:center}
+      .banner-content{position:relative;z-index:2;max-width:860px}
+      .tagline{font-size:clamp(1.1rem,2.2vw,1.45rem);color:var(--color-white-text);margin-bottom:1rem;font-weight:500}
+      .intro-text{font-size:1.05rem;color:var(--color-light-gray-text);margin-bottom:1.8rem;max-width:760px;margin-left:auto;margin-right:auto;line-height:1.6}
+      .banner-cta-buttons{display:flex;justify-content:center;align-items:center;gap:.9rem;flex-wrap:wrap}
+      .home-container{padding:1.5rem 1rem 2rem;max-width:1280px;margin:0 auto;text-align:center}
+      .app-container{display:flex;flex-direction:column;min-height:100vh}
+      main.content{flex:1}
+      .loading-message{color:rgba(240,249,255,.82);text-align:center;font-size:1.05rem;margin:1.6rem 0;padding:4rem 1rem}
+      a{color:#0891b2;text-decoration:none}
+      a.btn{text-decoration:none}
+      .btn{padding:.75rem 1.3rem;border-radius:10px;font-weight:600;font-size:.95rem;min-height:56px;min-width:128px;text-align:center;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(0,0,0,.2)}
+      .btn.primary{background-color:var(--color-green-accent);color:var(--color-white-text);border:2px solid var(--color-green-accent)}
+      .btn.secondary{background-color:transparent;color:var(--color-green-accent);border:2px solid var(--color-green-accent)}
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="home-container">
+        <section class="hero-banner">
+          <div class="banner-content">
+            <h1>Hello, I'm Md Mushfiqur Rahman</h1>
+            <p class="tagline">AI/ML Engineer | Strategist | Problem Solver</p>
+            <p class="intro-text">Empowering systems with intelligence. I lead the design and implementation of sophisticated ML, Generative AI, and agentic solutions, bridging ideas to impactful outcomes.</p>
+            <div class="banner-cta-buttons">
+              <a href="/projects" class="btn primary">View My Work</a>
+              <a href="/contact" class="btn secondary">Let's Connect</a>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

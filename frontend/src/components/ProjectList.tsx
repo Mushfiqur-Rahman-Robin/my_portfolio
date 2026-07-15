@@ -213,6 +213,7 @@ const ProjectList: React.FC = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn primary"
+                    aria-label={`View ${project.title} live`}
                   >
                     View Live
                   </a>

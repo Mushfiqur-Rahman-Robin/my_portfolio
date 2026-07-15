@@ -145,7 +145,7 @@ const Home: React.FC = () => {
                   </Link>
                   <div className="project-preview-actions">
                     {project.project_url && (
-                      <a href={project.project_url} target="_blank" rel="noopener noreferrer" className="btn primary">
+                      <a href={project.project_url} target="_blank" rel="noopener noreferrer" className="btn primary" aria-label={`View ${project.title} live`}>
                         View Live
                       </a>
                     )}
