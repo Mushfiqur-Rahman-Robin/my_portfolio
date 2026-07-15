@@ -1,0 +1,13 @@
+Poppins font — latin subset (weights 300, 400, 500, 600, 700)
+Copyright (c) 2014 Indian Type Foundry (www.indiantypefoundry.com), with Reserved
+Font Name "Poppins".
+
+Licensed under the SIL Open Font License, Version 1.1.
+Full license: https://openfontlicense.org
+
+The woff2 files in this directory were subsetted to the Basic Latin range and
+copied from the @fontsource/poppins package for self-hosting so the site no
+longer depends on the render-blocking Google Fonts request chain.
+
+This directory and its contents are covered by the OFL-1.1 license above; they
+are NOT part of the project's MIT-licensed source code.

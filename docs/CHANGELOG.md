@@ -12,6 +12,13 @@ All notable changes to this project are documented in this file.
 - Added foundational tests that lock in the critical `index.html` shell contract (lang/viewport, meta/canonical/OG, API preconnect, inline hero, deferred entry script) plus RTL smoke tests for `<Footer />` and `<Navbar />` (router, mobile-menu toggle, cleanup). These guard the PageSpeed-critical markup against silent regressions in later performance PRs.
 - Updated `frontend/README.md` and root `README.md` to document the frontend test workflow.
 
+### Performance / CLS (fonts)
+- Self-hosted the Poppins web font: bundled the latin-subset woff2 files for weights 300/400/500/600/700 under `frontend/public/fonts/` and served them same-origin, removing the render-blocking `fonts.googleapis.com`/`fonts.gstatic.com` request chain entirely.
+- Added `<link rel="preload" as="font">` for the critical 400 (body) and 700 (LCP `h1`) weights and inlined the `@font-face` declarations in the `index.html` critical `<style>` with `font-display: optional`, so the font is used on first paint when preloaded and never swaps later — eliminating the dominant 0.211 web-font CLS contribution.
+- Kept the API preconnect and the existing non-blocking (print/onload) CSS loader for the bundled stylesheet.
+- Added `public/fonts/LICENSE.txt` (OFL-1.1) to comply with the Poppins license redistribution terms.
+- Added a `fonts.test.ts` guard asserting no Google Fonts references, the two font preloads, the `optional` `@font-face` declarations, and the `Poppins`-first stack with a system fallback.
+
 ### Performance & SEO
 - Created proper `robots.txt` (plain text) to fix invalid robots.txt error reported by PageSpeed Insights.
 - Created `llms.txt` with H1 header and links for AI/LLM crawler discoverability.

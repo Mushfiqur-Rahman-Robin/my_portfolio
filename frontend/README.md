@@ -57,6 +57,9 @@ This keeps API calls same-origin in both Docker and local dev proxy mode.
 - `src/components/`: Reusable UI blocks (navbar, footer, project list, skills).
 - `src/pages/`: Route-level pages and page-scoped CSS.
 - `src/index.css`: Global design tokens and base typography/colors.
+- `public/fonts/`: Self-hosted Poppins latin-subset woff2 files (300–700) plus
+  the OFL-1.1 `LICENSE.txt`. The font is preloaded and declared with
+  `font-display: optional` inline in `index.html` to avoid layout shift.
 
 ## Build
 
