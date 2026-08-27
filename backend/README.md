@@ -55,6 +55,7 @@ gzip -dc /home/mushfiq/portfolio_backups/YYYY-MM-DD_04-00-01/db_dump.sql.gz | do
 - Calendly integration is configured via `CALENDLY_URL` and `CALENDLY_USERNAME` environment variables. The `/api/v1/booking-config/` endpoint exposes these to the frontend for the "Book a Session" button.
 - New image uploads for portfolio models are converted to WebP at save time in backend signals. Existing stored `.png/.jpg` paths are kept as-is unless a new image is uploaded.
 - Visitor count endpoint now logs admin-only visitor analytics metadata (`ip_address`, country, device type, user-agent, timestamp) in `VisitorAnalytics`.
+- Visitor counting is deduplicated per distinct browser via a `visitor_id` UUID (persisted in `localStorage`); every page navigation is logged in `PageVisit` without affecting the count. See `POST /api/v1/visitor-count/` and `POST /api/v1/page-visits/`.
 - Chatbot memory now uses the most recent 20 interactions per session (user+assistant pairs) for follow-up continuity.
 - Chatbot prompt assembly is centralized in `api/prompt.py` (`build_chatbot_prompt`) so placeholder-like values (e.g. `{x}`, `${NAME}`) are passed safely without formatting errors.
 - LLM provider and model are configurable via `LLM_PROVIDER` (default: `gemini`; also supports `openai`), `LLM_CHAT_MODEL` (optional override), and the respective API keys (`GEMINI_API_KEY` / `OPENAI_API_KEY`). See `api/llm_client.py` for the abstraction layer.

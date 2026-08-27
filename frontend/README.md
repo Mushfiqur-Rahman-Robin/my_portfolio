@@ -64,3 +64,16 @@ This keeps API calls same-origin in both Docker and local dev proxy mode.
 cd frontend
 npm run build
 ```
+
+## Performance notes
+
+- **Fonts**: Poppins is self-hosted (latin subset, weights 400/500/600/700) under `public/fonts/` and preloaded via `<link rel="preload">`. This removes the Google Fonts third-party dependency and eliminates font-swap layout shift.
+- **Bundle splitting**: `vite.config.ts` uses a function-form `manualChunks` so react/react-dom/react-router live in a cacheable `vendor` chunk and the app `index` chunk stays small (~14 KB).
+- **index.html**: kept minimal (meta/SEO tags, API preconnect, font preloads, JSON-LD Person schema, empty `#root`). The hero and all content are rendered by React — no pre-rendered shell or duplicated critical CSS, which previously caused LCP delay and CLS.
+
+## Tests
+
+```bash
+cd frontend
+npm run test:run
+```

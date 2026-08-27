@@ -31,7 +31,7 @@
 - **Database:** PostgreSQL 15 (production), SQLite (local/test)
 - **Cache:** Redis 7
 - **Vector Store:** ChromaDB 0.4.14
-- **LLM Providers:** OpenAI GPT / Google Gemini Flash 2.5 (configurable)
+- **LLM Providers:** OpenAI GPT / Google Gemini Flash 3.6 (configurable)
 - **Containerization:** Docker Compose
 
 ### Key Features
@@ -302,9 +302,17 @@ cd frontend
 npm run build
 
 # Expected output:
-# - dist/index.html: ~0.5 KB
+# - dist/index.html: ~3 KB
 # - dist/assets/*.css: ~40 KB
-# - dist/assets/*.js: ~285 KB
+# - dist/assets/*.js: ~285 KB (vendor ~208 KB + app ~14 KB + route chunks + axios ~42 KB)
+```
+
+#### Frontend Unit Tests
+```bash
+cd frontend
+npm run test:run
+
+# Expected: 17 tests passed across index.html shell, Navbar, Footer, and visitor tracking contracts
 ```
 
 #### Security Audit

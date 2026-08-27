@@ -2,6 +2,43 @@
 
 All notable changes to this project are documented in this file.
 
+## 2026-08-27
+
+### Added
+- **Distinct-visitor tracking + page-visit logging**: The visitor counter now counts each distinct browser once (deduplicated server-side by a `visitor_id` UUID persisted in `localStorage`), and every page navigation is logged in a new `PageVisit` model without affecting the count. Previously only the homepage incremented the counter and deep-links/navigations were missed.
+  - `VisitorCountView` accepts optional `visitor_id` + `page`; a returning visitor is not counted again but their page navigation is logged.
+  - New `POST /api/v1/page-visits/` endpoint (`PageVisitView`) logs route changes with a lenient `page_visit` throttle (20/min).
+  - New read-only `PageVisit` admin view and `visitor_id` column in the `VisitorAnalytics` admin.
+  - Frontend: `src/utils/visitor.ts` manages the persistent visitor id; a `VisitorTracker` in `App.tsx` counts the visitor once on load and logs every route change. The old `visitor-count` POST was removed from `Home.tsx`.
+
+### Fixed
+- **Chatbot returning "Sorry, I encountered an error"**: Google retired the `gemini-2.5-flash` model (API returned `404 NOT_FOUND` for new users). Updated the default chat model to `gemini-3.6-flash` in `api/llm_client.py`, added its pricing (`$1.50/M input, $7.50/M output`) to `api/pricing.py`, and updated `backend/.env`/tests accordingly. The chatbot now answers correctly (e.g., motto → "Learning is Surviving!").
+
+### Docker / CI
+- **Hardened the frontend Docker build**: added `frontend/.dockerignore` (excludes `node_modules`, `dist`, logs, env files) shrinking the build context from ~130 MB to ~3 MB, and switched the build stage from `npm install` to `npm ci` for deterministic, lockfile-exact installs (matching the CI workflow). This resolves transient `ECONNRESET` failures during `docker compose up --build`.
+
+### Performance & Core Web Vitals
+- **Self-hosted Poppins font** (weights 400/500/600/700, latin subset, ~31 KiB total) in `frontend/public/fonts/`, replacing the Google Fonts CDN. Eliminates the web-font layout-shift culprit flagged by PageSpeed Insights and removes a third-party render dependency.
+- **Removed hero pre-render + inline critical CSS** from `index.html`. The pre-rendered shell was replaced by React on mount, which caused the LCP "element render delay" (2,710 ms mobile / 4,630 ms desktop) and the hero-banner CLS. The app now renders the hero once through React with correctly-split bundles.
+- **Removed `deferCssPlugin`** (the `media="print" onload` CSS deferral). The main CSS bundle is only ~14 KB; serving it as a normal render-blocking stylesheet avoids FOUC (flash of unstyled content) that was contributing to CLS.
+- **Fixed Vite `manualChunks`**: replaced the object-form config (which silently failed to capture `react-dom/client`) with a function-form splitter. react/react-dom/react-router now live in the immutable `vendor` chunk; the app `index` chunk dropped from **188 KB → ~14 KB**, cutting main-thread parse/execution work.
+- **Composited the hero `pulse-glow` animation**: replaced `transform: scale/rotate` (non-composited, main-thread cost) with an opacity-only animation plus `will-change: opacity`.
+- **Reserved space for the Calendly "Book a Session" button**: it now renders with `visibility: hidden` until the config loads, instead of appearing asynchronously and shifting the hero layout.
+- **Added `res.ok` checks** to the Home page `fetch` calls for visitor-count, booking-config, and featured projects so HTTP error responses are handled deterministically.
+
+### Images
+- Generated a proper **1200×630 `og-image.webp`** (was pointing at a 1536×1024 file while declaring 1200×630 — a dimension mismatch) and updated og:/twitter: image meta to reference it.
+- Generated a retina-friendly **960×640 `about-profile.webp`** for the About page (was serving a 1536×1024 file for a ~480 px display).
+- Added explicit `width`/`height` attributes to the About page image to prevent layout shift.
+
+### Agentic Browsing & Structured Data
+- Added **JSON-LD `Person` structured data** (name, URL, image, sameAs social profiles, knowsAbout) to `index.html`, improving schema density and machine readability.
+- The mobile **agentic browsing** score (2/3) was failing the `cumulative-layout-shift` audit (0.223 > 0.1 threshold); the CLS fixes above bring it under the threshold (desktop was already passing at 0.012).
+
+### Tests & CI
+- Added a **frontend test step** (`npm run test:run`) to the CI/CD pipeline so the Vitest suite (currently 17 tests) runs on every push/PR.
+- Updated `index.shell.test.ts` to assert the cleaned `index.html` contract: self-hosted font preloads, no external font hosts, empty `#root`, and matching og:image dimensions.
+
 ## 2026-07-15
 
 ### Performance & SEO
