@@ -28,7 +28,7 @@ DEFAULT_MODELS = {
         "embedding_dim": 1536,
     },
     "gemini": {
-        "chat": "gemini-2.5-flash",
+        "chat": "gemini-3.6-flash",
         "embedding": "gemini-embedding-2",
         "embedding_dim": 1536,
     },

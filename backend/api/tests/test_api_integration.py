@@ -15,7 +15,19 @@ from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory
 
 from ..llm_client import generate_chat_completion, generate_embedding
-from ..models import Achievement, Certification, ChatSession, Experience, LLMCostTracking, Project, Publication, Tag, VisitorAnalytics
+from ..models import (
+    Achievement,
+    Certification,
+    ChatSession,
+    Experience,
+    LLMCostTracking,
+    PageVisit,
+    Project,
+    Publication,
+    Tag,
+    TotalVisitorCount,
+    VisitorAnalytics,
+)
 from ..prompt import build_chatbot_prompt
 from ..views import ChatbotView, get_country_for_ip, get_device_type
 
@@ -248,6 +260,71 @@ class APITests(TestCase):
         self.assertEqual(second.status_code, status.HTTP_200_OK)
         self.assertEqual(VisitorAnalytics.objects.count(), 2)
 
+    @patch("api.views.get_country_for_ip")
+    @patch("api.throttles.VisitorCountRateThrottle.allow_request", return_value=True)
+    def test_visitor_count_deduplicates_distinct_visitors_by_visitor_id(
+        self,
+        _mock_allow_request,
+        mock_country_lookup,
+    ):
+        mock_country_lookup.return_value = "Bangladesh"
+
+        headers = {
+            "HTTP_X_FORWARDED_FOR": "103.21.244.1, 127.0.0.1",
+            "HTTP_USER_AGENT": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148",
+        }
+        payload = {"visitor_id": "browser-uuid-123", "page": "/"}
+
+        first = self.client.post(reverse("visitor-count"), payload, format="json", **headers)
+        second = self.client.post(reverse("visitor-count"), payload, format="json", **headers)
+
+        self.assertEqual(first.status_code, status.HTTP_200_OK)
+        self.assertEqual(second.status_code, status.HTTP_200_OK)
+        self.assertEqual(first.data["count"], 1)
+        # Second visit from the same visitor must NOT increment the count.
+        self.assertEqual(second.data["count"], 1)
+        # Only one analytics record is created per distinct visitor.
+        self.assertEqual(VisitorAnalytics.objects.count(), 1)
+
+    @patch("api.throttles.VisitorCountRateThrottle.allow_request", return_value=True)
+    def test_visitor_count_logs_page_visits_without_incrementing_for_returning_visitor(
+        self,
+        _mock_allow_request,
+    ):
+        payload = {"visitor_id": "browser-uuid-456", "page": "/about"}
+
+        self.client.post(reverse("visitor-count"), payload, format="json")
+        self.assertEqual(PageVisit.objects.count(), 1)
+
+        # Returning visitor navigates to a second page: count unchanged, page logged.
+        self.client.post(reverse("visitor-count"), {"visitor_id": "browser-uuid-456", "page": "/projects"}, format="json")
+        self.assertEqual(PageVisit.objects.count(), 2)
+        self.assertEqual(TotalVisitorCount.objects.get().count, 1)
+        # Ordered newest-first (default model ordering).
+        self.assertEqual(list(PageVisit.objects.values_list("page", flat=True)), ["/projects", "/about"])
+
+    @patch("api.throttles.PageVisitRateThrottle.allow_request", return_value=True)
+    def test_page_visit_endpoint_logs_navigation_without_incrementing(self, _mock_allow_request):
+        payload = {"visitor_id": "browser-uuid-789", "page": "/contact"}
+
+        response = self.client.post(reverse("page-visit"), payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["message"], "Page visit logged")
+        self.assertEqual(PageVisit.objects.count(), 1)
+        self.assertEqual(PageVisit.objects.first().page, "/contact")
+        self.assertEqual(PageVisit.objects.first().visitor_id, "browser-uuid-789")
+        # The page-visit endpoint never touches visitor counts.
+        self.assertFalse(TotalVisitorCount.objects.exists())
+        self.assertFalse(VisitorAnalytics.objects.exists())
+
+    @patch("api.throttles.PageVisitRateThrottle.allow_request", return_value=True)
+    def test_page_visit_endpoint_requires_page(self, _mock_allow_request):
+        response = self.client.post(reverse("page-visit"), {"visitor_id": "browser-uuid-abc"}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(PageVisit.objects.count(), 0)
+
     def test_chatbot_conversation_context_uses_last_20_interactions(self):
         session = ChatSession.objects.create()
 
@@ -382,7 +459,7 @@ class LLMClientTests(TestCase):
     def test_get_chat_model_gemini_default(self):
         from ..llm_client import get_chat_model
 
-        self.assertEqual(get_chat_model(), "gemini-2.5-flash")
+        self.assertEqual(get_chat_model(), "gemini-3.6-flash")
 
     @override_settings(LLM_PROVIDER="openai", LLM_CHAT_MODEL="")
     def test_get_chat_model_openai_default(self):
@@ -636,12 +713,12 @@ class LLMCostTrackingTests(TestCase):
 
         from ..llm_client import record_llm_cost
 
-        record_llm_cost("chat", "gemini-2.5-flash", 1000, 200, session=session)
+        record_llm_cost("chat", "gemini-3.6-flash", 1000, 200, session=session)
 
         record = LLMCostTracking.objects.first()
         self.assertIsNotNone(record)
         self.assertEqual(record.operation_type, "chat")
-        self.assertEqual(record.model_name, "gemini-2.5-flash")
+        self.assertEqual(record.model_name, "gemini-3.6-flash")
         self.assertEqual(record.session_total_tokens, 1200)
         self.assertEqual(record.session, session)
 
@@ -675,9 +752,9 @@ class LLMCostTrackingTests(TestCase):
 
         session = ChatSession.objects.create()
 
-        record_llm_cost("chat", "gemini-2.5-flash", 1000, 200, session=session)
-        record_llm_cost("chat", "gemini-2.5-flash", 500, 100, session=session)
-        record_llm_cost("chat", "gemini-2.5-flash", 300, 50, session=session)
+        record_llm_cost("chat", "gemini-3.6-flash", 1000, 200, session=session)
+        record_llm_cost("chat", "gemini-3.6-flash", 500, 100, session=session)
+        record_llm_cost("chat", "gemini-3.6-flash", 300, 50, session=session)
 
         records = list(LLMCostTracking.objects.order_by("created_at"))
         self.assertEqual(len(records), 1)
@@ -719,9 +796,9 @@ class LLMCostTrackingTests(TestCase):
 
         session = ChatSession.objects.create()
 
-        record_llm_cost("chat", "gemini-2.5-flash", 1000, 200, session=session)
+        record_llm_cost("chat", "gemini-3.6-flash", 1000, 200, session=session)
         record_llm_cost("embedding", "gemini-embedding-2", 400, 0)
-        record_llm_cost("chat", "gemini-2.5-flash", 300, 100, session=session)
+        record_llm_cost("chat", "gemini-3.6-flash", 300, 100, session=session)
         record_llm_cost("embedding", "gemini-embedding-2", 200, 0)
 
         records = list(LLMCostTracking.objects.order_by("created_at"))
@@ -756,8 +833,8 @@ class LLMCostTrackingTests(TestCase):
     def test_chat_cost_calculation_gemini_flash(self):
         from ..pricing import calculate_chat_cost
 
-        cost = calculate_chat_cost("gemini-2.5-flash", 1000000, 1000000)
-        expected = 0.30 + 2.50
+        cost = calculate_chat_cost("gemini-3.6-flash", 1000000, 1000000)
+        expected = 1.50 + 7.50
         self.assertAlmostEqual(float(cost), expected)
 
     def test_chat_cost_calculation_openai(self):
@@ -782,7 +859,7 @@ class LLMCostTrackingTests(TestCase):
     def test_chat_cost_zero_tokens(self):
         from ..pricing import calculate_chat_cost
 
-        cost = calculate_chat_cost("gemini-2.5-flash", 0, 0)
+        cost = calculate_chat_cost("gemini-3.6-flash", 0, 0)
         self.assertEqual(cost, 0.0)
 
     def test_embedding_cost_zero_tokens(self):
@@ -934,7 +1011,7 @@ class LLMCostTrackingTests(TestCase):
     def test_llm_cost_tracking_str(self):
         record = LLMCostTracking.objects.create(
             operation_type="chat",
-            model_name="gemini-2.5-flash",
+            model_name="gemini-3.6-flash",
             session_total_tokens=100,
             session_cost=0.00042,
             total_cost=0.00042,
@@ -946,7 +1023,7 @@ class LLMCostTrackingTests(TestCase):
         from ..llm_client import record_llm_cost
 
         with self.assertNumQueries(6):
-            record_llm_cost("chat", "gemini-2.5-flash", 100, 50)
+            record_llm_cost("chat", "gemini-3.6-flash", 100, 50)
 
     def test_cost_tracking_uses_minimal_queries_for_embedding(self):
         from ..llm_client import record_llm_cost
@@ -961,8 +1038,8 @@ class LLMCostTrackingTests(TestCase):
     def test_concurrent_write_safety_via_select_for_update(self):
         from ..llm_client import record_llm_cost
 
-        record_llm_cost("chat", "gemini-2.5-flash", 100, 50)
-        record_llm_cost("chat", "gemini-2.5-flash", 200, 100)
+        record_llm_cost("chat", "gemini-3.6-flash", 100, 50)
+        record_llm_cost("chat", "gemini-3.6-flash", 200, 100)
 
         # Use updated_at ordering (matches Meta.ordering) — the second record
         # will always have the most recent updated_at because record_llm_cost

@@ -66,7 +66,7 @@ class ModelStrTests(TestCase):
         cls.chat_message = ChatMessage.objects.create(session=cls.chat_session, sender="user", message="Hi")
         cls.llm_cost = LLMCostTracking.objects.create(
             operation_type="chat",
-            model_name="gemini-2.5-flash",
+            model_name="gemini-3.6-flash",
             session_total_tokens=200,
             session_cost=0.0010,
             total_cost=0.0050,

@@ -296,7 +296,7 @@ class VisitorAnalyticsAdminTests(TestCase):
         self.model_admin = VisitorAnalyticsAdmin(VisitorAnalytics, self.site)
 
     def test_list_display(self):
-        expected = ("visited_at", "ip_address", "country", "device_type")
+        expected = ("visited_at", "visitor_id", "ip_address", "country", "device_type")
         self.assertEqual(self.model_admin.list_display, expected)
 
     def test_list_filter(self):
@@ -308,7 +308,7 @@ class VisitorAnalyticsAdminTests(TestCase):
     def test_search_fields(self):
         self.assertEqual(
             self.model_admin.search_fields,
-            ("ip_address", "country", "user_agent"),
+            ("visitor_id", "ip_address", "country", "user_agent"),
         )
 
     def test_permissions_return_false(self):
@@ -349,7 +349,7 @@ class LLMCostTrackingAdminTests(TestCase):
         session = ChatSession.objects.create()
         record = LLMCostTracking.objects.create(
             session=session,
-            model_name="gemini-2.5-flash",
+            model_name="gemini-3.6-flash",
             session_total_tokens=100,
             session_cost=0.001,
             total_cost=0.001,
@@ -361,7 +361,7 @@ class LLMCostTrackingAdminTests(TestCase):
     def test_job_or_session_with_job(self):
         record = LLMCostTracking.objects.create(
             job_name="test_job",
-            model_name="gemini-2.5-flash",
+            model_name="gemini-3.6-flash",
             session_total_tokens=100,
             session_cost=0.001,
             total_cost=0.001,
@@ -374,7 +374,7 @@ class LLMCostTrackingAdminTests(TestCase):
         record = LLMCostTracking.objects.create(
             session=session,
             job_name="both_job",
-            model_name="gemini-2.5-flash",
+            model_name="gemini-3.6-flash",
             session_total_tokens=100,
             session_cost=0.001,
             total_cost=0.001,
@@ -384,7 +384,7 @@ class LLMCostTrackingAdminTests(TestCase):
 
     def test_job_or_session_neither(self):
         record = LLMCostTracking.objects.create(
-            model_name="gemini-2.5-flash",
+            model_name="gemini-3.6-flash",
             session_total_tokens=100,
             session_cost=0.001,
             total_cost=0.001,
