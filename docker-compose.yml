@@ -21,7 +21,13 @@ services:
       - chromadb
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        # Injected into the Vite build via the Dockerfile ARG/ENV. Override per
+        # environment with `VITE_API_URL` (e.g. `VITE_API_URL=/api/v1/` for
+        # same-origin routing through the frontend nginx /api/ proxy).
+        VITE_API_URL: ${VITE_API_URL:-https://api.mushfiqurrahmanrobin.com/api/v1/}
     container_name: portfolio_frontend
     ports:
       - "127.0.0.1:5173:80"

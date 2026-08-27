@@ -161,6 +161,20 @@ npm list axios react react-router-dom    # Check key dependencies
 npm audit --omit=dev                     # Check for vulnerabilities
 ```
 
+#### 3. Frontend API URL (`VITE_API_URL`)
+The API base URL is injected at **Vite build time**:
+
+- **Local dev / manual build** (`npm run dev`, `npm run build`): read from
+  `frontend/.env.local` → `VITE_API_URL=/api/v1/` (same-origin via the dev proxy).
+- **Docker build**: read from the build ARG declared in `frontend/Dockerfile`
+  (`ARG VITE_API_URL` / `ENV VITE_API_URL=$VITE_API_URL`) and passed by
+  `docker-compose.yml` (`args.VITE_API_URL`, default
+  `https://api.mushfiqurrahmanrobin.com/api/v1/`; override per environment with a
+  `VITE_API_URL` shell variable or a compose `.env` file).
+- **Important**: `.env.local` is excluded from the Docker build context by
+  `frontend/.dockerignore`, so the container build **never** picks it up. The ARG is
+  the single source of truth for container builds.
+
 ---
 
 ## Development Workflow
@@ -403,10 +417,15 @@ cd /home/mushfiq/Desktop/my_portfolio
 git fetch --all --prune
 git checkout main
 git pull origin main
+# Optional: force the API origin for this build (defaults to https://api.mushfiqurrahmanrobin.com/api/v1/)
+# export VITE_API_URL=/api/v1/
 docker compose up --build -d --no-deps --force-recreate backend frontend
 docker compose exec -T backend python manage.py migrate --noinput
 docker compose exec -T backend python manage.py check
 docker compose ps
+# Smoke-test the built frontend for the /undefined regression:
+docker exec portfolio_frontend sh -c 'grep -rl "undefined" /usr/share/nginx/html/assets/ | wc -l'
+# Expected: 0 (every API call is prefixed with a real VITE_API_URL, never "undefined")
 ```
 
 ### Database Backups & Restores
@@ -542,6 +561,28 @@ npm run build
 
 # Check for linting errors
 npm run lint
+```
+
+#### Pages Render Blank / Requests Go to `/undefined...`
+**Problem:** data-driven pages (`/projects`, `/experience`, `/publications`, `/about`, `/resume`)
+are blank in production while the homepage looks fine.
+**Cause:** `VITE_API_URL` was not set at build time, so Vite baked the literal string
+`undefined` into the bundle. The browser then requests `/undefinedprojects/`, nginx
+answers with the SPA `index.html` instead of JSON, and the data never loads.
+**Diagnose:**
+```bash
+# Inside the built image — the string "undefined" should NOT appear in any asset
+docker exec portfolio_frontend sh -c 'grep -rln "undefined" /usr/share/nginx/html/assets/'
+# Or watch live traffic:
+docker compose logs frontend | grep undefined
+```
+**Solution:** ensure the build received `VITE_API_URL`. In container builds this comes
+exclusively from the Docker build ARG (`docker-compose.yml` → `frontend/Dockerfile`),
+never from `.env.local` (excluded via `.dockerignore`). Rebuild and re-verify:
+```bash
+docker compose build frontend
+docker compose up -d frontend
+docker exec portfolio_frontend sh -c 'grep -rln "undefined" /usr/share/nginx/html/assets/ | wc -l'  # 0
 ```
 
 #### Docker Build Timeout

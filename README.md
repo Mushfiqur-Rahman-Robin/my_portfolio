@@ -49,11 +49,16 @@ The repository is organized as a monorepo with the following main directories:
 1.  **Prerequisites**: Docker and Docker Compose must be installed.
 2.  **Environment**:
     -   Create `backend/.env` and fill in the required backend variables.
-    -   Create `frontend/.env.local` with `VITE_API_URL=/api/v1/` for local/dev same-origin API routing.
+    -   Create `frontend/.env.local` with `VITE_API_URL=/api/v1/` for local/dev same-origin API routing (used by `npm run dev` / `npm run build` outside Docker).
 3.  **Build & Run**:
     ```bash
     docker compose up --build
     ```
+    > When building the frontend container, `VITE_API_URL` is passed explicitly as a
+    > Docker build ARG (default `https://api.mushfiqurrahmanrobin.com/api/v1/`, override
+    > with `VITE_API_URL=/api/v1/` for same-origin routing). It is **not** read from
+    > `frontend/.env.local` inside the container, because `.dockerignore` excludes env
+    > files from the build context.
 4.  **Access**:
     -   **Frontend**: `http://localhost:5173`
     -   **Backend API**: `http://localhost:8000/api/`
@@ -68,6 +73,7 @@ The repository is organized as a monorepo with the following main directories:
 
 -   **CI/CD**: The GitHub Actions pipeline in `.github/workflows/cicd.yml` runs backend checks, frontend checks, and production deploy on `main`.
 -   **Runtime**: Production deploy is Docker Compose based (`git pull` + `docker compose up --build -d` + migrations) via SSH action.
+-   **API base URL**: the frontend container build injects `VITE_API_URL` (see `docker-compose.yml`). Defaults to `https://api.mushfiqurrahmanrobin.com/api/v1/` in production; no server-side env file is required for a correct build.
 
 ## Changelog
 

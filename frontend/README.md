@@ -48,6 +48,13 @@ VITE_API_URL=/api/v1/
 
 This keeps API calls same-origin in both Docker and local dev proxy mode.
 
+> **Docker builds do NOT read `.env.local`.** `frontend/.dockerignore` excludes
+> `.env*` from the build context, so the container build receives `VITE_API_URL` as
+> an explicit build ARG declared in `frontend/Dockerfile` and wired up in
+> `docker-compose.yml` (default `https://api.mushfiqurrahmanrobin.com/api/v1/`,
+> override with `VITE_API_URL=/api/v1/`). Forgetting this produced `undefined`
+> API URLs and blank pages in production (see `docs/CHANGELOG.md`).
+
 ## Changelog
 
 - See [../docs/CHANGELOG.md](../docs/CHANGELOG.md) for tracked UI and project updates.
