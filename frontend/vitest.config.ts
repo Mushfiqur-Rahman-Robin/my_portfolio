@@ -10,6 +10,9 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     css: false,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    env: {
+      VITE_API_URL: '/api/v1/',
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
