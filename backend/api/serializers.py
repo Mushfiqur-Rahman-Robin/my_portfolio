@@ -104,14 +104,26 @@ class ExperienceSerializer(serializers.ModelSerializer):
 
 
 class VisitorCountPostSerializer(serializers.Serializer):
-    # The VisitorCountView doesn't actually take any input in its POST body,
-    # it just increments a counter. So we define an empty serializer for its input.
-    pass
+    # Optional distinct-visitor identifier (UUID persisted in the browser). When
+    # provided, the visitor is only counted once; subsequent requests from the
+    # same visitor simply log the page navigation.
+    visitor_id = serializers.CharField(required=False, allow_blank=True, default="")
+    # Optional page path to log for this visit.
+    page = serializers.CharField(required=False, allow_blank=True, default="")
 
 
 class VisitorCountResponseSerializer(serializers.Serializer):
     message = serializers.CharField(read_only=True)
     count = serializers.IntegerField(read_only=True)
+
+
+class PageVisitPostSerializer(serializers.Serializer):
+    visitor_id = serializers.CharField(required=False, allow_blank=True, default="")
+    page = serializers.CharField(required=True, allow_blank=False)
+
+
+class PageVisitResponseSerializer(serializers.Serializer):
+    message = serializers.CharField(read_only=True)
 
 
 class BookingConfigResponseSerializer(serializers.Serializer):

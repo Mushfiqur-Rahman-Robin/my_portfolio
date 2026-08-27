@@ -1,8 +1,9 @@
-import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useRef } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar.tsx';
 import Footer from './components/Footer.tsx';
 import Home from './pages/Home.tsx';
+import { trackPageVisit, trackVisitorCount } from './utils/visitor';
 
 const About = lazy(() => import('./pages/About.tsx'));
 const Contact = lazy(() => import('./pages/Contact.tsx'));
@@ -24,9 +25,34 @@ const PageLoader = () => (
   </div>
 );
 
+function VisitorTracker() {
+  const location = useLocation();
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    // Count a distinct visitor once per browser (backend deduplicates by visitor_id)
+    // and log the landing page.
+    trackVisitorCount(location.pathname);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    // Skip the landing page here; it was already logged by trackVisitorCount.
+    // Log every subsequent route navigation without affecting the visitor count.
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    trackPageVisit(location.pathname);
+  }, [location.pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <Router>
+      <VisitorTracker />
       <div className="app-container">
         <Navbar />
         <main className="content">

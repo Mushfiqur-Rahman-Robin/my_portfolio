@@ -37,6 +37,16 @@ class VisitorCountRateThrottle(AnonRateThrottle):
     scope = "visitor_count"
 
 
+class PageVisitRateThrottle(AnonRateThrottle):
+    """
+    Limits the rate of page-navigation logging for anonymous users.
+    More lenient than visitor_count so route changes are not throttled in
+    normal use, while still protecting against abuse.
+    """
+
+    scope = "page_visit"
+
+
 class ChatbotRateThrottle(AnonRateThrottle):
     """
     Limits the rate of chatbot queries for anonymous users to prevent abuse

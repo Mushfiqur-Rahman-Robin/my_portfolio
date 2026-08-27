@@ -25,6 +25,7 @@ from .models import (
     DailyVisitorCount,
     Experience,
     ExperiencePhoto,
+    PageVisit,
     Project,
     Publication,
     Resume,
@@ -40,6 +41,8 @@ from .serializers import (
     ContactMessageSerializer,
     ExperiencePhotoSerializer,
     ExperienceSerializer,
+    PageVisitPostSerializer,
+    PageVisitResponseSerializer,
     ProjectSerializer,
     PublicationSerializer,
     ResumeSerializer,
@@ -47,7 +50,7 @@ from .serializers import (
     VisitorCountPostSerializer,
     VisitorCountResponseSerializer,
 )
-from .throttles import ChatbotRateThrottle, ContactFormRateThrottle, VisitorCountRateThrottle
+from .throttles import ChatbotRateThrottle, ContactFormRateThrottle, PageVisitRateThrottle, VisitorCountRateThrottle
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -258,6 +261,16 @@ class VisitorCountView(APIView):
     schema_tags = ["Contact & Admin"]
     throttle_classes = [VisitorCountRateThrottle]
 
+    @staticmethod
+    def _log_page_visit(visitor_id, page):
+        """Best-effort log of a single page navigation; never affects counts."""
+        if not page:
+            return
+        try:
+            PageVisit.objects.create(visitor_id=visitor_id or "", page=page[:500])
+        except Exception as e:  # pragma: no cover - best effort logging
+            logger.error(f"Error logging page visit: {e}", exc_info=True)
+
     @extend_schema(
         request=VisitorCountPostSerializer,
         responses={200: VisitorCountResponseSerializer},
@@ -265,6 +278,22 @@ class VisitorCountView(APIView):
     )
     def post(self, request, format=None):
         try:
+            visitor_id = (request.data.get("visitor_id") or "").strip()
+            page = (request.data.get("page") or "").strip()
+
+            # Always log the page navigation, regardless of whether the visitor
+            # has been counted before.
+            self._log_page_visit(visitor_id, page)
+
+            # If this visitor has already been counted, return the current count
+            # without incrementing again (distinct visitor deduplication).
+            if visitor_id and VisitorAnalytics.objects.filter(visitor_id=visitor_id).exists():
+                total_count, _ = TotalVisitorCount.objects.get_or_create()
+                return Response(
+                    {"message": "Page visit logged, visitor already counted", "count": total_count.count},
+                    status=status.HTTP_200_OK,
+                )
+
             # --- UPDATED LOGIC ---
             # 1. Increment the total visitor count
             total_count, _ = TotalVisitorCount.objects.get_or_create()
@@ -284,6 +313,7 @@ class VisitorCountView(APIView):
                 ip_address = get_client_ip(request)
                 user_agent = request.META.get("HTTP_USER_AGENT", "")
                 VisitorAnalytics.objects.create(
+                    visitor_id=visitor_id,
                     ip_address=ip_address,
                     country=get_country_for_ip(ip_address),
                     device_type=get_device_type(request),
@@ -302,6 +332,33 @@ class VisitorCountView(APIView):
                 {"error": "An internal error occurred while updating visitor count."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+class PageVisitView(APIView):
+    """
+    Logs a page navigation for a visitor without incrementing any counts.
+    Used by the frontend on every route change.
+    """
+
+    authentication_classes = []
+    permission_classes = [AllowAny]
+    schema_tags = ["Contact & Admin"]
+    throttle_classes = [PageVisitRateThrottle]
+
+    @extend_schema(
+        request=PageVisitPostSerializer,
+        responses={200: PageVisitResponseSerializer},
+        summary="Log a page navigation without incrementing visitor counts",
+    )
+    def post(self, request, format=None):
+        visitor_id = (request.data.get("visitor_id") or "").strip()
+        page = (request.data.get("page") or "").strip()
+
+        if not page:
+            return Response({"error": "Page parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        VisitorCountView._log_page_visit(visitor_id, page)
+        return Response({"message": "Page visit logged"}, status=status.HTTP_200_OK)
 
 
 class BookingConfigView(APIView):

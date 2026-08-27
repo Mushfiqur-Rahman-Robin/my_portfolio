@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 import SkillsSection from '../components/SkillsSection.tsx';
 import './css/Home.css';
-import { stripHtmlTags } from '../utils/html_cleaner'; // Import the utility
+import { stripHtmlTags } from '../utils/html_cleaner';
+
+const API = import.meta.env.VITE_API_URL;
 
 
 interface Project {
@@ -37,15 +38,14 @@ const Home: React.FC = () => {
   const [calendlyUrl, setCalendlyUrl] = useState<string>("");
 
   useEffect(() => {
-    // Increment visitor count on page load (backend-only)
-    axios.post(`${import.meta.env.VITE_API_URL}visitor-count/`)
-      .catch(err => console.error('Failed to increment visitor count:', err));
-
-    // Fetch booking configuration for Calendly
-    axios.get(`${import.meta.env.VITE_API_URL}booking-config/`)
-      .then(response => {
-        if (response.data.calendly_url) {
-          setCalendlyUrl(response.data.calendly_url);
+    fetch(`${API}booking-config/`)
+      .then(res => {
+        if (!res.ok) throw new Error(`Booking config request failed: ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        if (data.calendly_url) {
+          setCalendlyUrl(data.calendly_url);
         }
       })
       .catch(err => console.error('Failed to fetch site config:', err));
@@ -54,11 +54,13 @@ const Home: React.FC = () => {
     const fetchFeaturedProjects = async () => {
       setLoadingFeaturedProjects(true);
       try {
-        const response = await axios.get<PaginationInfo<Project>>(
-          `${import.meta.env.VITE_API_URL}projects/?is_featured=true&ordering=display_order`
+        const res = await fetch(
+          `${API}projects/?is_featured=true&ordering=display_order`,
         );
+        if (!res.ok) throw new Error(`Featured projects request failed: ${res.status}`);
+        const data: PaginationInfo<Project> = await res.json();
         // Show up to top 3 featured projects
-        const projects = response.data.results.slice(0, 3);
+        const projects = data.results.slice(0, 3);
         if (projects.length > 0) {
           setFeaturedProjects(projects);
           setError(null);
@@ -100,17 +102,18 @@ const Home: React.FC = () => {
             >
               Buy Me A Coffee
             </span>
-            {calendlyUrl && (
-              <a
-                href={calendlyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn calendly-btn"
-                title="Book a session with me on Calendly"
-              >
-                Book a Session
-              </a>
-            )}
+            <a
+              href={calendlyUrl || '#'}
+              target={calendlyUrl ? '_blank' : undefined}
+              rel={calendlyUrl ? 'noopener noreferrer' : undefined}
+              className="btn calendly-btn"
+              title={calendlyUrl ? 'Book a session with me on Calendly' : 'Calendly booking is currently unavailable'}
+              aria-hidden={calendlyUrl ? undefined : 'true'}
+              tabIndex={calendlyUrl ? 0 : -1}
+              style={{ visibility: calendlyUrl ? 'visible' : 'hidden' }}
+            >
+              Book a Session
+            </a>
           </div>
         </div>
       </section>

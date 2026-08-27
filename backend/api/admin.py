@@ -15,6 +15,7 @@ from .models import (
     Experience,
     ExperiencePhoto,
     LLMCostTracking,
+    PageVisit,
     Project,
     ProjectImage,
     Publication,
@@ -220,10 +221,29 @@ class DailyVisitorCountAdmin(admin.ModelAdmin):
 class VisitorAnalyticsAdmin(admin.ModelAdmin):
     """Read-only admin view for visitor metadata analytics."""
 
-    list_display = ("visited_at", "ip_address", "country", "device_type")
+    list_display = ("visited_at", "visitor_id", "ip_address", "country", "device_type")
     list_filter = ("country", "device_type", "visited_at")
-    search_fields = ("ip_address", "country", "user_agent")
-    readonly_fields = ("id", "ip_address", "country", "device_type", "user_agent", "visited_at")
+    search_fields = ("visitor_id", "ip_address", "country", "user_agent")
+    readonly_fields = ("id", "visitor_id", "ip_address", "country", "device_type", "user_agent", "visited_at")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(PageVisit)
+class PageVisitAdmin(admin.ModelAdmin):
+    """Read-only admin view for per-page navigation logs."""
+
+    list_display = ("visited_at", "page", "visitor_id")
+    list_filter = ("visited_at",)
+    search_fields = ("page", "visitor_id")
+    readonly_fields = ("id", "visitor_id", "page", "visited_at")
 
     def has_add_permission(self, request):
         return False

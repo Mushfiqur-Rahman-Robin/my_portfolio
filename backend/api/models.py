@@ -184,6 +184,7 @@ class VisitorAnalytics(models.Model):
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    visitor_id = models.CharField(max_length=128, blank=True, default="", db_index=True)
     ip_address = models.GenericIPAddressField(blank=True, null=True, db_index=True)
     country = models.CharField(max_length=120, default="Unknown", blank=True, db_index=True)
     device_type = models.CharField(max_length=20, choices=DEVICE_TYPE_CHOICES, default="unknown", db_index=True)
@@ -197,6 +198,23 @@ class VisitorAnalytics(models.Model):
 
     def __str__(self):
         return f"{self.ip_address or 'Unknown IP'} from {self.country} ({self.get_device_type_display()})"
+
+
+class PageVisit(models.Model):
+    """Stores a log of every page a visitor navigates to (does not affect counts)."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    visitor_id = models.CharField(max_length=128, blank=True, default="", db_index=True)
+    page = models.CharField(max_length=500)
+    visited_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["-visited_at"]
+        verbose_name = "Page Visit"
+        verbose_name_plural = "Page Visits"
+
+    def __str__(self):
+        return f"{self.page} ({self.visitor_id or 'anonymous'})"
 
 
 class Experience(models.Model):

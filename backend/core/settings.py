@@ -126,6 +126,7 @@ REST_FRAMEWORK = {
         "user": "1000/hour",  # General rate for authenticated users across all APIs
         "contact_form": "5/day",  # Specific rate for contact form submissions (anonymous users)
         "visitor_count": "1/second",  # Specific rate for visitor count endpoint
+        "page_visit": "20/minute",  # Specific rate for page-navigation logging
         "chatbot": "50/day",  # Specific rate for chatbot queries
     },
 }
