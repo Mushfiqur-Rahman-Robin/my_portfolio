@@ -241,12 +241,12 @@
 }
 
 .tag-badge {
-  background-color: var(--color-green-accent);
-  color: var(--color-black-background);
+  background-color: #065f6b;
+  color: #ffffff;
   padding: 0.3rem 0.6rem;
   border-radius: 5px;
   font-size: 0.85rem;
-  border: 1px solid #55c43d;
+  border: 1px solid rgba(255, 255, 255, 0.22);
 }
 
 .project-created-at {

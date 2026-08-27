@@ -41,22 +41,20 @@
       rgba(8, 145, 178, 0.2) 0%,
       transparent 70%);
   animation: pulse-glow 15s infinite ease-in-out alternate;
+  will-change: opacity;
   z-index: 1;
 }
 
 @keyframes pulse-glow {
   0% {
-    transform: scale(1) rotate(0deg);
     opacity: 0.3;
   }
 
   50% {
-    transform: scale(1.2) rotate(180deg);
     opacity: 0.6;
   }
 
   100% {
-    transform: scale(1) rotate(360deg);
     opacity: 0.3;
   }
 }
@@ -92,6 +90,7 @@
   align-items: center;
   gap: 0.9rem;
   flex-wrap: wrap;
+  min-height: 56px;
 }
 
 .btn {
@@ -112,26 +111,26 @@
 }
 
 .btn.primary {
-  background-color: var(--color-green-accent);
-  color: var(--color-white-text);
-  border: 2px solid var(--color-green-accent);
+  background-color: #0e7490;
+  color: #ffffff;
+  border: 2px solid #0e7490;
 }
 
 .btn.primary:hover {
-  background-color: var(--color-green-accent-hover);
-  border-color: var(--color-green-accent-hover);
+  background-color: #0b5e74;
+  border-color: #0b5e74;
   transform: translateY(-2px);
 }
 
 .btn.secondary {
   background-color: transparent;
-  color: var(--color-green-accent);
-  border: 2px solid var(--color-green-accent);
+  color: #0e7490;
+  border: 2px solid #0e7490;
 }
 
 .btn.secondary:hover {
-  background-color: var(--color-green-accent);
-  color: var(--color-white-text);
+  background-color: #0e7490;
+  color: #ffffff;
   transform: translateY(-2px);
 }
 
@@ -291,13 +290,13 @@
 }
 
 .tag-badge {
-  background-color: var(--color-green-accent);
-  color: var(--color-white-text);
+  background-color: #065f6b;
+  color: #ffffff;
   padding: 0.3rem 0.6rem;
   border-radius: 5px;
   font-size: 0.8rem;
   line-height: 1.2;
-  border: 1px solid var(--color-green-accent-hover);
+  border: 1px solid rgba(255, 255, 255, 0.22);
 }
 
 .project-preview-actions {
